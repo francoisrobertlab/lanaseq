@@ -7,6 +7,7 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.files.web.PublicFilesView;
+import ca.qc.ircm.lanaseq.jobs.web.JobsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
@@ -49,8 +50,9 @@ public class ViewLayout extends AppLayout implements RouterLayout, LocaleChangeO
   public static final String SIDE_NAV = styleName(ID, "sidenav");
   public static final String DATASETS = "datasets";
   public static final String SAMPLES = "samples";
-  public static final String PUBLIC_FILES = "publicFiles";
   public static final String PROTOCOLS = "protocols";
+  public static final String PUBLIC_FILES = "publicFiles";
+  public static final String JOBS = "jobs";
   public static final String PROFILE = "profile";
   public static final String USERS = "users";
   public static final String EXIT_SWITCH_USER = "exitSwitchUser";
@@ -71,6 +73,7 @@ public class ViewLayout extends AppLayout implements RouterLayout, LocaleChangeO
   protected SideNavItem samples;
   protected SideNavItem protocols;
   protected SideNavItem publicFiles;
+  protected SideNavItem jobs;
   protected SideNavItem profile;
   protected SideNavItem users;
   protected SideNavItem exitSwitchUser;
@@ -110,6 +113,8 @@ public class ViewLayout extends AppLayout implements RouterLayout, LocaleChangeO
     publicFiles = new SideNavItem("Public files", PublicFilesView.class,
         VaadinIcon.UNLOCK.create());
     publicFiles.setId(styleName(PUBLIC_FILES, NAV));
+    jobs = new SideNavItem("Background Jobs", JobsView.class, VaadinIcon.HOURGLASS.create());
+    jobs.setId(styleName(JOBS, NAV));
     profile = new SideNavItem("Profile", ProfileView.class, VaadinIcon.USER.create());
     profile.setId(styleName(PROFILE, NAV));
     users = new SideNavItem("Users", UsersView.class, VaadinIcon.GROUP.create());
@@ -121,7 +126,7 @@ public class ViewLayout extends AppLayout implements RouterLayout, LocaleChangeO
     exitSwitchUser.setVisible(false);
     signout = new SideNavItem("Signout", SignoutView.class, VaadinIcon.SIGN_OUT.create());
     signout.setId(styleName(SIGNOUT, NAV));
-    sideNav.addItem(datasets, samples, protocols, publicFiles, profile, users, exitSwitchUser,
+    sideNav.addItem(datasets, samples, protocols, publicFiles, jobs, profile, users, exitSwitchUser,
         signout);
   }
 
@@ -133,6 +138,7 @@ public class ViewLayout extends AppLayout implements RouterLayout, LocaleChangeO
     samples.setLabel(getTranslation(MESSAGE_PREFIX + SAMPLES));
     protocols.setLabel(getTranslation(MESSAGE_PREFIX + PROTOCOLS));
     publicFiles.setLabel(getTranslation(MESSAGE_PREFIX + PUBLIC_FILES));
+    jobs.setLabel(getTranslation(MESSAGE_PREFIX + JOBS));
     profile.setLabel(getTranslation(MESSAGE_PREFIX + PROFILE));
     users.setLabel(getTranslation(MESSAGE_PREFIX + USERS));
     exitSwitchUser.setLabel(getTranslation(MESSAGE_PREFIX + EXIT_SWITCH_USER));
@@ -158,6 +164,8 @@ public class ViewLayout extends AppLayout implements RouterLayout, LocaleChangeO
       return Optional.of(protocols);
     } else if (view instanceof PublicFilesView) {
       return Optional.of(publicFiles);
+    } else if (view instanceof JobsView) {
+      return Optional.of(jobs);
     } else if (view instanceof ProfileView) {
       return Optional.of(profile);
     } else if (view instanceof UsersView) {

@@ -6,10 +6,12 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.HEADER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.JOBS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.LABORATORY;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.NAV;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.PUBLIC_FILES;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SAMPLES;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
@@ -69,6 +71,16 @@ public class ViewLayoutElement extends AppLayoutElement {
   public SideNavItemElement protocols() {
     openSideNav();
     return $(SideNavItemElement.class).id(styleName(PROTOCOLS, NAV));
+  }
+
+  public SideNavItemElement publicFiles() {
+    openSideNav();
+    return $(SideNavItemElement.class).id(styleName(PUBLIC_FILES, NAV));
+  }
+
+  public SideNavItemElement jobs() {
+    openSideNav();
+    return $(SideNavItemElement.class).id(styleName(JOBS, NAV));
   }
 
   public SideNavItemElement profile() {

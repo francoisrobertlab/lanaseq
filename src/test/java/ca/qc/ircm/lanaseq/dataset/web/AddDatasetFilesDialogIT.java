@@ -1,7 +1,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
-import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVE_STARTED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -11,9 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
@@ -46,6 +45,8 @@ public class AddDatasetFilesDialogIT extends AbstractBrowserTestCase {
   private AppConfiguration configuration;
   @Autowired
   private MessageSource messageSource;
+  @Autowired
+  private JobService jobService;
   private Path file1;
   private Path file2;
 
@@ -139,11 +140,7 @@ public class AddDatasetFilesDialogIT extends AbstractBrowserTestCase {
         messageSource.getMessage(MESSAGE_PREFIX + SAVE_STARTED, new Object[]{3, dataset.getName()},
             currentLocale()), notification.getText());
     // Wait for files to finish copying.
-    notification = $(NotificationElement.class).withAttributeContainingWord("theme",
-        NotificationVariant.LUMO_SUCCESS.getVariantName()).waitForFirst();
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{3, dataset.getName()},
-            currentLocale()), notification.getText());
+    Thread.sleep(1000);
     Path folder = configuration.getHome().folder(dataset);
     Path upload = configuration.getUpload().folder(dataset);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
@@ -160,5 +157,6 @@ public class AddDatasetFilesDialogIT extends AbstractBrowserTestCase {
     assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(filenameInRoot)));
+    Assertions.assertEquals(1, jobService.getJobs().size());
   }
 }

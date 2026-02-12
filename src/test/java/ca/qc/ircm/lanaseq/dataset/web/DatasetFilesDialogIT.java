@@ -2,7 +2,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SAVE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -14,6 +14,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetPublicFile;
 import ca.qc.ircm.lanaseq.dataset.DatasetPublicFileRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
@@ -56,6 +57,8 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
   private AppConfiguration configuration;
   @Autowired
   private MessageSource messageSource;
+  @Autowired
+  private JobService jobService;
   private Path file1;
 
   @BeforeEach
@@ -259,13 +262,16 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
     dialog.upload().upload(file1.toFile());
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + FILES_SUCCESS, new Object[]{file1.getFileName()},
-            currentLocale()), notification.getText());
+    Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FILES_SAVE,
+            new Object[]{file1.getFileName(), dataset.getName()}, currentLocale()),
+        notification.getText());
+    // Wait for files to finish copying.
+    Thread.sleep(1000);
     Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
     assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(file1.getFileName())));
+    Assertions.assertEquals(1, jobService.getJobs().size());
   }
 }

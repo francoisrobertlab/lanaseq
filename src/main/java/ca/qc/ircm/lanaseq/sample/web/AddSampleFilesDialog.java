@@ -9,12 +9,14 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.jobs.Job;
+import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -26,7 +28,6 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -95,11 +96,16 @@ public class AddSampleFilesDialog extends Dialog implements LocaleChangeObserver
   private Set<String> existingFilenames = new HashSet<>();
   private final transient SampleService service;
   private final transient AppConfiguration configuration;
+  private final transient AuthenticatedUser authenticatedUser;
+  private final transient JobService jobService;
 
   @Autowired
-  protected AddSampleFilesDialog(SampleService service, AppConfiguration configuration) {
+  protected AddSampleFilesDialog(SampleService service, AppConfiguration configuration,
+      AuthenticatedUser authenticatedUser, JobService jobService) {
     this.service = service;
     this.configuration = configuration;
+    this.authenticatedUser = authenticatedUser;
+    this.jobService = jobService;
   }
 
   public static String id(String baseId) {
@@ -245,22 +251,15 @@ public class AddSampleFilesDialog extends Dialog implements LocaleChangeObserver
     Collection<Path> files = service.uploadFiles(sample);
     if (validate(files)) {
       logger.debug("save new files {} for sample {}", files, sample);
-      final UI ui = UI.getCurrent();
-      service.saveFiles(sample, files, f -> f.getFileName().toString()).thenAccept(e -> {
-        ui.accessLater(() -> {
-          Notification notification = new Notification();
-          notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-          notification.setDuration(SAVED_NOTIFICATION_DURATION);
-          notification.setText(
-              getTranslation(MESSAGE_PREFIX + SAVED, files.size(), sample.getName()));
-          notification.open();
-        }, null).run();
-      }).exceptionally(e -> {
-        logger.warn("Exception thrown while copying files {} for sample {}", files, sample, e);
-        ui.accessLater(() -> new WarningNotification(
-            getTranslation(MESSAGE_PREFIX + SAVE_FAILED, sample.getName())).open(), null).run();
-        return null;
-      });
+      Job job = new Job();
+      job.title = getTranslation(MESSAGE_PREFIX + SAVE_STARTED, files.size(), sample.getName());
+      job.owner = authenticatedUser.getUser().orElseThrow();
+      job.future = service.saveFiles(sample, files, f -> f.getFileName().toString(),
+          (message, progress) -> {
+            job.message = message;
+            job.progress = progress;
+          });
+      jobService.addJob(job);
       Notification.show(
           getTranslation(MESSAGE_PREFIX + SAVE_STARTED, files.size(), sample.getName()));
       fireSavedEvent();

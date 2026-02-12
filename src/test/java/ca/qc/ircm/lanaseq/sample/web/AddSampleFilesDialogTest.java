@@ -10,9 +10,6 @@ import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.OVERWRITE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.OVERWRITE_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVE_FAILED;
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVE_STARTED;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SIZE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
@@ -22,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,13 +36,15 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.DataWithFiles;
+import ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog;
+import ca.qc.ircm.lanaseq.jobs.Job;
+import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
@@ -54,7 +54,6 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.testbench.unit.MetaKeys;
@@ -66,6 +65,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,6 +76,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -104,12 +105,18 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   private SampleService service;
   @MockitoBean
   private AppConfiguration configuration;
+  @MockitoBean
+  private JobService jobService;
   @Mock
   private ComponentEventListener<SavedEvent<AddSampleFilesDialog>> savedListener;
   @Captor
   private ArgumentCaptor<Collection<Path>> filesCaptor;
   @Captor
   private ArgumentCaptor<Function<Path, String>> filenameCaptor;
+  @Captor
+  private ArgumentCaptor<Job> jobCaptor;
+  @Captor
+  private ArgumentCaptor<BiConsumer<String, Double>> progressionCaptor;
   @Autowired
   private SampleRepository repository;
   private final Locale locale = Locale.ENGLISH;
@@ -444,7 +451,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
 
     assertTrue(dialog.error.isVisible());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE_ERROR), dialog.error.getText());
-    verify(service, never()).saveFiles(any(), any(), any());
+    verify(service, never()).saveFiles(any(), any(), any(), any());
     assertFalse($(Notification.class).exists());
     verify(savedListener, never()).onComponentEvent(any());
     assertTrue(dialog.isOpened());
@@ -452,7 +459,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_OverwriteAllowed() {
-    when(service.saveFiles(any(), any(), any())).then(i -> CompletableFuture.completedFuture(null));
+    CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
+    when(service.saveFiles(any(), any(), any(), any())).then(i -> future);
     dialog.addSavedListener(savedListener);
     dialog.files.getListDataView().getItems().forEach(f -> dialog.overwrite(f));
     Sample sample = repository.findById(dialog.getSampleId()).orElseThrow();
@@ -460,21 +468,30 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
 
     dialog.save();
 
-    verify(service).saveFiles(eq(sample), filesCaptor.capture(), filenameCaptor.capture());
+    verify(service).saveFiles(eq(sample), filesCaptor.capture(), filenameCaptor.capture(),
+        progressionCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(4, files.size());
     for (Path file : files) {
       assertTrue(files.contains(uploadFolder(sample).resolve(file)));
       assertEquals(file.getFileName().toString(), filenameCaptor.getValue().apply(file));
     }
+    verify(jobService).addJob(jobCaptor.capture());
+    assertSame(future, jobCaptor.getValue().future);
+    assertEquals(3, jobCaptor.getValue().owner.getId());
+    assertEquals(
+        dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, files.size(),
+            sample.getName()), jobCaptor.getValue().title);
+    assertTrue(LocalDateTime.now().minusMinutes(1).isBefore(jobCaptor.getValue().time));
+    assertTrue(LocalDateTime.now().plusMinutes(1).isAfter(jobCaptor.getValue().time));
+    progressionCaptor.getValue().accept("test message", 0.35);
+    assertEquals("test message", jobCaptor.getValue().message);
+    assertEquals(0.35, jobCaptor.getValue().progress);
     assertFalse(dialog.error.isVisible());
     Notification notification = $(Notification.class).first();
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVE_STARTED, 4, sample.getName()),
-        test(notification).getText());
-    notification = $(Notification.class).last();
-    assertTrue(notification.hasThemeName(NotificationVariant.LUMO_SUCCESS.getVariantName()));
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 4, sample.getName()),
-        test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, 4,
+        sample.getName()), test(notification).getText());
+    assertFalse(dialog.error.isVisible());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -485,14 +502,16 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     when(service.uploadFiles(any())).thenReturn(
         files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
             .collect(Collectors.toList()));
-    when(service.saveFiles(any(), any(), any())).then(i -> CompletableFuture.completedFuture(null));
+    CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
+    when(service.saveFiles(any(), any(), any(), any())).then(i -> future);
     dialog.addSavedListener(savedListener);
     Sample sample = repository.findById(1L).orElseThrow();
     dialog.setSampleId(1L);
 
     dialog.save();
 
-    verify(service).saveFiles(eq(sample), filesCaptor.capture(), filenameCaptor.capture());
+    verify(service).saveFiles(eq(sample), filesCaptor.capture(), filenameCaptor.capture(),
+        progressionCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(2, files.size());
     File file = this.files.get(0);
@@ -501,13 +520,20 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     file = this.files.get(1);
     assertTrue(files.contains(uploadFolder(sample).resolve(file.toPath())));
     assertEquals(file.getName(), filenameCaptor.getValue().apply(file.toPath()));
+    verify(jobService).addJob(jobCaptor.capture());
+    assertSame(future, jobCaptor.getValue().future);
+    assertEquals(3, jobCaptor.getValue().owner.getId());
+    assertEquals(
+        dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, files.size(),
+            sample.getName()), jobCaptor.getValue().title);
+    assertTrue(LocalDateTime.now().minusMinutes(1).isBefore(jobCaptor.getValue().time));
+    assertTrue(LocalDateTime.now().plusMinutes(1).isAfter(jobCaptor.getValue().time));
+    progressionCaptor.getValue().accept("test message", 0.35);
+    assertEquals("test message", jobCaptor.getValue().message);
+    assertEquals(0.35, jobCaptor.getValue().progress);
     Notification notification = $(Notification.class).first();
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVE_STARTED, 2, sample.getName()),
-        test(notification).getText());
-    notification = $(Notification.class).last();
-    assertTrue(notification.hasThemeName(NotificationVariant.LUMO_SUCCESS.getVariantName()));
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 2, sample.getName()),
-        test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, 2,
+        sample.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -515,24 +541,33 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   @Test
   public void save_NoFiles() {
     when(service.uploadFiles(any())).thenReturn(new ArrayList<>());
-    when(service.saveFiles(any(), any(), any())).then(i -> CompletableFuture.completedFuture(null));
+    CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
+    when(service.saveFiles(any(), any(), any(), any())).then(i -> future);
     dialog.addSavedListener(savedListener);
     Sample sample = repository.findById(1L).orElseThrow();
     dialog.setSampleId(1L);
 
     dialog.save();
 
-    verify(service).saveFiles(eq(sample), filesCaptor.capture(), any());
+    verify(service).saveFiles(eq(sample), filesCaptor.capture(), any(),
+        progressionCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(0, files.size());
     assertTrue(Files.exists(uploadFolder(sample)));
+    verify(jobService).addJob(jobCaptor.capture());
+    assertSame(future, jobCaptor.getValue().future);
+    assertEquals(3, jobCaptor.getValue().owner.getId());
+    assertEquals(
+        dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, files.size(),
+            sample.getName()), jobCaptor.getValue().title);
+    assertTrue(LocalDateTime.now().minusMinutes(1).isBefore(jobCaptor.getValue().time));
+    assertTrue(LocalDateTime.now().plusMinutes(1).isAfter(jobCaptor.getValue().time));
+    progressionCaptor.getValue().accept("test message", 0.35);
+    assertEquals("test message", jobCaptor.getValue().message);
+    assertEquals(0.35, jobCaptor.getValue().progress);
     Notification notification = $(Notification.class).first();
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVE_STARTED, 0, sample.getName()),
-        test(notification).getText());
-    notification = $(Notification.class).last();
-    assertTrue(notification.hasThemeName(NotificationVariant.LUMO_SUCCESS.getVariantName()));
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 0, sample.getName()),
-        test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, 0,
+        sample.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -543,26 +578,35 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     when(service.uploadFiles(any())).thenReturn(
         files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
             .collect(Collectors.toList()));
-    when(service.saveFiles(any(), any(), any())).then(
-        i -> CompletableFuture.failedFuture(new IOException("could not read a file")));
+    CompletableFuture<Void> future = CompletableFuture.failedFuture(
+        new IOException("could not read a file"));
+    when(service.saveFiles(any(), any(), any(), any())).then(i -> future);
     dialog.addSavedListener(savedListener);
     Sample sample = repository.findById(1L).orElseThrow();
     dialog.setSampleId(1L);
 
     dialog.save();
 
-    verify(service).saveFiles(eq(sample), filesCaptor.capture(), any());
+    verify(service).saveFiles(eq(sample), filesCaptor.capture(), any(),
+        progressionCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(2, files.size());
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0).toPath())));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1).toPath())));
+    verify(jobService).addJob(jobCaptor.capture());
+    assertSame(future, jobCaptor.getValue().future);
+    assertEquals(3, jobCaptor.getValue().owner.getId());
+    assertEquals(
+        dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, files.size(),
+            sample.getName()), jobCaptor.getValue().title);
+    assertTrue(LocalDateTime.now().minusMinutes(1).isBefore(jobCaptor.getValue().time));
+    assertTrue(LocalDateTime.now().plusMinutes(1).isAfter(jobCaptor.getValue().time));
+    progressionCaptor.getValue().accept("test message", 0.35);
+    assertEquals("test message", jobCaptor.getValue().message);
+    assertEquals(0.35, jobCaptor.getValue().progress);
     Notification notification = $(Notification.class).first();
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVE_STARTED, 2, sample.getName()),
-        test(notification).getText());
-    notification = $(Notification.class).last();
-    assertInstanceOf(WarningNotification.class, notification);
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVE_FAILED, sample.getName()),
-        ((WarningNotification) notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, 2,
+        sample.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
