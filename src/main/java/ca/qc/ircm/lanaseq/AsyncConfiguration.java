@@ -36,7 +36,6 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
   @Override
   public Executor getAsyncExecutor() {
-    System.out.println(asyncTaskExecutor.getClass());
     DelegatingSecurityContextAsyncTaskExecutor executor = new DelegatingSecurityContextAsyncTaskExecutor(
         asyncTaskExecutor);
     executor.setSecurityContextHolderStrategy(securityContextHolderStrategy);

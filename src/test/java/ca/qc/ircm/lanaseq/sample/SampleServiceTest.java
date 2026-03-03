@@ -890,7 +890,6 @@ public class SampleServiceTest {
     verify(configuration.getHome()).getFolder();
     verify(configuration.getArchives().get(0), times(2)).getFolder();
     verify(configuration.getArchives().get(1), times(2)).getFolder();
-    System.out.println(files);
     assertEquals(2, files.size());
     folder = configuration.getArchives().get(0).getFolder().resolve("otherdirectory");
     assertTrue(files.contains(folder.resolve("OF_20241118_ROB_01.raw")));
