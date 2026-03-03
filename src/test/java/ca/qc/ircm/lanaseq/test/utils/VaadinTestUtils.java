@@ -26,7 +26,6 @@ import com.vaadin.flow.data.renderer.BasicRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.function.SerializableBiConsumer;
 import com.vaadin.flow.function.ValueProvider;
-import elemental.json.JsonArray;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -39,6 +38,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * Utility methods for presenter testign.
@@ -191,12 +191,12 @@ public class VaadinTestUtils {
    * @param renderer renderer
    * @return all registered functions of this renderer
    */
-  public static <SOURCE> Map<String, SerializableBiConsumer<SOURCE, JsonArray>> functions(
+  public static <SOURCE> Map<String, SerializableBiConsumer<SOURCE, ArrayNode>> functions(
       LitRenderer<SOURCE> renderer) {
     try {
       Field field = LitRenderer.class.getDeclaredField("clientCallables");
       field.setAccessible(true);
-      @SuppressWarnings("unchecked") Map<String, SerializableBiConsumer<SOURCE, JsonArray>> functions = (Map<String, SerializableBiConsumer<SOURCE, JsonArray>>) field.get(
+      @SuppressWarnings("unchecked") Map<String, SerializableBiConsumer<SOURCE, ArrayNode>> functions = (Map<String, SerializableBiConsumer<SOURCE, ArrayNode>>) field.get(
           renderer);
       return functions;
     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException |
