@@ -53,11 +53,11 @@
 
   <properties>
     <resource.delimiter>$[*]</resource.delimiter>
-    <java.version>17</java.version>
+    <java.version>21</java.version>
     <start-class>ca.qc.ircm.lanaseq.Main</start-class>
     <!-- Dependencies -->
     <vaadin.version>24.9.8</vaadin.version>
-    <generate-property-names.version>2.1</generate-property-names.version>
+    <generate-property-names.version>2.2</generate-property-names.version>
     <openfeign.querydsl.version>5.6.1</openfeign.querydsl.version>
     <guava.version>33.3.1-jre</guava.version>
     <greenmail.version>2.0.1</greenmail.version>
