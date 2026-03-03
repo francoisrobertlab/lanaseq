@@ -4,10 +4,10 @@ import com.vaadin.flow.spring.security.VaadinAwareSecurityContextHolderStrategy;
 import java.util.concurrent.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 
 /**
@@ -15,27 +15,27 @@ import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecu
  */
 @Configuration
 @EnableAsync
-@DependsOn("VaadinSecurityContextHolderStrategy")
 public class AsyncConfiguration implements AsyncConfigurer {
 
   private final AsyncTaskExecutor asyncTaskExecutor;
-  private final VaadinAwareSecurityContextHolderStrategy securityContextHolderStrategy;
+  private final SecurityContextHolderStrategy securityContextHolderStrategy;
 
   /**
    * Creates a new {@link AsyncConfiguration} instance.
    *
    * @param applicationTaskExecutor       default {@link AsyncTaskExecutor} from Spring Boot
-   * @param securityContextHolderStrategy Vaadin's VaadinAwareSecurityContextHolderStrategy
+   * @param securityContextHolderStrategy SecurityContextHolderStrategy
    */
   @Autowired
   public AsyncConfiguration(AsyncTaskExecutor applicationTaskExecutor,
-      VaadinAwareSecurityContextHolderStrategy securityContextHolderStrategy) {
+      SecurityContextHolderStrategy securityContextHolderStrategy) {
     this.asyncTaskExecutor = applicationTaskExecutor;
     this.securityContextHolderStrategy = securityContextHolderStrategy;
   }
 
   @Override
   public Executor getAsyncExecutor() {
+    assert securityContextHolderStrategy instanceof VaadinAwareSecurityContextHolderStrategy;
     DelegatingSecurityContextAsyncTaskExecutor executor = new DelegatingSecurityContextAsyncTaskExecutor(
         asyncTaskExecutor);
     executor.setSecurityContextHolderStrategy(securityContextHolderStrategy);
