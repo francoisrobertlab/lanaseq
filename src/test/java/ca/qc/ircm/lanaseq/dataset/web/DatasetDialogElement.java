@@ -132,7 +132,8 @@ public class DatasetDialogElement extends DialogElement {
   }
 
   public ConfirmDialogElement confirm() {
-    return $(ConfirmDialogElement.class).id(id(CONFIRM));
+    return ((TestBenchElement) getDriver().findElement(By.id(id(CONFIRM)))).wrap(
+        ConfirmDialogElement.class);
   }
 
   public SelectSampleDialogElement selectSampleDialog() {

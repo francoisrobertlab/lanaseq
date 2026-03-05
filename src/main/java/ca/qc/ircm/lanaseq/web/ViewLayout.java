@@ -2,6 +2,7 @@ package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
+import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.Constants;
@@ -30,6 +31,7 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.RolesAllowed;
 import java.io.Serial;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -40,6 +42,7 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
 /**
  * Main layout.
  */
+@RolesAllowed({USER})
 public class ViewLayout extends AppLayout implements RouterLayout, LocaleChangeObserver,
     AfterNavigationObserver, UrlComponent {
 

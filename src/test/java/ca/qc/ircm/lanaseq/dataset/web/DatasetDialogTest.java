@@ -91,7 +91,6 @@ import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
-import elemental.json.impl.JsonUtil;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -110,6 +109,9 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Tests for {@link DatasetDialog}.
@@ -393,15 +395,18 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     dialog.samples.setItems(new ArrayList<>(samples));
     Sample sample = samples.get(0);
     Sample droppedSample = samples.get(2);
+    ObjectMapper objectMapper = new ObjectMapper();
     GridDragStartEvent<Sample> dragStartEvent = new GridDragStartEvent<>(dialog.samples, false,
-        JsonUtil.parse(
-            "{'draggedItems':[{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper()
-                .key(sample) + "'}]}"));
+        objectMapper.readValue(
+            "{\"draggedItems\":[{\"key\":\"" + dialog.samples.getDataCommunicator().getKeyMapper()
+                .key(sample) + "\"}]}", ObjectNode.class));
     fireEvent(dialog.samples, dragStartEvent);
     assertEquals(GridDropMode.BETWEEN, dialog.samples.getDropMode());
-    GridDropEvent<Sample> dropEvent = new GridDropEvent<>(dialog.samples, false, JsonUtil.parse(
-        "{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample) + "'}"),
-        GridDropLocation.ABOVE.getClientName(), JsonUtil.parse("[]"));
+    GridDropEvent<Sample> dropEvent = new GridDropEvent<>(dialog.samples, false,
+        objectMapper.readValue(
+            "{\"key\":\"" + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample)
+                + "\"}", ObjectNode.class), GridDropLocation.ABOVE.getClientName(),
+        objectMapper.readValue("[]", ArrayNode.class));
     fireEvent(dialog.samples, dropEvent);
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
     assertEquals(this.samples.size(), samples.size());
@@ -431,15 +436,18 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     dialog.samples.setItems(new ArrayList<>(samples));
     Sample sample = samples.get(0);
     Sample droppedSample = samples.get(2);
+    ObjectMapper objectMapper = new ObjectMapper();
     GridDragStartEvent<Sample> dragStartEvent = new GridDragStartEvent<>(dialog.samples, false,
-        JsonUtil.parse(
-            "{'draggedItems':[{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper()
-                .key(sample) + "'}]}"));
+        objectMapper.readValue(
+            "{\"draggedItems\":[{\"key\":\"" + dialog.samples.getDataCommunicator().getKeyMapper()
+                .key(sample) + "\"}]}", ObjectNode.class));
     fireEvent(dialog.samples, dragStartEvent);
     assertEquals(GridDropMode.BETWEEN, dialog.samples.getDropMode());
-    GridDropEvent<Sample> dropEvent = new GridDropEvent<>(dialog.samples, false, JsonUtil.parse(
-        "{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample) + "'}"),
-        GridDropLocation.BELOW.getClientName(), JsonUtil.parse("[]"));
+    GridDropEvent<Sample> dropEvent = new GridDropEvent<>(dialog.samples, false,
+        objectMapper.readValue(
+            "{\"key\":\"" + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample)
+                + "\"}", ObjectNode.class), GridDropLocation.BELOW.getClientName(),
+        objectMapper.readValue("[]", ArrayNode.class));
     fireEvent(dialog.samples, dropEvent);
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
     assertEquals(this.samples.size(), samples.size());
