@@ -383,6 +383,7 @@ public class UserFormTest extends SpringUIUnitTest {
   }
 
   @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
   public void isValid_NewManager() {
     mockPasswordForm();
     when(form.passwords.getPassword()).thenReturn(password);
