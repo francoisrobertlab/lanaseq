@@ -13,8 +13,10 @@ import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
+import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
+import org.openqa.selenium.By;
 
 /**
  * Web element for {@link SamplesAnalysisDialog}.
@@ -40,10 +42,12 @@ public class SamplesAnalysisDialogElement extends DialogElement {
   }
 
   public ConfirmDialogElement confirm() {
-    return $(ConfirmDialogElement.class).id(id(CONFIRM));
+    return ((TestBenchElement) getDriver().findElement(By.id(id(CONFIRM)))).wrap(
+        ConfirmDialogElement.class);
   }
 
   public ConfirmDialogElement errors() {
-    return $(ConfirmDialogElement.class).id(id(ERRORS));
+    return ((TestBenchElement) getDriver().findElement(By.id(id(ERRORS)))).wrap(
+        ConfirmDialogElement.class);
   }
 }
