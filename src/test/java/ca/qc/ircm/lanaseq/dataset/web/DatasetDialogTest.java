@@ -398,14 +398,14 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     ObjectMapper objectMapper = new ObjectMapper();
     GridDragStartEvent<Sample> dragStartEvent = new GridDragStartEvent<>(dialog.samples, false,
         objectMapper.readValue(
-            "{'draggedItems':[{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper()
-                .key(sample) + "'}]}", ObjectNode.class));
+            "{\"draggedItems\":[{\"key\":\"" + dialog.samples.getDataCommunicator().getKeyMapper()
+                .key(sample) + "\"}]}", ObjectNode.class));
     fireEvent(dialog.samples, dragStartEvent);
     assertEquals(GridDropMode.BETWEEN, dialog.samples.getDropMode());
     GridDropEvent<Sample> dropEvent = new GridDropEvent<>(dialog.samples, false,
         objectMapper.readValue(
-            "{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample)
-                + "'}", ObjectNode.class), GridDropLocation.ABOVE.getClientName(),
+            "{\"key\":\"" + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample)
+                + "\"}", ObjectNode.class), GridDropLocation.ABOVE.getClientName(),
         objectMapper.readValue("[]", ArrayNode.class));
     fireEvent(dialog.samples, dropEvent);
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
@@ -439,14 +439,14 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     ObjectMapper objectMapper = new ObjectMapper();
     GridDragStartEvent<Sample> dragStartEvent = new GridDragStartEvent<>(dialog.samples, false,
         objectMapper.readValue(
-            "{'draggedItems':[{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper()
-                .key(sample) + "'}]}", ObjectNode.class));
+            "{\"draggedItems\":[{\"key\":\"" + dialog.samples.getDataCommunicator().getKeyMapper()
+                .key(sample) + "\"}]}", ObjectNode.class));
     fireEvent(dialog.samples, dragStartEvent);
     assertEquals(GridDropMode.BETWEEN, dialog.samples.getDropMode());
     GridDropEvent<Sample> dropEvent = new GridDropEvent<>(dialog.samples, false,
         objectMapper.readValue(
-            "{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample)
-                + "'}", ObjectNode.class), GridDropLocation.BELOW.getClientName(),
+            "{\"key\":\"" + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample)
+                + "\"}", ObjectNode.class), GridDropLocation.BELOW.getClientName(),
         objectMapper.readValue("[]", ArrayNode.class));
     fireEvent(dialog.samples, dropEvent);
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
