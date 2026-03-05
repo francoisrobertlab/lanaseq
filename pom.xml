@@ -375,13 +375,6 @@
           </executions>
         </plugin>
         <plugin>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-maven-plugin</artifactId>
-          <configuration>
-            <executable>true</executable>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>org.mybatis.maven</groupId>
           <artifactId>migrations-maven-plugin</artifactId>
           <version>${migrations-maven-plugin.version}</version>
