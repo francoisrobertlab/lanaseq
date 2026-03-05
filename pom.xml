@@ -150,6 +150,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-dev</artifactId>
+      <scope>test</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
       <version>${greenmail.version}</version>
