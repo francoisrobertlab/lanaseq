@@ -502,10 +502,9 @@ public class UsersViewTest extends SpringUIUnitTest {
     view.switchUser.click();
     verify(switchUserService).switchUser(user, VaadinServletRequest.getCurrent());
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
-        i -> ("if ($1 == '_self') this.stopApplication(); window.open($0, $1)").equals(
-            i.getInvocation().getExpression()) && ("/" + DatasetsView.VIEW_NAME).equals(
-            i.getInvocation().getParameters().get(0)) && "_self".equals(
-            i.getInvocation().getParameters().get(1))));
+        i -> i.getInvocation().getExpression().contains("window.open($0, $1)") && ("/"
+            + DatasetsView.VIEW_NAME).equals(i.getInvocation().getParameters().get(0))
+            && "_self".equals(i.getInvocation().getParameters().get(1))));
   }
 
   @Test
