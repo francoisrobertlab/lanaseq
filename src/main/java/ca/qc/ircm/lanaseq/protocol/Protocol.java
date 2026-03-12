@@ -20,6 +20,7 @@ import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import org.springframework.lang.Nullable;
 
 /**
@@ -77,6 +78,20 @@ public class Protocol implements Data, Owned, Serializable {
   public Protocol(long id, String name) {
     this.id = id;
     this.name = name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Protocol protocol)) {
+      return false;
+    }
+    return Objects.equals(name, protocol.name) && Objects.equals(creationDate,
+        protocol.creationDate);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, creationDate);
   }
 
   @Override

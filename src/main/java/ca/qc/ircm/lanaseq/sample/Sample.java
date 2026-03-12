@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.springframework.lang.Nullable;
@@ -202,6 +203,19 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
     name = Strings.normalize(name);
     name = name.replaceAll("[^\\w-]", "");
     this.name = name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Sample sample)) {
+      return false;
+    }
+    return Objects.equals(name, sample.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(name);
   }
 
   @Override

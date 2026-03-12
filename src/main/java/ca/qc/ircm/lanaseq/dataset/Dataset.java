@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -151,6 +152,19 @@ public class Dataset implements Data, DataWithFiles, Owned, Serializable {
     name = Strings.normalize(name);
     name = name.replaceAll("[^\\w-]", "");
     this.name = name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Dataset dataset)) {
+      return false;
+    }
+    return Objects.equals(name, dataset.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(name);
   }
 
   @Override

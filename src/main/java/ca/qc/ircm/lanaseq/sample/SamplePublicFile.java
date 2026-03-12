@@ -16,6 +16,7 @@ import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Public file for a sample.
@@ -52,6 +53,20 @@ public class SamplePublicFile implements Data, Serializable {
    */
   @Column(nullable = false)
   private LocalDate expiryDate = LocalDate.now();
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof SamplePublicFile that)) {
+      return false;
+    }
+    return Objects.equals(path, that.path) && Objects.equals(sample, that.sample) && Objects.equals(
+        expiryDate, that.expiryDate);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(path, sample, expiryDate);
+  }
 
   @Override
   public String toString() {

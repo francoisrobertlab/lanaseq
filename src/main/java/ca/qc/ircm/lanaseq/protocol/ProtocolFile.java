@@ -17,6 +17,7 @@ import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Protocol file.
@@ -68,6 +69,20 @@ public class ProtocolFile implements Data, Serializable {
 
   public ProtocolFile(String filename) {
     this.filename = filename;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof ProtocolFile that)) {
+      return false;
+    }
+    return Objects.equals(filename, that.filename) && Objects.equals(creationDate,
+        that.creationDate) && Objects.equals(protocol, that.protocol);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(filename, creationDate, protocol);
   }
 
   public String getFilename() {

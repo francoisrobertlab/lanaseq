@@ -115,30 +115,21 @@ public class User implements Data, Owned, Serializable {
   }
 
   @Override
-  public String toString() {
-    return "User [id=" + id + ", email=" + email + "]";
+  public boolean equals(Object o) {
+    if (!(o instanceof User user)) {
+      return false;
+    }
+    return Objects.equals(email, user.email);
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((email == null) ? 0 : email.hashCode());
-    return result;
+    return Objects.hashCode(email);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof User other)) {
-      return false;
-    }
-    return Objects.equals(email, other.email);
+  public String toString() {
+    return "User [id=" + id + ", email=" + email + "]";
   }
 
   @Override

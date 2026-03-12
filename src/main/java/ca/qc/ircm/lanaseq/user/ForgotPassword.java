@@ -58,28 +58,17 @@ public class ForgotPassword implements Data, Serializable {
   private User user;
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((confirmNumber == null) ? 0 : confirmNumber.hashCode());
-    result = prime * result + ((requestMoment == null) ? 0 : requestMoment.hashCode());
-    return result;
+  public boolean equals(Object o) {
+    if (!(o instanceof ForgotPassword that)) {
+      return false;
+    }
+    return Objects.equals(requestMoment, that.requestMoment) && Objects.equals(confirmNumber,
+        that.confirmNumber) && Objects.equals(user, that.user);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    ForgotPassword other = (ForgotPassword) obj;
-    return Objects.equals(confirmNumber, other.confirmNumber) && Objects.equals(requestMoment,
-        other.requestMoment);
+  public int hashCode() {
+    return Objects.hash(requestMoment, confirmNumber, user);
   }
 
   @Override
