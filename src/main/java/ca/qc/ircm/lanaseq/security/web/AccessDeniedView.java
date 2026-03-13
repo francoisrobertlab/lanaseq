@@ -20,7 +20,7 @@ import com.vaadin.flow.router.ErrorParameter;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.HasErrorParameter;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.Serial;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * Access denied view.
  */
 @Route("accessdenied")
-@AnonymousAllowed
+@PermitAll
 public class AccessDeniedView extends Composite<VerticalLayout> implements
     HasErrorParameter<AccessDeniedException>, LocaleChangeObserver, HasDynamicTitle {
 
