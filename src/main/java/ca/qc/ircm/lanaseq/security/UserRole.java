@@ -8,6 +8,7 @@ public interface UserRole {
   String USER = "ROLE_USER";
   String MANAGER = "ROLE_MANAGER";
   String ADMIN = "ROLE_ADMIN";
+  String ROLE_PREVIOUS_ADMINISTRATOR = "ROLE_PREVIOUS_ADMINISTRATOR";
 
   /**
    * Returns all user roles.

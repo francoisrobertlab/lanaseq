@@ -32,10 +32,8 @@ import ca.qc.ircm.lanaseq.files.web.PublicFilesView;
 import ca.qc.ircm.lanaseq.jobs.web.JobsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
-import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
-import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.UI;
@@ -49,10 +47,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * Tests for {@link ViewLayout}.
@@ -64,10 +60,6 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   private static final String MESSAGE_PREFIX = messagePrefix(ViewLayout.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ViewLayout view;
-  @MockitoSpyBean
-  private SwitchUserService switchUserService;
-  @Autowired
-  private UserRepository userRepository;
   @Mock
   private AfterNavigationListener navigationListener;
   @Captor
@@ -256,20 +248,17 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   }
 
   @Test
-  @WithUserDetails("lanaseq@ircm.qc.ca")
+  @WithMockUser(username = "jonh.smith@ircm.qc.ca", roles = {"USER", "PREVIOUS_ADMINISTRATOR"})
   public void tabs_SelectExitSwitchUser() {
-    switchUserService.switchUser(userRepository.findById(3L).orElseThrow(),
-        VaadinServletRequest.getCurrent());
     navigate(SamplesView.class);
     view = $(ViewLayout.class).first();
 
     test(view.sideNav).clickItem(view.exitSwitchUser.getLabel());
 
-    verify(switchUserService).exitSwitchUser(VaadinServletRequest.getCurrent());
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
         i -> i.getInvocation().getExpression().contains("window.open($0, $1)") && !i.getInvocation()
-            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0)
-            .equals("/" + DatasetsView.VIEW_NAME)));
+            .getParameters().isEmpty() && i.getInvocation().getParameters().getFirst()
+            .equals("/impersonate/exit")));
   }
 
   @Test

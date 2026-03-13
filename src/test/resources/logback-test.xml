@@ -10,6 +10,7 @@
   <logger name="ca.qc.ircm.lanaseq.web.validation" level="TRACE"/>
   <logger name="org.springframework" level="INFO"/>
   <logger name="org.springframework.security" level="INFO"/>
+  <logger name="org.springframework.security.web.authentication.switchuser" level="DEBUG"/>
   <logger name="org.springframework.jdbc.datasource.init.ScriptUtils" level="WARN"/>
   <logger name="org.springframework.test.context.transaction.TransactionContext" level="WARN"/>
   <!--

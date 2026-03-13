@@ -16,16 +16,13 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -42,7 +39,6 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinServletRequest;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
 import java.io.Serial;
@@ -90,14 +86,12 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
   private final Map<User, Button> actives = new HashMap<>();
   private final transient ObjectFactory<UserDialog> dialogFactory;
   private final transient UserService service;
-  private final transient SwitchUserService switchUserService;
   private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
-  protected UsersView(UserService service, SwitchUserService switchUserService,
-      AuthenticatedUser authenticatedUser, ObjectFactory<UserDialog> dialogFactory) {
+  protected UsersView(UserService service, AuthenticatedUser authenticatedUser,
+      ObjectFactory<UserDialog> dialogFactory) {
     this.service = service;
-    this.switchUserService = switchUserService;
     this.authenticatedUser = authenticatedUser;
     this.dialogFactory = dialogFactory;
   }
@@ -262,8 +256,10 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     if (user == null) {
       new ErrorNotification(getTranslation(MESSAGE_PREFIX + USERS_REQUIRED)).open();
     } else {
-      switchUserService.switchUser(user, VaadinServletRequest.getCurrent());
-      UI.getCurrent().getPage().setLocation(getUrlWithContextPath(DatasetsView.class));
+      logger.debug("Switching to user {}, authenticated user is {}", user,
+          authenticatedUser.getUser());
+      getUI().ifPresent(ui -> ui.getPage()
+          .setLocation(prependContextPath("impersonate?username=" + user.getEmail())));
     }
   }
 

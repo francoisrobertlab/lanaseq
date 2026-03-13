@@ -24,19 +24,15 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
@@ -56,7 +52,6 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Comparator;
 import java.util.List;
@@ -84,8 +79,6 @@ public class UsersViewTest extends SpringUIUnitTest {
   private UsersView view;
   @MockitoBean
   private UserService service;
-  @MockitoBean
-  private SwitchUserService switchUserService;
   @Captor
   private ArgumentCaptor<User> userCaptor;
   @Captor
@@ -481,7 +474,9 @@ public class UsersViewTest extends SpringUIUnitTest {
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED),
         ((ErrorNotification) error).getText());
-    verify(switchUserService, never()).switchUser(any(), any());
+    assertFalse(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
+        i -> i.getInvocation().getExpression().contains("window.open($0, $1)")
+            && ((String) i.getInvocation().getParameters().getFirst()).startsWith("/impersonate")));
     assertTrue($(UsersView.class).exists());
   }
 
@@ -500,11 +495,11 @@ public class UsersViewTest extends SpringUIUnitTest {
     User user = repository.findById(3L).orElseThrow();
     view.users.select(user);
     view.switchUser.click();
-    verify(switchUserService).switchUser(user, VaadinServletRequest.getCurrent());
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
-        i -> i.getInvocation().getExpression().contains("window.open($0, $1)") && ("/"
-            + DatasetsView.VIEW_NAME).equals(i.getInvocation().getParameters().get(0))
-            && "_self".equals(i.getInvocation().getParameters().get(1))));
+        i -> i.getInvocation().getExpression().contains("window.open($0, $1)")
+            && ("/impersonate?username=jonh.smith@ircm.qc.ca").equals(
+            i.getInvocation().getParameters().getFirst()) && "_self".equals(
+            i.getInvocation().getParameters().get(1))));
   }
 
   @Test
@@ -514,7 +509,9 @@ public class UsersViewTest extends SpringUIUnitTest {
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED),
         ((ErrorNotification) error).getText());
-    verify(switchUserService, never()).switchUser(any(), any());
+    assertFalse(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
+        i -> i.getInvocation().getExpression().contains("window.open($0, $1)")
+            && ((String) i.getInvocation().getParameters().getFirst()).startsWith("/impersonate")));
     assertTrue($(UsersView.class).exists());
   }
 }
