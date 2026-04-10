@@ -2,16 +2,12 @@ package ca.qc.ircm.lanaseq;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import java.util.Optional;
-import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,18 +42,10 @@ public class AsyncConfigurationTest {
   public void testUserRepository() {
     String email = "jonh.smith@ircm.qc.ca";
     User user = userRepository.findByEmail(email).orElseThrow();
-    // Keep the test in case Spring Boot fixes repository usage with @Async during tests.
-    // Virtual threads from Java 21 do not fix the issue.
-    assertThrows(CompletionException.class, () -> {
-      bean.run().thenAccept(e -> {
-        assertEquals(user, userRepository.findByEmail(email).orElseThrow());
-      }).join();
-    });
-    // Patches UserRepository because when using @Async, repositories cannot access test database.
-    when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+    // Without 'fix-database-for-threads.sql', Async methods will only see an empty database.
     bean.run().thenAccept(e -> {
       assertEquals(user, userRepository.findByEmail(email).orElseThrow());
     }).join();
-    verify(userRepository, atLeast(4)).findByEmail(email);
+    verify(userRepository, atLeast(2)).findByEmail(email);
   }
 }

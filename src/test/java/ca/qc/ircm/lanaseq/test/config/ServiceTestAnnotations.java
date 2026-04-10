@@ -28,7 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
     VaadinLicenseExecutionListener.class, FixSecurityContextHolderStrategyExecutionListener.class,
     UiUnitTestExecutionListener.class}, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Transactional
-@Sql({"/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql"})
+@Sql({"/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql",
+    "/fix-database-for-threads.sql"})
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public @interface ServiceTestAnnotations {

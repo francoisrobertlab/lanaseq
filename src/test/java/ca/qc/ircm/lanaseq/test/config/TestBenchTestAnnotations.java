@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Execution(ExecutionMode.SAME_THREAD)
 @Transactional
 @Sql({"/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql",
-    "/fix-it-tests.sql"})
+    "/fix-database-for-threads.sql"})
 public @interface TestBenchTestAnnotations {
 
 }
