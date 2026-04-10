@@ -141,6 +141,9 @@ app:
     - folder: ${app.home.folder}/archives
       windows-label: '${app.home.windows-label}\archives'
       unix-label: '${app.home.unix-label}/archives'
+    - folder: ${app.home.folder}/archives2
+      windows-label: '${app.home.windows-label}\archives2'
+      unix-label: '${app.home.unix-label}/archives2'
   serverUrl: http://localhost:${local.server.port}
 
 security:
