@@ -98,6 +98,8 @@ spring:
     host: localhost
 
 app:
+  home:
+    folder: ${user.dir}/target/test-app-home
   archives:
     - folder: ${app.home.folder}/archives
       windows-label: '${app.home.windows-label}\archives'
@@ -133,6 +135,8 @@ spring:
     host: localhost
 
 app:
+  home:
+    folder: ${user.dir}/target/test-app-home
   archives:
     - folder: ${app.home.folder}/archives
       windows-label: '${app.home.windows-label}\archives'

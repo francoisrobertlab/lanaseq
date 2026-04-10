@@ -116,7 +116,8 @@ public class AppConfigurationTest {
   @Test
   public void getHome() {
     AppConfiguration.NetworkDrive<DataWithFiles> home = appConfiguration.getHome();
-    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq"), home.getFolder());
+    assertEquals(Paths.get(System.getProperty("user.dir"), "target/test-app-home"),
+        home.getFolder());
     assertEquals("\\\\lanaseq01\\lanaseq", home.getWindowsLabel());
     assertEquals("smb://lanaseq01/lanaseq", home.getUnixLabel());
   }
