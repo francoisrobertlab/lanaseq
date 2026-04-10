@@ -2,6 +2,7 @@ package ca.qc.ircm.lanaseq;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import ca.qc.ircm.lanaseq.test.config.KeepFoldersForAppConfiguration;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
  * Tests for {@link AppConfiguration}.
  */
 @ServiceTestAnnotations
+@KeepFoldersForAppConfiguration
 @ActiveProfiles({"test", "context-path"})
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AppConfigurationContextPathTest {

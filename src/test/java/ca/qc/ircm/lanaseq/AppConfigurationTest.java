@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.test.config.KeepFoldersForAppConfiguration;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,6 +26,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  * Tests for {@link AppConfiguration}.
  */
 @ServiceTestAnnotations
+@KeepFoldersForAppConfiguration
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AppConfigurationTest {
 
