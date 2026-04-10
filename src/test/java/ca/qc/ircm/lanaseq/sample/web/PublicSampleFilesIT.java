@@ -14,8 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 
@@ -26,21 +24,12 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 @WithAnonymousUser
 public class PublicSampleFilesIT extends AbstractBrowserTestCase {
 
-  @TempDir
-  Path temporaryFolder;
   @Autowired
   private SampleRepository repository;
   @Autowired
   private SamplePublicFileRepository samplePublicFileRepository;
   @Autowired
   private AppConfiguration configuration;
-
-  @BeforeEach
-  public void beforeTest() throws Throwable {
-    setHome(Files.createDirectory(temporaryFolder.resolve("home")));
-    setArchive(Files.createDirectory(temporaryFolder.resolve("archives")));
-    setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
-  }
 
   @BrowserTest
   public void publicFile() throws Throwable {

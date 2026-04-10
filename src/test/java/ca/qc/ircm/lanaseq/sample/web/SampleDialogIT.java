@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -44,8 +43,6 @@ import org.springframework.test.context.transaction.TestTransaction;
 public class SampleDialogIT extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SampleDialog.class);
-  @TempDir
-  Path temporaryFolder;
   @Autowired
   private SampleRepository repository;
   @Autowired
@@ -77,7 +74,6 @@ public class SampleDialogIT extends AbstractBrowserTestCase {
   @BeforeEach
   public void beforeTest() throws Throwable {
     protocol = protocolRepository.findById(1L).orElseThrow();
-    setHome(Files.createDirectory(temporaryFolder.resolve("home")));
   }
 
   private void open() {

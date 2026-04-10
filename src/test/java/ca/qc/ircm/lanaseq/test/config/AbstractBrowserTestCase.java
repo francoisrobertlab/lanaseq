@@ -6,6 +6,7 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.AppConfiguration.NetworkDrive;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.jobs.Job;
@@ -24,6 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -32,6 +34,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,16 +61,25 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase {
   @Value("${server.servlet.context-path:}")
   protected String contextPath;
   private boolean runOnHub = false;
-  private Path home;
-  private Path archive;
-  private Path analysis;
-  private Path upload;
+  @TempDir
+  protected Path temporaryFolder;
+  protected Path home;
+  protected Path archive;
+  protected Path archive2;
+  protected Path analysis;
+  protected Path upload;
   @Autowired
   private AppConfiguration configuration;
   @Autowired
   private MessageSource messageSource;
   @Autowired
   private JobService jobService;
+  private Path savedHome;
+  private List<NetworkDrive<DataWithFiles>> savedArchives;
+  private Path savedArchive;
+  private Path savedArchive2;
+  private Path savedAnalysis;
+  private Path savedUpload;
 
   @BeforeEach
   @SuppressWarnings("JUnitMalformedDeclaration") // Works because of Vaadin's JUnit5 extension.
@@ -84,67 +96,36 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase {
   }
 
   /**
-   * Saves home folder to reset its value upon test completion.
+   * Saves folders to reset their value upon test completion.
    */
   @BeforeEach
-  public void saveHomeFolder() {
-    home = configuration.getHome().getFolder();
-  }
-
-  /**
-   * Saves archive folder to reset its value upon test completion.
-   */
-  @BeforeEach
-  public void saveArchiveFolder() {
-    archive = configuration.getArchives().get(0).getFolder();
-  }
-
-  /**
-   * Saves analysis folder to reset its value upon test completion.
-   */
-  @BeforeEach
-  public void saveAnalysisFolder() {
-    analysis = configuration.getAnalysis().getFolder();
-  }
-
-  /**
-   * Saves upload folder to reset its value upon test completion.
-   */
-  @BeforeEach
-  public void saveUploadFolder() {
-    upload = configuration.getUpload().getFolder();
-  }
-
-  /**
-   * Restores home folder's value.
-   */
-  @AfterEach
-  public void restoreHomeFolder() throws Throwable {
+  public void saveFolders() throws Throwable {
+    savedHome = configuration.getHome().getFolder();
+    savedArchives = new ArrayList<>(configuration.getArchives());
+    savedArchive = configuration.getArchives().get(0).getFolder();
+    savedArchive2 = configuration.getArchives().get(1).getFolder();
+    savedAnalysis = configuration.getAnalysis().getFolder();
+    savedUpload = configuration.getUpload().getFolder();
+    home = temporaryFolder;
+    archive = temporaryFolder.resolve("archive");
+    archive2 = temporaryFolder.resolve("archive2");
+    analysis = temporaryFolder.resolve("analysis");
+    upload = temporaryFolder.resolve("upload");
     setHome(home);
-  }
-
-  /**
-   * Restores archive folder's value.
-   */
-  @AfterEach
-  public void restoreArchiveFolder() throws Throwable {
-    setArchive(archive);
-  }
-
-  /**
-   * Restores upload folder's value.
-   */
-  @AfterEach
-  public void restoreAnalysisFolder() throws Throwable {
+    setArchive(archive, archive2);
     setAnalysis(analysis);
+    setUpload(upload);
   }
 
   /**
-   * Restores upload folder's value.
+   * Restores folders' value.
    */
   @AfterEach
-  public void restoreUploadFolder() throws Throwable {
-    setUpload(upload);
+  public void restoreFolders() throws Throwable {
+    setHome(savedHome);
+    setArchive(savedArchive, savedArchive2);
+    setAnalysis(savedAnalysis);
+    setUpload(savedUpload);
   }
 
   /**
@@ -236,38 +217,35 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase {
 
   protected void setHome(Path home)
       throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder",
-        Path.class);
+    Method setFolder = NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
     setFolder.setAccessible(true);
-    AppConfiguration.NetworkDrive<DataWithFiles> homeDrive = configuration.getHome();
+    NetworkDrive<DataWithFiles> homeDrive = configuration.getHome();
     setFolder.invoke(homeDrive, home);
   }
 
-  protected void setArchive(Path archive)
+  protected void setArchive(Path archive, Path archive2)
       throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder",
-        Path.class);
+    configuration.getArchives().clear();
+    configuration.getArchives().addAll(savedArchives);
+    Method setFolder = NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
     setFolder.setAccessible(true);
-    AppConfiguration.NetworkDrive<DataWithFiles> firstArchiveDrive = configuration.getArchives()
-        .get(0);
-    setFolder.invoke(firstArchiveDrive, archive);
+    setFolder.invoke(configuration.getArchives().get(0), archive);
+    setFolder.invoke(configuration.getArchives().get(1), archive2);
   }
 
   protected void setAnalysis(Path analysis)
       throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder",
-        Path.class);
+    Method setFolder = NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
     setFolder.setAccessible(true);
-    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisDrive = configuration.getAnalysis();
+    NetworkDrive<Collection<? extends DataWithFiles>> analysisDrive = configuration.getAnalysis();
     setFolder.invoke(analysisDrive, analysis);
   }
 
   protected void setUpload(Path upload)
       throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder",
-        Path.class);
+    Method setFolder = NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
     setFolder.setAccessible(true);
-    AppConfiguration.NetworkDrive<DataWithFiles> uploadDrive = configuration.getUpload();
+    NetworkDrive<DataWithFiles> uploadDrive = configuration.getUpload();
     setFolder.invoke(uploadDrive, upload);
   }
 }

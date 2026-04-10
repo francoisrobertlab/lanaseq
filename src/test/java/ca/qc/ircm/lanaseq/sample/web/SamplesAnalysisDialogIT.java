@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -32,19 +30,11 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SamplesAnalysisDialogIT extends AbstractBrowserTestCase {
 
-  @TempDir
-  Path temporaryFolder;
   @Autowired
   private SampleRepository repository;
   @Autowired
   private AppConfiguration configuration;
   private final Random random = new Random();
-
-  @BeforeEach
-  public void beforeTest() throws Throwable {
-    setHome(Files.createDirectory(temporaryFolder.resolve("home")));
-    setAnalysis(Files.createDirectory(temporaryFolder.resolve("analysis")));
-  }
 
   private void open() {
     openView(VIEW_NAME);

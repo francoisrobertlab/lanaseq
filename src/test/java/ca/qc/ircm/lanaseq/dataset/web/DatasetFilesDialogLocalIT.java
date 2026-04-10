@@ -17,8 +17,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -32,18 +30,10 @@ public class DatasetFilesDialogLocalIT extends AbstractLocalBrowserTestCase {
 
   @Value("${download-home}")
   protected Path downloadHome;
-  @TempDir
-  Path temporaryFolder;
   @Autowired
   private DatasetRepository repository;
   @Autowired
   private AppConfiguration configuration;
-
-  @BeforeEach
-  public void beforeTest() throws Throwable {
-    setHome(Files.createDirectory(temporaryFolder.resolve("home")));
-    setArchive(Files.createDirectory(temporaryFolder.resolve("archives")));
-  }
 
   private void open() {
     openView(VIEW_NAME);

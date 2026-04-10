@@ -25,9 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -47,8 +45,6 @@ public class DatasetDialogIT extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetDialog.class);
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialogIT.class);
-  @TempDir
-  Path temporaryFolder;
   @Autowired
   private DatasetRepository repository;
   @Autowired
@@ -65,11 +61,6 @@ public class DatasetDialogIT extends AbstractBrowserTestCase {
   private final String filename = "OF_20241120_ROB_01";
   private final String note = "test note\nsecond line";
   private final LocalDate date = LocalDate.of(2020, 7, 20);
-
-  @BeforeEach
-  public void beforeTest() throws Throwable {
-    setHome(Files.createDirectory(temporaryFolder.resolve("home")));
-  }
 
   private void open() {
     openView(VIEW_NAME);

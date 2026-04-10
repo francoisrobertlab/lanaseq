@@ -22,8 +22,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -37,8 +35,6 @@ import org.springframework.test.context.transaction.TestTransaction;
 public class AddSampleFilesDialogIT extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(AddSampleFilesDialog.class);
-  @TempDir
-  Path temporaryFolder;
   @Autowired
   private SampleRepository repository;
   @Autowired
@@ -49,12 +45,6 @@ public class AddSampleFilesDialogIT extends AbstractBrowserTestCase {
   private JobService jobService;
   private Path file1;
   private Path file2;
-
-  @BeforeEach
-  public void beforeTest() throws Throwable {
-    setHome(Files.createDirectory(temporaryFolder.resolve("home")));
-    setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
-  }
 
   private void open() {
     openView(VIEW_NAME);

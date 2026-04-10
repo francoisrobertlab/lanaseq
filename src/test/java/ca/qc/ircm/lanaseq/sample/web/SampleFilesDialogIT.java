@@ -32,7 +32,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -47,8 +46,6 @@ import org.springframework.test.context.transaction.TestTransaction;
 public class SampleFilesDialogIT extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
-  @TempDir
-  Path temporaryFolder;
   @Autowired
   private SampleRepository repository;
   @Autowired
@@ -63,9 +60,6 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
 
   @BeforeEach
   public void beforeTest() throws Throwable {
-    setHome(Files.createDirectory(temporaryFolder.resolve("home")));
-    setArchive(Files.createDirectory(temporaryFolder.resolve("archives")));
-    setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
     file1 = Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI());
   }
 
