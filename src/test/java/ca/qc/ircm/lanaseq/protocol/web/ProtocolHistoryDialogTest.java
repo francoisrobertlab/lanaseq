@@ -102,6 +102,11 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(dialog.files).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));

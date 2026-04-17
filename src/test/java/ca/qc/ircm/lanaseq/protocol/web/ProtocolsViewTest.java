@@ -117,6 +117,37 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.protocols).isUsable());
+    assertTrue(test(view.add).isUsable());
+    assertTrue(view.edit.isVisible());
+    assertFalse(view.edit.isEnabled());
+    assertFalse(view.history.isVisible());
+    view.protocols.setItems(protocols);
+    view.protocols.select(protocols.getFirst());
+    assertTrue(view.edit.isVisible());
+    assertTrue(view.edit.isEnabled());
+    assertFalse(view.history.isVisible());
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void fieldsExistence_Manager() {
+    assertTrue(test(view.protocols).isUsable());
+    assertTrue(test(view.add).isUsable());
+    assertTrue(view.edit.isVisible());
+    assertFalse(view.edit.isEnabled());
+    assertTrue(view.history.isVisible());
+    assertFalse(view.history.isEnabled());
+    view.protocols.setItems(protocols);
+    view.protocols.select(protocols.getFirst());
+    assertTrue(view.edit.isVisible());
+    assertTrue(view.edit.isEnabled());
+    assertTrue(view.history.isVisible());
+    assertTrue(view.history.isEnabled());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(PROTOCOLS, view.protocols.getId().orElse(""));

@@ -168,6 +168,31 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(dialog.name).isUsable());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.upload).isUsable());
+    assertTrue(test(dialog.files).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertFalse(dialog.delete.isVisible());
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void fieldsExistence_Deletable() {
+    when(service.isDeletable(any())).thenReturn(true);
+    dialog.setProtocolId(4);
+    assertTrue(test(dialog.name).isUsable());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.upload).isUsable());
+    assertTrue(test(dialog.files).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertTrue(test(dialog.delete).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(NAME), dialog.name.getId().orElse(""));

@@ -1,20 +1,12 @@
 package ca.qc.ircm.lanaseq.protocol.web;
 
-import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
-import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import ca.qc.ircm.lanaseq.web.SigninViewElement;
-import com.vaadin.testbench.BrowserTest;
-import org.junit.jupiter.api.Assertions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
+import ca.qc.ircm.lanaseq.web.SigninView;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -23,87 +15,41 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ProtocolsViewIT extends AbstractBrowserTestCase {
+public class ProtocolsViewIT extends SpringUIUnitTest {
 
-  private static final String MESSAGE_PREFIX = messagePrefix(ProtocolsView.class);
-  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
-  @Autowired
-  private MessageSource messageSource;
-
-  private void open() {
-    openView(VIEW_NAME);
-  }
-
-  @BrowserTest
+  @Test
   @WithAnonymousUser
   public void security_Anonymous() {
-    open();
-
-    $(SigninViewElement.class).waitForFirst();
+    navigate(VIEW_NAME, SigninView.class);
   }
 
-  @BrowserTest
-  public void title() {
-    open();
-
-    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
-        currentLocale());
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-            currentLocale()), getDriver().getTitle());
-  }
-
-  @BrowserTest
-  public void fieldsExistence() {
-    open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
-    assertTrue(optional(view::protocols).isPresent());
-    assertTrue(optional(view::add).isPresent());
-    assertTrue(optional(view::edit).isPresent());
-    assertFalse(optional(view::history).isPresent());
-  }
-
-  @BrowserTest
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void fieldsExistence_Manager() {
-    open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
-    assertTrue(optional(view::protocols).isPresent());
-    assertTrue(optional(view::add).isPresent());
-    assertTrue(optional(view::edit).isPresent());
-    assertTrue(optional(view::history).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void edit() {
-    open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
+    ProtocolsView view = navigate(ProtocolsView.class);
 
-    view.protocols().select(0);
-    view.edit().click();
+    test(view.protocols).select(0);
+    test(view.edit).click();
 
-    assertTrue(view.dialog().isOpen());
+    assertTrue($(ProtocolDialog.class).exists());
   }
 
-  @BrowserTest
+  @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void history() {
-    open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
+    ProtocolsView view = navigate(ProtocolsView.class);
 
-    view.protocols().select(2);
-    view.history().click();
+    test(view.protocols).select(2);
+    test(view.history).click();
 
-    assertTrue(view.historyDialog().isOpen());
+    assertTrue($(ProtocolHistoryDialog.class).exists());
   }
 
-  @BrowserTest
+  @Test
   public void add() {
-    open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
+    ProtocolsView view = navigate(ProtocolsView.class);
 
-    view.add().click();
+    test(view.add).click();
 
-    assertTrue(view.dialog().isOpen());
+    assertTrue($(ProtocolDialog.class).exists());
   }
 }

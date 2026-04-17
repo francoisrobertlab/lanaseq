@@ -140,7 +140,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver {
     add(layout);
     FormLayout form = new FormLayout(name, note);
     form.setResponsiveSteps(new ResponsiveStep("0", 1));
-    layout.add(form, upload, files, filesError, confirm);
+    layout.add(form, upload, files, filesError);
     layout.setSizeFull();
     layout.expand(files);
     getFooter().add(delete, cancel, save);
@@ -323,9 +323,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver {
       logger.debug("save protocol {}", protocol);
       List<ProtocolFile> files = this.files.getListDataView().getItems().toList();
       service.save(protocol, new ArrayList<>(files));
-      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()));
       close();
       fireSavedEvent();
+      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()));
     }
   }
 
@@ -333,9 +333,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver {
     Protocol protocol = binder.getBean();
     logger.debug("delete protocol {}", protocol);
     service.delete(protocol);
-    Notification.show(getTranslation(MESSAGE_PREFIX + DELETED, protocol.getName()));
     fireDeletedEvent();
     close();
+    Notification.show(getTranslation(MESSAGE_PREFIX + DELETED, protocol.getName()));
   }
 
   long getProtocolId() {
