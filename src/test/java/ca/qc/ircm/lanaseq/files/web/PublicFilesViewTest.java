@@ -143,6 +143,16 @@ public class PublicFilesViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.files).isUsable());
+    assertTrue(test(view.filenameFilter).isUsable());
+    assertTrue(test(view.expiryDateFilter).isUsable());
+    assertTrue(test(view.sampleNameFilter).isUsable());
+    assertTrue(test(view.ownerFilter).isUsable());
+    assertTrue(test(view.downloadLinks).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(FILES, view.files.getId().orElse(""));
