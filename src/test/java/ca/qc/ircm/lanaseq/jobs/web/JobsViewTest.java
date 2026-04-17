@@ -170,6 +170,13 @@ public class JobsViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.jobs).isUsable());
+    assertTrue(test(view.refresh).isUsable());
+    assertTrue(test(view.removeDone).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(JOBS, view.jobs.getId().orElse(""));
