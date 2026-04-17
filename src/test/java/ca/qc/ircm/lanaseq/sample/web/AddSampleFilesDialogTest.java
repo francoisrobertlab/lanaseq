@@ -187,6 +187,14 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(dialog.message).isUsable());
+    assertTrue(test(dialog.files).isUsable());
+    assertTrue(test(dialog.refresh).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));

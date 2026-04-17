@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,9 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.testbench.BrowserTest;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.flow.component.combobox.ComboBoxBase.CustomValueSetEvent;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,26 +20,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Assertions;
-import org.openqa.selenium.Keys;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Integration tests for {@link SamplesAnalysisDialog}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SamplesAnalysisDialogIT extends AbstractBrowserTestCase {
+public class SamplesAnalysisDialogIT extends SpringUIUnitTest {
 
   @Autowired
   private SampleRepository repository;
   @Autowired
   private AppConfiguration configuration;
   private final Random random = new Random();
-
-  private void open() {
-    openView(VIEW_NAME);
-  }
 
   private byte[] writeFile(Path file) throws IOException {
     byte[] bytes = new byte[2048];
@@ -47,20 +44,7 @@ public class SamplesAnalysisDialogIT extends AbstractBrowserTestCase {
     return bytes;
   }
 
-  @BrowserTest
-  public void fieldsExistence() {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().select(0);
-    view.analyze().click();
-    SamplesAnalysisDialogElement dialog = view.analyzeDialog();
-    assertTrue(optional(dialog::header).isPresent());
-    assertTrue(optional(dialog::message).isPresent());
-    assertTrue(optional(dialog::filenamePatterns).isPresent());
-    assertTrue(optional(dialog::create).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void create_One() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path sampleFolder = configuration.getHome().folder(sample);
@@ -69,19 +53,18 @@ public class SamplesAnalysisDialogIT extends AbstractBrowserTestCase {
     final byte[] fastq1Content = writeFile(fastq1);
     Path fastq2 = sampleFolder.resolve(sample.getName() + "_R2.fastq");
     final byte[] fastq2Content = writeFile(fastq2);
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().select(1);
-    view.analyze().click();
-    SamplesAnalysisDialogElement dialog = view.analyzeDialog();
-    dialog.filenamePatterns().sendKeys("*.fastq" + Keys.RETURN);
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(1);
+    test(view.analyze).click();
+    SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
+    fireEvent(dialog.filenamePatterns,
+        new CustomValueSetEvent<>(dialog.filenamePatterns, false, "*.fastq"));
 
-    dialog.create().click();
-    Thread.sleep(2000); // Wait for file copy.
+    test(dialog.createFolder).click();
 
-    assertTrue(dialog.isOpen());
-    dialog.confirm().getConfirmButton().click();
-    assertFalse(dialog.isOpen());
+    assertTrue(dialog.isOpened());
+    test($(ConfirmDialog.class).first()).confirm();
+    assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(List.of(sample));
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample.getName() + "_R1.fastq")));
@@ -100,7 +83,7 @@ public class SamplesAnalysisDialogIT extends AbstractBrowserTestCase {
     assertFalse(Files.exists(datasetMeta));
   }
 
-  @BrowserTest
+  @Test
   public void create_Many() throws Throwable {
     Sample sample1 = repository.findById(4L).orElseThrow();
     Sample sample2 = repository.findById(10L).orElseThrow();
@@ -117,20 +100,20 @@ public class SamplesAnalysisDialogIT extends AbstractBrowserTestCase {
     final byte[] fastq3Content = writeFile(fastq3);
     Path fastq4 = sample2Folder.resolve("a_R2.fastq");
     final byte[] fastq4Content = writeFile(fastq4);
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().select(view.samples().name(3).startsWith("JS1") ? 3 : 2);
-    view.samples().select(1);
-    view.analyze().click();
-    SamplesAnalysisDialogElement dialog = view.analyzeDialog();
-    dialog.filenamePatterns().sendKeys("*.fastq" + Keys.RETURN);
+    SamplesView view = navigate(SamplesView.class);
+    // Sample is randomly JS1 or JS2 because they have the same date. Use a stable select.
+    view.samples.select(repository.findById(4L).orElseThrow());
+    test(view.samples).select(1);
+    test(view.analyze).click();
+    SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
+    fireEvent(dialog.filenamePatterns,
+        new CustomValueSetEvent<>(dialog.filenamePatterns, false, "*.fastq"));
 
-    dialog.create().click();
-    Thread.sleep(2000); // Wait for file copy.
+    test(dialog.createFolder).click();
 
-    assertTrue(dialog.isOpen());
-    dialog.confirm().getConfirmButton().click();
-    assertFalse(dialog.isOpen());
+    assertTrue(dialog.isOpened());
+    test($(ConfirmDialog.class).first()).confirm();
+    assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(samples);
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
@@ -154,7 +137,7 @@ public class SamplesAnalysisDialogIT extends AbstractBrowserTestCase {
     assertFalse(Files.exists(datasetMeta));
   }
 
-  @BrowserTest
+  @Test
   public void create_NoFilenamePattern() throws Throwable {
     Sample sample1 = repository.findById(10L).orElseThrow();
     Sample sample2 = repository.findById(11L).orElseThrow();
@@ -169,18 +152,17 @@ public class SamplesAnalysisDialogIT extends AbstractBrowserTestCase {
     Files.createDirectories(sample2Folder);
     Path fastq3 = sample2Folder.resolve("a_R1.fastq");
     final byte[] fastq3Content = writeFile(fastq3);
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().select(1);
-    view.samples().select(0);
-    view.analyze().click();
-    SamplesAnalysisDialogElement dialog = view.analyzeDialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(1);
+    test(view.samples).select(0);
+    test(view.analyze).click();
+    SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
 
-    dialog.create().click();
+    test(dialog.createFolder).click();
 
-    assertTrue(dialog.isOpen());
-    dialog.confirm().getConfirmButton().click();
-    assertFalse(dialog.isOpen());
+    assertTrue(dialog.isOpened());
+    test($(ConfirmDialog.class).first()).confirm();
+    assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(samples);
     assertTrue(Files.exists(folder));
     assertFalse(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));

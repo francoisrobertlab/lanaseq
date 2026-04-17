@@ -185,6 +185,70 @@ public class SampleDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence_Add() {
+    dialog.setSampleId(0);
+    assertTrue(test(dialog.date).isUsable());
+    assertTrue(test(dialog.sampleId).isUsable());
+    assertTrue(test(dialog.replicate).isUsable());
+    assertTrue(test(dialog.protocol).isUsable());
+    assertTrue(test(dialog.assay).isUsable());
+    assertTrue(test(dialog.type).isUsable());
+    assertTrue(test(dialog.target).isUsable());
+    assertTrue(test(dialog.strain).isUsable());
+    assertTrue(test(dialog.strainDescription).isUsable());
+    assertTrue(test(dialog.treatment).isUsable());
+    assertTrue(test(dialog.keywords).isUsable());
+    assertTrue(test(dialog.filenames).isUsable());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertFalse(dialog.delete.isVisible());
+  }
+
+  @Test
+  public void fieldsExistence_Update() {
+    assertTrue(test(dialog.date).isUsable());
+    assertTrue(test(dialog.sampleId).isUsable());
+    assertTrue(test(dialog.replicate).isUsable());
+    assertTrue(test(dialog.protocol).isUsable());
+    assertTrue(test(dialog.assay).isUsable());
+    assertTrue(test(dialog.type).isUsable());
+    assertTrue(test(dialog.target).isUsable());
+    assertTrue(test(dialog.strain).isUsable());
+    assertTrue(test(dialog.strainDescription).isUsable());
+    assertTrue(test(dialog.treatment).isUsable());
+    assertTrue(test(dialog.keywords).isUsable());
+    assertTrue(test(dialog.filenames).isUsable());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertFalse(dialog.delete.isVisible());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void fieldsExistence_Deletable() {
+    when(service.isDeletable(any())).thenReturn(true);
+    dialog.setSampleId(9);
+    assertTrue(test(dialog.date).isUsable());
+    assertTrue(test(dialog.sampleId).isUsable());
+    assertTrue(test(dialog.replicate).isUsable());
+    assertTrue(test(dialog.protocol).isUsable());
+    assertTrue(test(dialog.assay).isUsable());
+    assertTrue(test(dialog.type).isUsable());
+    assertTrue(test(dialog.target).isUsable());
+    assertTrue(test(dialog.strain).isUsable());
+    assertTrue(test(dialog.strainDescription).isUsable());
+    assertTrue(test(dialog.treatment).isUsable());
+    assertTrue(test(dialog.keywords).isUsable());
+    assertTrue(test(dialog.filenames).isUsable());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertTrue(test(dialog.delete).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(DATE), dialog.date.getId().orElse(""));

@@ -140,6 +140,39 @@ public class SamplesViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.samples).isUsable());
+    assertTrue(test(view.add).isUsable());
+    assertTrue(view.edit.isVisible());
+    assertFalse(view.edit.isEnabled());
+    assertTrue(view.merge.isVisible());
+    assertFalse(view.merge.isEnabled());
+    assertTrue(view.files.isVisible());
+    assertFalse(view.files.isEnabled());
+    assertTrue(view.analyze.isVisible());
+    assertFalse(view.analyze.isEnabled());
+    view.samples.setItems(samples);
+    view.samples.select(samples.getFirst());
+    assertTrue(view.edit.isVisible());
+    assertTrue(view.edit.isEnabled());
+    assertTrue(view.merge.isVisible());
+    assertTrue(view.merge.isEnabled());
+    assertTrue(view.files.isVisible());
+    assertTrue(view.files.isEnabled());
+    assertTrue(view.analyze.isVisible());
+    assertTrue(view.analyze.isEnabled());
+    view.samples.select(samples.get(1));
+    assertTrue(view.edit.isVisible());
+    assertFalse(view.edit.isEnabled());
+    assertTrue(view.merge.isVisible());
+    assertTrue(view.merge.isEnabled());
+    assertTrue(view.files.isVisible());
+    assertFalse(view.files.isEnabled());
+    assertTrue(view.analyze.isVisible());
+    assertTrue(view.analyze.isEnabled());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(SAMPLES, view.samples.getId().orElse(""));

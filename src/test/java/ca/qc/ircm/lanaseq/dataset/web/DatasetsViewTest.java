@@ -97,11 +97,34 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
   @Test
   public void fieldsExistence() {
-    test(view.datasets).isUsable();
-    test(view.edit).isUsable();
-    test(view.merge).isUsable();
-    test(view.files).isUsable();
-    test(view.analyze).isUsable();
+    assertTrue(test(view.datasets).isUsable());
+    assertTrue(view.edit.isVisible());
+    assertFalse(view.edit.isEnabled());
+    assertTrue(view.merge.isVisible());
+    assertFalse(view.merge.isEnabled());
+    assertTrue(view.files.isVisible());
+    assertFalse(view.files.isEnabled());
+    assertTrue(view.analyze.isVisible());
+    assertFalse(view.analyze.isEnabled());
+    view.datasets.setItems(datasets);
+    view.datasets.select(datasets.getFirst());
+    assertTrue(view.edit.isVisible());
+    assertTrue(view.edit.isEnabled());
+    assertTrue(view.merge.isVisible());
+    assertTrue(view.merge.isEnabled());
+    assertTrue(view.files.isVisible());
+    assertTrue(view.files.isEnabled());
+    assertTrue(view.analyze.isVisible());
+    assertTrue(view.analyze.isEnabled());
+    view.datasets.select(datasets.get(1));
+    assertTrue(view.edit.isVisible());
+    assertFalse(view.edit.isEnabled());
+    assertTrue(view.merge.isVisible());
+    assertTrue(view.merge.isEnabled());
+    assertTrue(view.files.isVisible());
+    assertFalse(view.files.isEnabled());
+    assertTrue(view.analyze.isVisible());
+    assertTrue(view.analyze.isEnabled());
   }
 
   @Test

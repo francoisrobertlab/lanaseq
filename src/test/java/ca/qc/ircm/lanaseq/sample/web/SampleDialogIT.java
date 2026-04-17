@@ -3,12 +3,15 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -17,32 +20,42 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
-import com.vaadin.flow.component.notification.testbench.NotificationElement;
-import com.vaadin.testbench.BrowserTest;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.combobox.ComboBoxBase.CustomValueSetEvent;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
+import jakarta.persistence.EntityManager;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
-import org.openqa.selenium.Keys;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.transaction.TestTransaction;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * Integration tests for {@link SampleDialog}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SampleDialogIT extends AbstractBrowserTestCase {
+public class SampleDialogIT extends SpringUIUnitTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SampleDialog.class);
+  @MockitoSpyBean
+  private SampleService service;
   @Autowired
   private SampleRepository repository;
   @Autowired
@@ -53,6 +66,8 @@ public class SampleDialogIT extends AbstractBrowserTestCase {
   private AppConfiguration configuration;
   @Autowired
   private MessageSource messageSource;
+  @Autowired
+  private EntityManager entityManager;
   private Protocol protocol;
   private final LocalDate date = LocalDate.of(2020, 7, 20);
   private final String assay = "RNA-seq";
@@ -76,30 +91,24 @@ public class SampleDialogIT extends AbstractBrowserTestCase {
     protocol = protocolRepository.findById(1L).orElseThrow();
   }
 
-  private void open() {
-    openView(VIEW_NAME);
-  }
-
-  private void fill(SampleDialogElement dialog) {
-    dialog.date().setDate(date);
-    dialog.sampleId().setValue(sampleId);
-    dialog.replicate().setValue(replicate);
-    dialog.protocol().selectByText(protocol.getName());
-    dialog.assay().clear();
-    dialog.assay().sendKeys(assay);
-    dialog.assay().sendKeys(Keys.TAB);
-    dialog.type().openPopup(); // Causes delay to make unit test work.
-    dialog.type().selectByText(type);
-    dialog.type().closePopup(); // Causes delay to make unit test work.
-    dialog.target().setValue(target);
-    dialog.strain().setValue(strain);
-    dialog.strainDescription().setValue(strainDescription);
-    dialog.treatment().setValue(treatment);
-    dialog.keywords().deselectByText("G24D");
-    dialog.keywords().selectByText(keyword1);
-    dialog.keywords().selectByText(keyword2);
-    dialog.filenames().sendKeys(filename + Keys.RETURN);
-    dialog.note().setValue(note);
+  private void fill(SampleDialog dialog) {
+    test(dialog.date).setValue(date);
+    test(dialog.sampleId).setValue(sampleId);
+    test(dialog.replicate).setValue(replicate);
+    test(dialog.protocol).selectItem(protocol.getName());
+    fireEvent(dialog.assay, new CustomValueSetEvent<>(dialog.assay, false, assay));
+    test(dialog.type).selectItem(type);
+    test(dialog.target).setValue(target);
+    test(dialog.strain).setValue(strain);
+    test(dialog.strainDescription).setValue(strainDescription);
+    test(dialog.treatment).setValue(treatment);
+    Set<String> keywordsSelection = new HashSet<>(test(dialog.keywords).getSelected());
+    keywordsSelection.remove("G24D");
+    keywordsSelection.add(keyword1);
+    keywordsSelection.add(keyword2);
+    test(dialog.keywords).selectItem(keywordsSelection.toArray(new String[0]));
+    fireEvent(dialog.filenames, new CustomValueSetEvent<>(dialog.filenames, false, filename));
+    test(dialog.note).setValue(note);
   }
 
   private String name() {
@@ -107,251 +116,168 @@ public class SampleDialogIT extends AbstractBrowserTestCase {
         + "_" + target + "_" + strain + "_" + strainDescription + "_" + treatment + "_" + replicate;
   }
 
-  @BrowserTest
-  public void fieldsExistence_Add() {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.add().click();
-    SampleDialogElement dialog = view.dialog();
-    assertTrue(optional(dialog::header).isPresent());
-    assertTrue(optional(dialog::date).isPresent());
-    assertTrue(optional(dialog::sampleId).isPresent());
-    assertTrue(optional(dialog::replicate).isPresent());
-    assertTrue(optional(dialog::protocol).isPresent());
-    assertTrue(optional(dialog::assay).isPresent());
-    assertTrue(optional(dialog::type).isPresent());
-    assertTrue(optional(dialog::target).isPresent());
-    assertTrue(optional(dialog::strain).isPresent());
-    assertTrue(optional(dialog::strainDescription).isPresent());
-    assertTrue(optional(dialog::treatment).isPresent());
-    assertTrue(optional(dialog::keywords).isPresent());
-    assertTrue(optional(dialog::filenames).isPresent());
-    assertTrue(optional(dialog::note).isPresent());
-    assertTrue(optional(dialog::save).isPresent());
-    assertTrue(optional(dialog::cancel).isPresent());
-    assertFalse(optional(dialog::delete).isPresent());
-    assertTrue(optional(dialog::confirm).isPresent());
+  private void detachOnServiceGet() {
+    when(service.get(anyLong())).then(a -> {
+      @SuppressWarnings("unchecked") Optional<Sample> optionalSample = (Optional<Sample>) a.callRealMethod();
+      optionalSample.ifPresent(d -> entityManager.detach(d));
+      return optionalSample;
+    });
   }
 
-  @BrowserTest
-  public void fieldsExistence_Update() {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().select(0);
-    view.edit().click();
-    SampleDialogElement dialog = view.dialog();
-    assertTrue(optional(dialog::header).isPresent());
-    assertTrue(optional(dialog::date).isPresent());
-    assertTrue(optional(dialog::sampleId).isPresent());
-    assertTrue(optional(dialog::replicate).isPresent());
-    assertTrue(optional(dialog::protocol).isPresent());
-    assertTrue(optional(dialog::assay).isPresent());
-    assertTrue(optional(dialog::type).isPresent());
-    assertTrue(optional(dialog::target).isPresent());
-    assertTrue(optional(dialog::strain).isPresent());
-    assertTrue(optional(dialog::strainDescription).isPresent());
-    assertTrue(optional(dialog::treatment).isPresent());
-    assertTrue(optional(dialog::keywords).isPresent());
-    assertTrue(optional(dialog::filenames).isPresent());
-    assertTrue(optional(dialog::note).isPresent());
-    assertTrue(optional(dialog::save).isPresent());
-    assertTrue(optional(dialog::cancel).isPresent());
-    assertFalse(optional(dialog::delete).isPresent());
-    assertTrue(optional(dialog::confirm).isPresent());
+  private <T> int column(Grid<T> grid, Column<T> column) {
+    return grid.getColumns().indexOf(column);
   }
 
-  @BrowserTest
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void fieldsExistence_Deletable() {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.samples().select(0);
-    view.edit().click();
-    SampleDialogElement dialog = view.dialog();
-    assertTrue(optional(dialog::header).isPresent());
-    assertTrue(optional(dialog::date).isPresent());
-    assertTrue(optional(dialog::sampleId).isPresent());
-    assertTrue(optional(dialog::replicate).isPresent());
-    assertTrue(optional(dialog::protocol).isPresent());
-    assertTrue(optional(dialog::assay).isPresent());
-    assertTrue(optional(dialog::type).isPresent());
-    assertTrue(optional(dialog::target).isPresent());
-    assertTrue(optional(dialog::strain).isPresent());
-    assertTrue(optional(dialog::strainDescription).isPresent());
-    assertTrue(optional(dialog::treatment).isPresent());
-    assertTrue(optional(dialog::keywords).isPresent());
-    assertTrue(optional(dialog::filenames).isPresent());
-    assertTrue(optional(dialog::note).isPresent());
-    assertTrue(optional(dialog::save).isPresent());
-    assertTrue(optional(dialog::cancel).isPresent());
-    assertTrue(optional(dialog::delete).isPresent());
-    assertTrue(optional(dialog::confirm).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void save_New() {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.add().click();
-    SampleDialogElement dialog = view.dialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.add).click();
+    SampleDialog dialog = $(SampleDialog.class).first();
     fill(dialog);
 
-    TestTransaction.flagForCommit();
-    dialog.save().click();
-    TestTransaction.end();
+    test(dialog.save).click();
 
     String name = name() + "_20200720";
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
-        notification.getText());
+    Notification notification = $(Notification.class).first();
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name},
+        UI.getCurrent().getLocale()), test(notification).getText());
     List<Sample> samples = repository.findByOwner(new User(3L));
     Sample sample = samples.stream().filter(ex -> name.equals(ex.getName())).findFirst()
         .orElseThrow();
     assertNotNull(sample);
     assertNotEquals(0, sample.getId());
-    Assertions.assertEquals(name, sample.getName());
+    assertEquals(name, sample.getName());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(sample.getCreationDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(sample.getCreationDate()));
-    Assertions.assertEquals((Long) 3L, sample.getOwner().getId());
-    Assertions.assertEquals(date, sample.getDate());
-    Assertions.assertEquals(sampleId, sample.getSampleId());
-    Assertions.assertEquals(replicate, sample.getReplicate());
-    Assertions.assertEquals(protocol.getId(), sample.getProtocol().getId());
-    Assertions.assertEquals(assay, sample.getAssay());
-    Assertions.assertEquals(type, sample.getType());
-    Assertions.assertEquals(target, sample.getTarget());
-    Assertions.assertEquals(strain, sample.getStrain());
-    Assertions.assertEquals(strainDescription, sample.getStrainDescription());
-    Assertions.assertEquals(treatment, sample.getTreatment());
-    Assertions.assertEquals(2, sample.getKeywords().size());
+    assertEquals((Long) 3L, sample.getOwner().getId());
+    assertEquals(date, sample.getDate());
+    assertEquals(sampleId, sample.getSampleId());
+    assertEquals(replicate, sample.getReplicate());
+    assertEquals(protocol.getId(), sample.getProtocol().getId());
+    assertEquals(assay, sample.getAssay());
+    assertEquals(type, sample.getType());
+    assertEquals(target, sample.getTarget());
+    assertEquals(strain, sample.getStrain());
+    assertEquals(strainDescription, sample.getStrainDescription());
+    assertEquals(treatment, sample.getTreatment());
+    assertEquals(2, sample.getKeywords().size());
     assertTrue(sample.getKeywords().contains(keyword1));
     assertTrue(sample.getKeywords().contains(keyword2));
-    Assertions.assertEquals(1, sample.getFilenames().size());
+    assertEquals(1, sample.getFilenames().size());
     assertTrue(sample.getFilenames().contains(filename));
-    Assertions.assertEquals(note, sample.getNote());
-    Assertions.assertEquals(5, view.samples().getRowCount());
+    assertEquals(note, sample.getNote());
+    assertEquals(5, test(view.samples).size());
   }
 
-  @BrowserTest
+  @Test
   public void save_Update() throws Throwable {
-    open();
+    detachOnServiceGet();
     Sample sample = repository.findById(4L).orElseThrow();
     Path oldFolder = configuration.getHome().folder(sample);
     Files.createDirectories(oldFolder);
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().select(view.samples().name(2).startsWith("JS1") ? 2 : 3);
-    view.edit().click();
-    SampleDialogElement dialog = view.dialog();
+    SamplesView view = navigate(SamplesView.class);
+    // Sample is randomly JS1 or JS2 because they have the same date. Use a stable select.
+    view.samples.select(sample);
+    test(view.edit).click();
+    SampleDialog dialog = $(SampleDialog.class).first();
     fill(dialog);
 
-    TestTransaction.flagForCommit();
-    dialog.save().click();
-    TestTransaction.end();
+    test(dialog.save).click();
 
     String name = name() + "_20200720";
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
-        notification.getText());
+    Notification notification = $(Notification.class).first();
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name},
+        UI.getCurrent().getLocale()), test(notification).getText());
     sample = repository.findById(4L).orElseThrow();
-    Assertions.assertEquals(name, sample.getName());
-    Assertions.assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
-    Assertions.assertEquals((Long) 3L, sample.getOwner().getId());
-    Assertions.assertEquals(date, sample.getDate());
-    Assertions.assertEquals(sampleId, sample.getSampleId());
-    Assertions.assertEquals(replicate, sample.getReplicate());
-    Assertions.assertEquals(protocol.getId(), sample.getProtocol().getId());
-    Assertions.assertEquals(assay, sample.getAssay());
-    Assertions.assertEquals(type, sample.getType());
-    Assertions.assertEquals(target, sample.getTarget());
-    Assertions.assertEquals(strain, sample.getStrain());
-    Assertions.assertEquals(strainDescription, sample.getStrainDescription());
-    Assertions.assertEquals(treatment, sample.getTreatment());
-    Assertions.assertEquals(3, sample.getKeywords().size());
+    assertEquals(name, sample.getName());
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
+    assertEquals((Long) 3L, sample.getOwner().getId());
+    assertEquals(date, sample.getDate());
+    assertEquals(sampleId, sample.getSampleId());
+    assertEquals(replicate, sample.getReplicate());
+    assertEquals(protocol.getId(), sample.getProtocol().getId());
+    assertEquals(assay, sample.getAssay());
+    assertEquals(type, sample.getType());
+    assertEquals(target, sample.getTarget());
+    assertEquals(strain, sample.getStrain());
+    assertEquals(strainDescription, sample.getStrainDescription());
+    assertEquals(treatment, sample.getTreatment());
+    assertEquals(3, sample.getKeywords().size());
     assertTrue(sample.getKeywords().contains("chipseq"));
     assertTrue(sample.getKeywords().contains(keyword1));
     assertTrue(sample.getKeywords().contains(keyword2));
-    Assertions.assertEquals(2, sample.getFilenames().size());
+    assertEquals(2, sample.getFilenames().size());
     assertTrue(sample.getFilenames().contains("OF_20241118_ROB_01"));
     assertTrue(sample.getFilenames().contains(filename));
-    Assertions.assertEquals(note, sample.getNote());
+    assertEquals(note, sample.getNote());
     Dataset dataset = datasetRepository.findById(2L).orElseThrow();
-    Assertions.assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
     dataset = datasetRepository.findById(6L).orElseThrow();
-    Assertions.assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", dataset.getName());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", dataset.getName());
     Thread.sleep(1000); // Allow time to apply changes to files.
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder));
     assertFalse(Files.exists(oldFolder));
-    Assertions.assertEquals(4, view.samples().getRowCount());
-    Assertions.assertEquals(name, view.samples().name(0));
+    assertEquals(4, test(view.samples).size());
+    assertEquals(name, test(view.samples).getCellText(0, column(view.samples, view.name)));
   }
 
-  @BrowserTest
+  @Test
   public void cancel() {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().select(0);
-    view.edit().click();
-    SampleDialogElement dialog = view.dialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(0);
+    test(view.edit).click();
+    SampleDialog dialog = $(SampleDialog.class).first();
     fill(dialog);
 
-    TestTransaction.flagForCommit();
-    dialog.cancel().click();
-    TestTransaction.end();
+    test(dialog.cancel).click();
 
-    assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
+    assertFalse($(Notification.class).exists());
     Sample sample = repository.findById(4L).orElseThrow();
-    Assertions.assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
-    Assertions.assertEquals((Long) 3L, sample.getOwner().getId());
-    Assertions.assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
-    Assertions.assertEquals("JS1", sample.getSampleId());
-    Assertions.assertEquals("R1", sample.getReplicate());
-    Assertions.assertEquals((Long) 3L, sample.getProtocol().getId());
-    Assertions.assertEquals("ChIP-seq", sample.getAssay());
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
+    assertEquals((Long) 3L, sample.getOwner().getId());
+    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    assertEquals("JS1", sample.getSampleId());
+    assertEquals("R1", sample.getReplicate());
+    assertEquals((Long) 3L, sample.getProtocol().getId());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    Assertions.assertEquals("Spt16", sample.getTarget());
-    Assertions.assertEquals("yFR101", sample.getStrain());
-    Assertions.assertEquals("G24D", sample.getStrainDescription());
+    assertEquals("Spt16", sample.getTarget());
+    assertEquals("yFR101", sample.getStrain());
+    assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
-    Assertions.assertEquals(3, sample.getKeywords().size());
+    assertEquals(3, sample.getKeywords().size());
     assertTrue(sample.getKeywords().contains("chipseq"));
     assertTrue(sample.getKeywords().contains("ip"));
     assertTrue(sample.getKeywords().contains("G24D"));
-    Assertions.assertEquals(1, sample.getFilenames().size());
+    assertEquals(1, sample.getFilenames().size());
     assertTrue(sample.getFilenames().contains("OF_20241118_ROB_01"));
     assertNull(sample.getNote());
-    Assertions.assertEquals(4, view.samples().getRowCount());
+    assertEquals(4, test(view.samples).size());
   }
 
-  @BrowserTest
+  @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void delete() throws Throwable {
-    open();
     Sample sample = repository.findById(9L).get();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.samples().select(0);
-    view.edit().click();
-    SampleDialogElement dialog = view.dialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.ownerFilter).setValue("benoit.coulombe@ircm.qc.ca");
+    test(view.samples).select(0);
+    test(view.edit).click();
+    SampleDialog dialog = $(SampleDialog.class).first();
     final String name = sample.getName();
 
-    TestTransaction.flagForCommit();
-    dialog.delete().click();
-    dialog.confirm().getConfirmButton().click();
-    TestTransaction.end();
+    test(dialog.delete).click();
+    test($(ConfirmDialog.class).first()).confirm();
 
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name}, currentLocale()),
-        notification.getText());
+    Notification notification = $(Notification.class).first();
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name},
+        UI.getCurrent().getLocale()), test(notification).getText());
     assertFalse(repository.findById(9L).isPresent());
     Thread.sleep(1000); // Allow time to apply changes to files.
     assertFalse(Files.exists(folder));
-    Assertions.assertEquals(3, view.samples().getRowCount());
+    assertEquals(3, test(view.samples).size());
   }
 }

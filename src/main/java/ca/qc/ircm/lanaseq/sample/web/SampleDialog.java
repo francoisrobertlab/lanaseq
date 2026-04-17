@@ -138,7 +138,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver {
     form.setColspan(keywords, 2);
     form.setColspan(filenames, 2);
     form.setColspan(note, 2);
-    layout.add(form, error, confirm);
+    layout.add(form, error);
     layout.setSizeFull();
     getFooter().add(delete, cancel, save);
     date.setId(id(DATE));
@@ -317,9 +317,9 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver {
     Sample sample = binder.getBean();
     logger.debug("delete sample {}", sample);
     service.delete(sample);
-    Notification.show(getTranslation(MESSAGE_PREFIX + DELETED, sample.getName()));
-    fireDeletedEvent();
     close();
+    fireDeletedEvent();
+    Notification.show(getTranslation(MESSAGE_PREFIX + DELETED, sample.getName()));
   }
 
   long getSampleId() {

@@ -93,6 +93,13 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(dialog.message).isUsable());
+    assertTrue(test(dialog.filenamePatterns).isUsable());
+    assertTrue(test(dialog.createFolder).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));

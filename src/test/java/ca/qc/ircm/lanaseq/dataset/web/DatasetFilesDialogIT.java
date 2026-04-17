@@ -20,8 +20,6 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.editor.EditorImpl;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
@@ -73,10 +71,6 @@ public class DatasetFilesDialogIT extends SpringUIUnitTest {
   @AfterEach
   public void afterTest() {
     jobService.getJobs().forEach(jobService::removeJob);
-  }
-
-  private <T> int column(Grid<T> grid, Column<T> column) {
-    return grid.getColumns().indexOf(column);
   }
 
   @Test
