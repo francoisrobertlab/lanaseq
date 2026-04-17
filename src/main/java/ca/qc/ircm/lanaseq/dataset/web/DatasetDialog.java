@@ -450,9 +450,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver {
       Dataset dataset = binder.getBean();
       logger.debug("save dataset {}", dataset);
       service.save(dataset);
-      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()));
       close();
       fireSavedEvent();
+      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()));
     }
   }
 
@@ -460,9 +460,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver {
     Dataset dataset = binder.getBean();
     logger.debug("delete dataset {}", dataset);
     service.delete(dataset);
-    Notification.show(getTranslation(MESSAGE_PREFIX + DELETED, dataset.getName()));
-    fireDeletedEvent();
     close();
+    fireDeletedEvent();
+    Notification.show(getTranslation(MESSAGE_PREFIX + DELETED, dataset.getName()));
   }
 
   public long getDatasetId() {

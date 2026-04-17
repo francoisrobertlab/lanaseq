@@ -96,6 +96,15 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    test(view.datasets).isUsable();
+    test(view.edit).isUsable();
+    test(view.merge).isUsable();
+    test(view.files).isUsable();
+    test(view.analyze).isUsable();
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(DatasetGrid.ID, view.datasets.getId().orElse(""));

@@ -183,6 +183,37 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(dialog.namePrefix).isUsable());
+    assertTrue(test(dialog.generateName).isUsable());
+    assertTrue(test(dialog.keywords).isUsable());
+    assertTrue(test(dialog.filenames).isUsable());
+    assertTrue(dialog.protocol.isAttached());
+    assertTrue(dialog.protocol.isReadOnly());
+    assertTrue(dialog.assay.isAttached());
+    assertTrue(dialog.assay.isReadOnly());
+    assertTrue(dialog.type.isAttached());
+    assertTrue(dialog.type.isReadOnly());
+    assertTrue(dialog.target.isAttached());
+    assertTrue(dialog.target.isReadOnly());
+    assertTrue(dialog.strain.isAttached());
+    assertTrue(dialog.strain.isReadOnly());
+    assertTrue(dialog.strainDescription.isAttached());
+    assertTrue(dialog.strainDescription.isReadOnly());
+    assertTrue(dialog.treatment.isAttached());
+    assertTrue(dialog.treatment.isReadOnly());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.date).isUsable());
+    assertTrue(test(dialog.samplesHeader).isUsable());
+    assertTrue(test(dialog.samples).isUsable());
+    assertTrue(test(dialog.addSample).isUsable());
+    assertFalse(test(dialog.error).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertTrue(test(dialog.delete).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(NAME_PREFIX), dialog.namePrefix.getId().orElse(""));
