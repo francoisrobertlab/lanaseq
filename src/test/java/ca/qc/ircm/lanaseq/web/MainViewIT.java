@@ -2,52 +2,40 @@ package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.web.MainView.VIEW_NAME;
 
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.testbench.BrowserTest;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Integration tests for {@link MainView}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class MainViewIT extends AbstractBrowserTestCase {
+public class MainViewIT extends SpringUIUnitTest {
 
-  private void open() {
-    openView(VIEW_NAME);
-  }
-
-  @BrowserTest
+  @Test
   @WithAnonymousUser
   public void security_Anonymous() {
-    open();
-
-    $(SigninViewElement.class).waitForFirst();
+    navigate(VIEW_NAME, SigninView.class);
   }
 
-  @BrowserTest
+  @Test
   public void userRedirected() {
-    open();
-
-    $(DatasetsViewElement.class).waitForFirst();
+    navigate(VIEW_NAME, DatasetsView.class);
   }
 
-  @BrowserTest
+  @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void managerRedirected() {
-    open();
-
-    $(DatasetsViewElement.class).waitForFirst();
+    navigate(VIEW_NAME, DatasetsView.class);
   }
 
-  @BrowserTest
+  @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void adminRedirected() {
-    open();
-
-    $(DatasetsViewElement.class).waitForFirst();
+    navigate(VIEW_NAME, DatasetsView.class);
   }
 }

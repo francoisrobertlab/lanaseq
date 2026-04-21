@@ -83,6 +83,96 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence_User() {
+    assertTrue(test(view.applicationName).isUsable());
+    assertTrue(test(view.header).isUsable());
+    assertTrue(test(view.laboratory).isUsable());
+    assertTrue(test(view.drawerToggle).isUsable());
+    assertTrue(test(view.datasets).isUsable());
+    assertTrue(test(view.samples).isUsable());
+    assertTrue(test(view.protocols).isUsable());
+    assertTrue(test(view.publicFiles).isUsable());
+    assertTrue(test(view.jobs).isUsable());
+    assertTrue(test(view.profile).isUsable());
+    assertFalse(view.users.isVisible());
+    assertFalse(view.exitSwitchUser.isVisible());
+    assertTrue(test(view.signout).isUsable());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void fieldsExistence_Manager() {
+    assertTrue(test(view.applicationName).isUsable());
+    assertTrue(test(view.header).isUsable());
+    assertTrue(test(view.laboratory).isUsable());
+    assertTrue(test(view.drawerToggle).isUsable());
+    assertTrue(test(view.datasets).isUsable());
+    assertTrue(test(view.samples).isUsable());
+    assertTrue(test(view.protocols).isUsable());
+    assertTrue(test(view.publicFiles).isUsable());
+    assertTrue(test(view.jobs).isUsable());
+    assertTrue(test(view.profile).isUsable());
+    assertTrue(test(view.users).isUsable());
+    assertFalse(view.exitSwitchUser.isVisible());
+    assertTrue(test(view.signout).isUsable());
+  }
+
+  @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
+  public void fieldsExistence_Admin() {
+    assertTrue(test(view.applicationName).isUsable());
+    assertTrue(test(view.header).isUsable());
+    assertTrue(test(view.laboratory).isUsable());
+    assertTrue(test(view.drawerToggle).isUsable());
+    assertTrue(test(view.datasets).isUsable());
+    assertTrue(test(view.samples).isUsable());
+    assertTrue(test(view.protocols).isUsable());
+    assertTrue(test(view.publicFiles).isUsable());
+    assertTrue(test(view.jobs).isUsable());
+    assertTrue(test(view.profile).isUsable());
+    assertTrue(test(view.users).isUsable());
+    assertFalse(view.exitSwitchUser.isVisible());
+    assertTrue(test(view.signout).isUsable());
+  }
+
+  @Test
+  @WithMockUser(username = "jonh.smith@ircm.qc.ca", roles = {"USER", "PREVIOUS_ADMINISTRATOR"})
+  public void fieldsExistence_Runas() {
+    assertTrue(test(view.applicationName).isUsable());
+    assertTrue(test(view.header).isUsable());
+    assertTrue(test(view.laboratory).isUsable());
+    assertTrue(test(view.drawerToggle).isUsable());
+    assertTrue(test(view.datasets).isUsable());
+    assertTrue(test(view.samples).isUsable());
+    assertTrue(test(view.protocols).isUsable());
+    assertTrue(test(view.publicFiles).isUsable());
+    assertTrue(test(view.jobs).isUsable());
+    assertTrue(test(view.profile).isUsable());
+    assertFalse(view.users.isVisible());
+    assertTrue(test(view.exitSwitchUser).isUsable());
+    assertTrue(test(view.signout).isUsable());
+  }
+
+  @Test
+  @WithMockUser(username = "jonh.smith@ircm.qc.ca", roles = {"USER", "ADMIN",
+      "PREVIOUS_ADMINISTRATOR"})
+  public void fieldsExistence_RunasAdmin() {
+    assertTrue(test(view.applicationName).isUsable());
+    assertTrue(test(view.header).isUsable());
+    assertTrue(test(view.laboratory).isUsable());
+    assertTrue(test(view.drawerToggle).isUsable());
+    assertTrue(test(view.datasets).isUsable());
+    assertTrue(test(view.samples).isUsable());
+    assertTrue(test(view.protocols).isUsable());
+    assertTrue(test(view.publicFiles).isUsable());
+    assertTrue(test(view.jobs).isUsable());
+    assertTrue(test(view.profile).isUsable());
+    assertTrue(test(view.users).isUsable());
+    assertTrue(test(view.exitSwitchUser).isUsable());
+    assertTrue(test(view.signout).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(styleName(APPLICATION_NAME), view.applicationName.getId().orElse(""));

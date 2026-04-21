@@ -1,7 +1,5 @@
 package ca.qc.ircm.lanaseq.web;
 
-import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
-import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.web.SigninView.DISABLED;
 import static ca.qc.ircm.lanaseq.web.SigninView.FAIL;
@@ -40,17 +38,6 @@ public class SigninViewIT extends AbstractBrowserTestCase {
 
   private void open() {
     openView(VIEW_NAME);
-  }
-
-  @BrowserTest
-  public void title() {
-    open();
-
-    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
-        currentLocale());
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-            currentLocale()), getDriver().getTitle());
   }
 
   @BrowserTest
