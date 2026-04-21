@@ -60,6 +60,14 @@ public class PasswordViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.header).isUsable());
+    assertTrue(test(view.passwords.password).isUsable());
+    assertTrue(test(view.passwords.passwordConfirm).isUsable());
+    assertTrue(test(view.save).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));

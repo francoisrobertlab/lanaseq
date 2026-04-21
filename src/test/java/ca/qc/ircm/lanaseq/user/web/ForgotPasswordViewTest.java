@@ -77,6 +77,14 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.header).isUsable());
+    assertTrue(test(view.message).isUsable());
+    assertTrue(test(view.email).isUsable());
+    assertTrue(test(view.save).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));

@@ -120,6 +120,21 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.users).isUsable());
+    assertTrue(test(view.add).isUsable());
+    assertTrue(view.edit.isVisible());
+    assertFalse(view.edit.isEnabled());
+    assertTrue(view.switchUser.isVisible());
+    assertFalse(view.switchUser.isEnabled());
+    test(view.users).select(0);
+    assertTrue(view.edit.isVisible());
+    assertTrue(view.edit.isEnabled());
+    assertTrue(view.switchUser.isVisible());
+    assertTrue(view.switchUser.isEnabled());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(USERS, view.users.getId().orElse(""));

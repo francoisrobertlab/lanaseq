@@ -1,9 +1,9 @@
 package ca.qc.ircm.lanaseq.user.web;
 
-import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
@@ -18,15 +18,11 @@ import org.springframework.test.context.ActiveProfiles;
 @TestBenchTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class UsersViewContextPathIT extends AbstractBrowserTestCase {
-
-  private void open() {
-    openView(VIEW_NAME);
-  }
+public class SwitchUserContextPathIT extends AbstractBrowserTestCase {
 
   @BrowserTest
   public void switchUser() {
-    open();
+    openView(UsersView.VIEW_NAME);
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
     view.users().select(2);
 
@@ -36,5 +32,22 @@ public class UsersViewContextPathIT extends AbstractBrowserTestCase {
     ViewLayoutElement viewReload = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(viewReload::exitSwitchUser).isPresent());
     assertFalse(optional(viewReload::users).isPresent());
+  }
+
+  @BrowserTest
+  public void exitSwitchUser() {
+    openView(DatasetsView.VIEW_NAME);
+    $(ViewLayoutElement.class).waitForFirst().users().click();
+    UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
+    usersView.users().select(2);
+    usersView.switchUser().click();
+    $(DatasetsViewElement.class).waitForFirst();
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
+    view.profile().click();
+    openView(ExitSwitchUserView.VIEW_NAME);
+    $(DatasetsViewElement.class).waitForFirst();
+    ViewLayoutElement viewReload = $(ViewLayoutElement.class).waitForFirst();
+    assertFalse(optional(viewReload::exitSwitchUser).isPresent());
+    assertTrue(optional(viewReload::users).isPresent());
   }
 }

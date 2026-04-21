@@ -10,6 +10,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.ID;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.SAVED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -58,6 +59,44 @@ public class ProfileViewTest extends SpringUIUnitTest {
   public void beforeTest() {
     UI.getCurrent().setLocale(locale);
     view = navigate(ProfileView.class);
+  }
+
+  @Test
+  public void fieldsExistence_User() {
+    assertTrue(test(view.form).isUsable());
+    assertTrue(test(view.form.email).isUsable());
+    assertTrue(test(view.form.name).isUsable());
+    assertFalse(view.form.admin.isVisible());
+    assertFalse(view.form.manager.isVisible());
+    assertTrue(test(view.form.passwords.password).isUsable());
+    assertTrue(test(view.form.passwords.passwordConfirm).isUsable());
+    assertTrue(test(view.save).isUsable());
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void fieldsExistence_Manager() {
+    assertTrue(test(view.form).isUsable());
+    assertTrue(test(view.form.email).isUsable());
+    assertTrue(test(view.form.name).isUsable());
+    assertFalse(view.form.admin.isVisible());
+    assertTrue(test(view.form.manager).isUsable());
+    assertTrue(test(view.form.passwords.password).isUsable());
+    assertTrue(test(view.form.passwords.passwordConfirm).isUsable());
+    assertTrue(test(view.save).isUsable());
+  }
+
+  @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
+  public void fieldsExistence_Admin() {
+    assertTrue(test(view.form).isUsable());
+    assertTrue(test(view.form.email).isUsable());
+    assertTrue(test(view.form.name).isUsable());
+    assertTrue(test(view.form.admin).isUsable());
+    assertTrue(test(view.form.manager).isUsable());
+    assertTrue(test(view.form.passwords.password).isUsable());
+    assertTrue(test(view.form.passwords.passwordConfirm).isUsable());
+    assertTrue(test(view.save).isUsable());
   }
 
   @Test

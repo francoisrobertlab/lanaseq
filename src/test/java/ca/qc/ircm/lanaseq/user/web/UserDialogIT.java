@@ -2,114 +2,80 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.SAVED;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import com.vaadin.flow.component.notification.testbench.NotificationElement;
-import com.vaadin.testbench.BrowserTest;
+import ca.qc.ircm.lanaseq.user.UserService;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
+import jakarta.persistence.EntityManager;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.transaction.TestTransaction;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * Integration tests for {@link UserDialog}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class UserDialogIT extends AbstractBrowserTestCase {
+public class UserDialogIT extends SpringUIUnitTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(UserDialog.class);
+  @MockitoSpyBean
+  private UserService service;
   @Autowired
   private UserRepository repository;
   @Autowired
   private PasswordEncoder passwordEncoder;
   @Autowired
   private MessageSource messageSource;
+  @Autowired
+  private EntityManager entityManager;
   private final String email = "it_test@ircm.qc.ca";
   private final String name = "test_name";
   private final String password = "test_password";
 
-  private void open() {
-    openView(VIEW_NAME);
+  private void setFields(UserDialog dialog) {
+    dialog.form.email.setValue(email);
+    dialog.form.name.setValue(name);
+    dialog.form.passwords.password.setValue(password);
+    dialog.form.passwords.passwordConfirm.setValue(password);
   }
 
-  private void setFields(UserDialogElement dialog) {
-    dialog.form().email().setValue(email);
-    dialog.form().name().setValue(name);
-    dialog.form().passwords().password().setValue(password);
-    dialog.form().passwords().passwordConfirm().setValue(password);
+  private void detachOnServiceGet() {
+    when(service.get(anyLong())).then(a -> {
+      @SuppressWarnings("unchecked") Optional<User> optionalUser = (Optional<User>) a.callRealMethod();
+      optionalUser.ifPresent(d -> entityManager.detach(d));
+      return optionalUser;
+    });
   }
 
-  @BrowserTest
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void fieldsExistence_Manager() {
-    open();
-    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
-
-    view.users().select(1);
-    view.edit().click();
-
-    UserDialogElement dialog = view.dialog();
-    assertTrue(optional(dialog::header).isPresent());
-    assertTrue(optional(dialog::form).isPresent());
-    assertTrue(optional(() -> dialog.form().email()).isPresent());
-    assertTrue(optional(() -> dialog.form().name()).isPresent());
-    assertFalse(optional(() -> dialog.form().admin()).isPresent());
-    assertTrue(optional(() -> dialog.form().manager()).isPresent());
-    assertTrue(optional(() -> dialog.form().passwords()).isPresent());
-    assertTrue(optional(() -> dialog.form().passwords().password()).isPresent());
-    assertTrue(optional(() -> dialog.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(dialog::save).isPresent());
-    assertTrue(optional(dialog::cancel).isPresent());
-  }
-
-  @BrowserTest
-  public void fieldsExistence_Admin() {
-    open();
-    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
-
-    view.users().select(2);
-    view.edit().click();
-
-    UserDialogElement dialog = view.dialog();
-    assertTrue(optional(dialog::header).isPresent());
-    assertTrue(optional(dialog::form).isPresent());
-    assertTrue(optional(() -> dialog.form().email()).isPresent());
-    assertTrue(optional(() -> dialog.form().name()).isPresent());
-    assertTrue(optional(() -> dialog.form().admin()).isPresent());
-    assertTrue(optional(() -> dialog.form().manager()).isPresent());
-    assertTrue(optional(() -> dialog.form().passwords()).isPresent());
-    assertTrue(optional(() -> dialog.form().passwords().password()).isPresent());
-    assertTrue(optional(() -> dialog.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(dialog::save).isPresent());
-    assertTrue(optional(dialog::cancel).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void save() {
-    open();
-    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
-    view.users().select(2);
-    view.edit().click();
-    UserDialogElement dialog = view.dialog();
+    detachOnServiceGet();
+    UsersView view = navigate(UsersView.class);
+    test(view.users).select(2);
+    test(view.edit).click();
+    UserDialog dialog = $(UserDialog.class).first();
     setFields(dialog);
 
-    TestTransaction.flagForCommit();
-    dialog.save().click();
-    TestTransaction.end();
+    test(dialog.save).click();
 
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{email}, currentLocale()),
-        notification.getText());
+    assertFalse($(UserDialog.class).exists());
+    Notification notification = $(Notification.class).first();
+    Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{email},
+        UI.getCurrent().getLocale()), test(notification).getText());
     User user = repository.findById(3L).orElseThrow();
     Assertions.assertEquals(email, user.getEmail());
     Assertions.assertEquals(name, user.getName());
@@ -118,22 +84,20 @@ public class UserDialogIT extends AbstractBrowserTestCase {
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
   }
 
-  @BrowserTest
+  @Test
   public void save_Fail() {
-    open();
-    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
-    view.users().select(2);
-    view.edit().click();
-    UserDialogElement dialog = view.dialog();
+    detachOnServiceGet();
+    UsersView view = navigate(UsersView.class);
+    test(view.users).select(2);
+    test(view.edit).click();
+    UserDialog dialog = $(UserDialog.class).first();
     setFields(dialog);
-    dialog.form().email().setValue("test");
+    dialog.form.email.setValue("test");
 
-    TestTransaction.flagForCommit();
-    dialog.save().click();
-    TestTransaction.end();
+    test(dialog.save).click();
 
-    assertTrue(optional(view::dialog).isPresent());
-    assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
+    assertTrue($(UserDialog.class).exists());
+    assertFalse($(Notification.class).exists());
     User user = repository.findById(3L).orElseThrow();
     Assertions.assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
     Assertions.assertEquals("Jonh Smith", user.getName());
@@ -142,20 +106,19 @@ public class UserDialogIT extends AbstractBrowserTestCase {
     assertTrue(passwordEncoder.matches("pass1", user.getHashedPassword()));
   }
 
-  @BrowserTest
+  @Test
   public void cancel() {
-    open();
-    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
-    view.users().select(2);
-    view.edit().click();
-    UserDialogElement dialog = view.dialog();
+    detachOnServiceGet();
+    UsersView view = navigate(UsersView.class);
+    test(view.users).select(2);
+    test(view.edit).click();
+    UserDialog dialog = $(UserDialog.class).first();
     setFields(dialog);
 
-    TestTransaction.flagForCommit();
-    dialog.cancel().click();
-    TestTransaction.end();
+    test(dialog.cancel).click();
 
-    assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
+    assertFalse($(UserDialog.class).exists());
+    assertFalse($(Notification.class).exists());
     User user = repository.findById(3L).orElseThrow();
     Assertions.assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
     Assertions.assertEquals("Jonh Smith", user.getName());

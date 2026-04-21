@@ -78,6 +78,35 @@ public class UserDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void fieldsExistence_Manager() {
+    assertTrue(test(dialog.form).isUsable());
+    assertTrue(test(dialog.form.email).isUsable());
+    assertTrue(test(dialog.form.name).isUsable());
+    assertFalse(dialog.form.admin.isVisible());
+    assertTrue(test(dialog.form.manager).isUsable());
+    assertTrue(test(dialog.form.passwords).isUsable());
+    assertTrue(test(dialog.form.passwords.password).isUsable());
+    assertTrue(test(dialog.form.passwords.passwordConfirm).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+  }
+
+  @Test
+  public void fieldsExistence_Admin() {
+    assertTrue(test(dialog.form).isUsable());
+    assertTrue(test(dialog.form.email).isUsable());
+    assertTrue(test(dialog.form.name).isUsable());
+    assertTrue(test(dialog.form.admin).isUsable());
+    assertTrue(test(dialog.form.manager).isUsable());
+    assertTrue(test(dialog.form.passwords).isUsable());
+    assertTrue(test(dialog.form.passwords.password).isUsable());
+    assertTrue(test(dialog.form.passwords.passwordConfirm).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+  }
+
+  @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
