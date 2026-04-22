@@ -48,7 +48,7 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 @EnableMethodSecurity(securedEnabled = true)
 public class WebSecurityConfiguration {
 
-  public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
+  private static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
   private static final String SIGNIN_DEFAULT_FAILURE_URL =
       SIGNIN_PROCESSING_URL + "?" + SigninView.FAIL;
   private static final String SIGNIN_LOCKED_URL = SIGNIN_PROCESSING_URL + "?" + SigninView.LOCKED;

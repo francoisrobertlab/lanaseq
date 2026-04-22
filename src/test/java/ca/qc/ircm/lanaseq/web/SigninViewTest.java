@@ -95,6 +95,12 @@ public class SigninViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void fieldsExistence() {
+    assertTrue(test(view).isOpen());
+    assertTrue(test(view).isUsable());
+  }
+
+  @Test
   public void labels() {
     assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.i18n.getHeader().getTitle());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DESCRIPTION),
