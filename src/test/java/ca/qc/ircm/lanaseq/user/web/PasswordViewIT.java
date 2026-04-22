@@ -45,7 +45,7 @@ public class PasswordViewIT extends SpringUIUnitTest {
   }
 
   @Test
-  public void mainView() {
+  public void forceChangePassword_mainView() {
     PasswordView view = navigate(MainView.VIEW_NAME, PasswordView.class);
     assertTrue(test(view.header).isUsable());
     assertTrue(test(view.passwords.password).isUsable());
@@ -54,7 +54,7 @@ public class PasswordViewIT extends SpringUIUnitTest {
   }
 
   @Test
-  public void datasetsView() {
+  public void forceChangePassword_datasetsView() {
     PasswordView view = navigate(DatasetsView.VIEW_NAME, PasswordView.class);
     assertTrue(test(view.header).isUsable());
     assertTrue(test(view.passwords.password).isUsable());
