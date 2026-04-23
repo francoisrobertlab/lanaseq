@@ -8,25 +8,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractLocalBrowserTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
- * Integration tests for {@link SampleFilesDialog}.
+ * Integration tests for {@link SampleFilesDialog} using Selenium.
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SampleFilesDialogLocalIT extends AbstractLocalBrowserTestCase {
+public class SampleFilesDialogDownloadIT extends AbstractSeleniumTestCase {
 
   @Value("${download-home}")
   protected Path downloadHome;
@@ -39,7 +39,7 @@ public class SampleFilesDialogLocalIT extends AbstractLocalBrowserTestCase {
     openView(VIEW_NAME);
   }
 
-  @BrowserTest
+  @Test
   public void download() throws Throwable {
     Files.createDirectories(downloadHome);
     Path downloaded = downloadHome.resolve("R1.fastq");
@@ -54,9 +54,10 @@ public class SampleFilesDialogLocalIT extends AbstractLocalBrowserTestCase {
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement dialog = view.filesDialog();
+    SamplesViewPage view = waitUntil(SamplesViewPage.find());
+    view.samples().select(1);
+    view.files().click();
+    SampleFilesDialogComponent dialog = waitUntil(SampleFilesDialogComponent.find());
 
     dialog.files().download(0).click();
 

@@ -1,37 +1,36 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.PublicSampleFiles.REST_MAPPING;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 
 /**
- * Integration tests for {@link PublicSampleFiles}.
+ * Integration tests for {@link PublicSampleFiles} using Selenium.
  */
 @TestBenchTestAnnotations
 @WithAnonymousUser
-public class PublicSampleFilesIT extends AbstractBrowserTestCase {
+public class PublicSampleFilesIT extends AbstractSeleniumTestCase {
 
   @Autowired
   private SampleRepository repository;
   @Autowired
-  private SamplePublicFileRepository samplePublicFileRepository;
-  @Autowired
   private AppConfiguration configuration;
 
-  @BrowserTest
+  @Test
   public void publicFile() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path home = configuration.getHome().folder(sample);
@@ -44,7 +43,7 @@ public class PublicSampleFilesIT extends AbstractBrowserTestCase {
     openView(
         REST_MAPPING + "/" + sample.getName() + "/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
 
-    Assertions.assertEquals(Files.readString(file1).replaceAll("\n", " "),
-        $("body").waitForFirst().getText());
+    WebElement body = waitUntil(d -> d.findElement(By.cssSelector("body")));
+    assertEquals(Files.readString(file1).replaceAll("\\n", " "), body.getText());
   }
 }
