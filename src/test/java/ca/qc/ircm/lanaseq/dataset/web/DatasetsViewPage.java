@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 
 import ca.qc.ircm.lanaseq.test.config.SeleniumComponent;
@@ -20,5 +21,13 @@ public class DatasetsViewPage extends SeleniumComponent {
   public DatasetsViewPage(WebElement datasetsView) {
     super(datasetsView);
     assert ID.equals(datasetsView.getAttribute("id"));
+  }
+
+  public DatasetGridComponent datasets() {
+    return new DatasetGridComponent(element.findElement(By.id(DatasetGrid.ID)));
+  }
+
+  public WebElement files() {
+    return element.findElement(By.id(FILES));
   }
 }
