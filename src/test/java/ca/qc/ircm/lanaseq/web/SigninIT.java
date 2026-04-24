@@ -10,12 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPage;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewComponent;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
 import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
-import ca.qc.ircm.lanaseq.user.web.ForgotPasswordViewPage;
+import ca.qc.ircm.lanaseq.user.web.ForgotPasswordViewComponent;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -45,13 +45,13 @@ public class SigninIT extends AbstractSeleniumTestCase {
   @Test
   public void sign_Fail_invalid_username() {
     open();
-    SigninViewPage view = waitUntil(SigninViewPage.find());
+    SigninViewComponent view = waitUntil(SigninViewComponent.find());
     view.username().sendKeys("not.exists@ircm.qc.ca");
     view.password().sendKeys("notright");
     view.signin().click();
     waitUntil(d -> Optional.ofNullable(d.getCurrentUrl()).orElse("")
         .startsWith(viewUrl(VIEW_NAME) + "?"));
-    view = waitUntil(SigninViewPage.find());
+    view = waitUntil(SigninViewComponent.find());
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FAIL, null, currentLocale()),
         view.errorMessageDescription().getText());
     assertNotNull(driver.getCurrentUrl());
@@ -62,13 +62,13 @@ public class SigninIT extends AbstractSeleniumTestCase {
   @Test
   public void sign_Fail_invalid_password() {
     open();
-    SigninViewPage view = waitUntil(SigninViewPage.find());
+    SigninViewComponent view = waitUntil(SigninViewComponent.find());
     view.username().sendKeys("olivia.brown@ircm.qc.ca");
     view.password().sendKeys("notright");
     view.signin().click();
     waitUntil(d -> Optional.ofNullable(d.getCurrentUrl()).orElse("")
         .startsWith(viewUrl(VIEW_NAME) + "?"));
-    view = waitUntil(SigninViewPage.find());
+    view = waitUntil(SigninViewComponent.find());
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FAIL, null, currentLocale()),
         view.errorMessageDescription().getText());
     assertEquals(viewUrl(VIEW_NAME) + "?" + FAIL, driver.getCurrentUrl());
@@ -78,13 +78,13 @@ public class SigninIT extends AbstractSeleniumTestCase {
   @Test
   public void sign_Disabled() {
     open();
-    SigninViewPage view = waitUntil(SigninViewPage.find());
+    SigninViewComponent view = waitUntil(SigninViewComponent.find());
     view.username().sendKeys("ava.martin@ircm.qc.ca");
     view.password().sendKeys("password");
     view.signin().click();
     waitUntil(d -> Optional.ofNullable(d.getCurrentUrl()).orElse("")
         .startsWith(viewUrl(VIEW_NAME) + "?"));
-    view = waitUntil(SigninViewPage.find());
+    view = waitUntil(SigninViewComponent.find());
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + DISABLED, null, currentLocale()),
         view.errorMessageDescription().getText());
     assertEquals(viewUrl(VIEW_NAME) + "?" + DISABLED, driver.getCurrentUrl());
@@ -94,9 +94,9 @@ public class SigninIT extends AbstractSeleniumTestCase {
   @Test
   public void sign_Locked() {
     open();
-    SigninViewPage view;
+    SigninViewComponent view;
     for (int i = 0; i < 6; i++) {
-      view = waitUntil(SigninViewPage.find());
+      view = waitUntil(SigninViewComponent.find());
       view.username().sendKeys("olivia.brown@ircm.qc.ca");
       view.password().sendKeys("notright");
       view.signin().click();
@@ -106,7 +106,7 @@ public class SigninIT extends AbstractSeleniumTestCase {
         throw new IllegalStateException("Sleep was interrupted", e);
       }
     }
-    view = waitUntil(SigninViewPage.find());
+    view = waitUntil(SigninViewComponent.find());
     System.out.println(view.errorMessageDescription().getText());
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + LOCKED,
             new Object[]{configuration.lockDuration().getSeconds() / 60}, currentLocale()),
@@ -118,11 +118,11 @@ public class SigninIT extends AbstractSeleniumTestCase {
   @Test
   public void sign() {
     open();
-    SigninViewPage view = waitUntil(SigninViewPage.find());
+    SigninViewComponent view = waitUntil(SigninViewComponent.find());
     view.username().sendKeys("jonh.smith@ircm.qc.ca");
     view.password().sendKeys("pass1");
     view.signin().click();
-    waitUntil(DatasetsViewPage.find());
+    waitUntil(DatasetsViewComponent.find());
     assertEquals(viewUrl(DatasetsView.VIEW_NAME), driver.getCurrentUrl());
     Cookie rememberMeCookie = driver.manage().getCookieNamed("remember-me");
     assertNotNull(rememberMeCookie);
@@ -133,9 +133,9 @@ public class SigninIT extends AbstractSeleniumTestCase {
   @Test
   public void forgotPassword() {
     open();
-    SigninViewPage view = waitUntil(SigninViewPage.find());
+    SigninViewComponent view = waitUntil(SigninViewComponent.find());
     view.forgotPassword().click();
-    waitUntil(ForgotPasswordViewPage.find());
+    waitUntil(ForgotPasswordViewComponent.find());
     assertEquals(viewUrl(ForgotPasswordView.VIEW_NAME), driver.getCurrentUrl());
     assertNull(driver.manage().getCookieNamed("remember-me"));
   }
@@ -144,7 +144,7 @@ public class SigninIT extends AbstractSeleniumTestCase {
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void already_User() {
     open();
-    waitUntil(DatasetsViewPage.find());
+    waitUntil(DatasetsViewComponent.find());
     assertEquals(viewUrl(DatasetsView.VIEW_NAME), driver.getCurrentUrl());
   }
 }

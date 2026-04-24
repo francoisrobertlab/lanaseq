@@ -14,13 +14,13 @@ import org.openqa.selenium.WebElement;
 /**
  * Web element for {@link ProtocolsView}.
  */
-public class ProtocolsViewPage extends SeleniumComponent {
+public class ProtocolsViewComponent extends SeleniumComponent {
 
-  public static Function<WebDriver, ProtocolsViewPage> find() {
-    return d -> new ProtocolsViewPage(d.findElement(By.id(ID)));
+  public static Function<WebDriver, ProtocolsViewComponent> find() {
+    return d -> new ProtocolsViewComponent(d.findElement(By.id(ID)));
   }
 
-  public ProtocolsViewPage(WebElement protocolsView) {
+  public ProtocolsViewComponent(WebElement protocolsView) {
     super(protocolsView);
     assert ID.equals(protocolsView.getAttribute("id"));
   }

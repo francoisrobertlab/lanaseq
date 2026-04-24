@@ -11,13 +11,13 @@ import org.openqa.selenium.WebElement;
 /**
  * Web element for {@link ForgotPasswordView}.
  */
-public class ForgotPasswordViewPage extends SeleniumComponent {
+public class ForgotPasswordViewComponent extends SeleniumComponent {
 
-  public static Function<WebDriver, ForgotPasswordViewPage> find() {
-    return d -> new ForgotPasswordViewPage(d.findElement(By.id(ID)));
+  public static Function<WebDriver, ForgotPasswordViewComponent> find() {
+    return d -> new ForgotPasswordViewComponent(d.findElement(By.id(ID)));
   }
 
-  public ForgotPasswordViewPage(WebElement forgotPasswordView) {
+  public ForgotPasswordViewComponent(WebElement forgotPasswordView) {
     super(forgotPasswordView);
     assert ID.equals(forgotPasswordView.getAttribute("id"));
   }

@@ -37,7 +37,7 @@ public class ProtocolHistoryDialogDownloadIT extends AbstractSeleniumTestCase {
         Objects.requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx"))
             .toURI());
     open();
-    ProtocolsViewPage view = waitUntil(ProtocolsViewPage.find());
+    ProtocolsViewComponent view = waitUntil(ProtocolsViewComponent.find());
     view.protocols().select(2);
     view.history().click();
     ProtocolHistoryDialogComponent dialog = waitUntil(ProtocolHistoryDialogComponent.find());

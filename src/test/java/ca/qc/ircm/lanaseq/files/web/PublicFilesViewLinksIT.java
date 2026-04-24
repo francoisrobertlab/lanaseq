@@ -34,7 +34,7 @@ public class PublicFilesViewLinksIT extends AbstractSeleniumTestCase {
     Path downloaded = downloadHome.resolve("links.txt");
     Files.deleteIfExists(downloaded);
     open();
-    PublicFilesViewPage view = waitUntil(PublicFilesViewPage.find());
+    PublicFilesViewComponent view = waitUntil(PublicFilesViewComponent.find());
 
     view.downloadLinks().click();
 
@@ -67,7 +67,7 @@ public class PublicFilesViewLinksIT extends AbstractSeleniumTestCase {
     Path downloaded = downloadHome.resolve("links.txt");
     Files.deleteIfExists(downloaded);
     open();
-    PublicFilesViewPage view = waitUntil(PublicFilesViewPage.find());
+    PublicFilesViewComponent view = waitUntil(PublicFilesViewComponent.find());
     view.files().filenameFilter().sendKeys("JS1");
 
     view.downloadLinks().click();

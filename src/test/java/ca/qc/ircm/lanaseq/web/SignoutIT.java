@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPage;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewComponent;
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
 import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import org.junit.jupiter.api.Test;
@@ -25,47 +25,47 @@ public class SignoutIT extends AbstractSeleniumTestCase {
   @Test
   public void signout() {
     openView(DatasetsView.VIEW_NAME);
-    waitUntil(ViewLayoutPage.find());
+    waitUntil(ViewLayoutComponent.find());
     openView(SignoutView.VIEW_NAME);
-    waitUntil(SigninViewPage.find());
+    waitUntil(SigninViewComponent.find());
   }
 
   @Test
   @WithAnonymousUser
   public void signout_clear_rememberme() {
     openView(SigninView.VIEW_NAME);
-    SigninViewPage view = waitUntil(SigninViewPage.find());
+    SigninViewComponent view = waitUntil(SigninViewComponent.find());
     view.username().sendKeys("jonh.smith@ircm.qc.ca");
     view.password().sendKeys("pass1");
     view.signin().click();
-    waitUntil(DatasetsViewPage.find());
+    waitUntil(DatasetsViewComponent.find());
     assertNotNull(driver.manage().getCookieNamed("remember-me"));
     openView(SignoutView.VIEW_NAME);
-    waitUntil(SigninViewPage.find());
+    waitUntil(SigninViewComponent.find());
     assertNull(driver.manage().getCookieNamed("remember-me"));
   }
 
   @Test
   public void signout_sidenav() {
     open();
-    ViewLayoutPage layout = waitUntil(ViewLayoutPage.find());
+    ViewLayoutComponent layout = waitUntil(ViewLayoutComponent.find());
     layout.signout().click();
-    waitUntil(SigninViewPage.find());
+    waitUntil(SigninViewComponent.find());
   }
 
   @Test
   @WithAnonymousUser
   public void signout_sidenav_clear_rememberme() {
     openView(SigninView.VIEW_NAME);
-    SigninViewPage view = waitUntil(SigninViewPage.find());
+    SigninViewComponent view = waitUntil(SigninViewComponent.find());
     view.username().sendKeys("jonh.smith@ircm.qc.ca");
     view.password().sendKeys("pass1");
     view.signin().click();
-    waitUntil(DatasetsViewPage.find());
+    waitUntil(DatasetsViewComponent.find());
     assertNotNull(driver.manage().getCookieNamed("remember-me"));
-    ViewLayoutPage layout = waitUntil(ViewLayoutPage.find());
+    ViewLayoutComponent layout = waitUntil(ViewLayoutComponent.find());
     layout.signout().click();
-    waitUntil(SigninViewPage.find());
+    waitUntil(SigninViewComponent.find());
     assertNull(driver.manage().getCookieNamed("remember-me"));
   }
 }

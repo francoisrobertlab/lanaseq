@@ -23,8 +23,8 @@ class SignoutContextPathIT extends AbstractSeleniumTestCase {
   @Test
   public void signout() {
     open();
-    ViewLayoutPage layout = waitUntil(ViewLayoutPage.find());
+    ViewLayoutComponent layout = waitUntil(ViewLayoutComponent.find());
     layout.signout().click();
-    waitUntil(SigninViewPage.find());
+    waitUntil(SigninViewComponent.find());
   }
 }

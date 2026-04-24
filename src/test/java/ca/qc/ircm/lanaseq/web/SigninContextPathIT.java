@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPage;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewComponent;
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
 import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import org.junit.jupiter.api.Test;
@@ -28,11 +28,11 @@ public class SigninContextPathIT extends AbstractSeleniumTestCase {
   @Test
   public void sign() {
     open();
-    SigninViewPage view = waitUntil(SigninViewPage.find());
+    SigninViewComponent view = waitUntil(SigninViewComponent.find());
     view.username().sendKeys("jonh.smith@ircm.qc.ca");
     view.password().sendKeys("pass1");
     view.signin().click();
-    waitUntil(DatasetsViewPage.find());
+    waitUntil(DatasetsViewComponent.find());
     Cookie rememberMeCookie = driver.manage().getCookieNamed("remember-me");
     assertNotNull(rememberMeCookie);
     assertEquals(contextPath, rememberMeCookie.getPath());

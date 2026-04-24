@@ -13,13 +13,13 @@ import org.openqa.selenium.WebElement;
 /**
  * Web element for {@link SamplesView}.
  */
-public class SamplesViewPage extends SeleniumComponent {
+public class SamplesViewComponent extends SeleniumComponent {
 
-  public static Function<WebDriver, SamplesViewPage> find() {
-    return d -> new SamplesViewPage(d.findElement(By.id(ID)));
+  public static Function<WebDriver, SamplesViewComponent> find() {
+    return d -> new SamplesViewComponent(d.findElement(By.id(ID)));
   }
 
-  public SamplesViewPage(WebElement samplesView) {
+  public SamplesViewComponent(WebElement samplesView) {
     super(samplesView);
     assert ID.equals(samplesView.getAttribute("id"));
   }

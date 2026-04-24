@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPage;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewComponent;
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
 import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
-import ca.qc.ircm.lanaseq.web.ViewLayoutPage;
+import ca.qc.ircm.lanaseq.web.ViewLayoutComponent;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -21,13 +21,13 @@ public class SwitchUserIT extends AbstractSeleniumTestCase {
   @Test
   public void switchUser() {
     openView(UsersView.VIEW_NAME);
-    UsersViewPage view = waitUntil(UsersViewPage.find());
+    UsersViewComponent view = waitUntil(UsersViewComponent.find());
     view.users().select(2);
 
     view.switchUser().click();
 
-    waitUntil(DatasetsViewPage.find());
-    ViewLayoutPage layout = waitUntil(ViewLayoutPage.find());
+    waitUntil(DatasetsViewComponent.find());
+    ViewLayoutComponent layout = waitUntil(ViewLayoutComponent.find());
     assertTrue(optional(layout::exitSwitchUser).isPresent());
     assertFalse(optional(layout::users).isPresent());
   }
@@ -35,16 +35,16 @@ public class SwitchUserIT extends AbstractSeleniumTestCase {
   @Test
   public void exitSwitchUser() {
     openView(DatasetsView.VIEW_NAME);
-    waitUntil(ViewLayoutPage.find()).users().click();
-    UsersViewPage view = waitUntil(UsersViewPage.find());
+    waitUntil(ViewLayoutComponent.find()).users().click();
+    UsersViewComponent view = waitUntil(UsersViewComponent.find());
     view.users().select(2);
     view.switchUser().click();
-    waitUntil(DatasetsViewPage.find());
-    ViewLayoutPage layout = waitUntil(ViewLayoutPage.find());
+    waitUntil(DatasetsViewComponent.find());
+    ViewLayoutComponent layout = waitUntil(ViewLayoutComponent.find());
     layout.profile().click();
     openView(ExitSwitchUserView.VIEW_NAME);
-    waitUntil(DatasetsViewPage.find());
-    layout = waitUntil(ViewLayoutPage.find());
+    waitUntil(DatasetsViewComponent.find());
+    layout = waitUntil(ViewLayoutComponent.find());
     assertFalse(optional(layout::exitSwitchUser).isPresent());
     assertTrue(optional(layout::users).isPresent());
   }

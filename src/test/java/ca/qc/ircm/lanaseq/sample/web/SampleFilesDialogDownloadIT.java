@@ -54,7 +54,7 @@ public class SampleFilesDialogDownloadIT extends AbstractSeleniumTestCase {
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
-    SamplesViewPage view = waitUntil(SamplesViewPage.find());
+    SamplesViewComponent view = waitUntil(SamplesViewComponent.find());
     view.samples().select(1);
     view.files().click();
     SampleFilesDialogComponent dialog = waitUntil(SampleFilesDialogComponent.find());

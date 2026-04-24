@@ -36,7 +36,7 @@ public class ProtocolDialogDownloadIT extends AbstractSeleniumTestCase {
     Path source = Paths.get(
         Objects.requireNonNull(getClass().getResource("/protocol/FLAG_Protocol.docx")).toURI());
     open();
-    ProtocolsViewPage view = waitUntil(ProtocolsViewPage.find());
+    ProtocolsViewComponent view = waitUntil(ProtocolsViewComponent.find());
     view.protocols().select(0);
     view.edit().click();
     ProtocolDialogComponent dialog = waitUntil(ProtocolDialogComponent.find());

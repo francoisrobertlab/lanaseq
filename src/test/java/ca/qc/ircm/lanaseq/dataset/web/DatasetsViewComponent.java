@@ -12,13 +12,13 @@ import org.openqa.selenium.WebElement;
 /**
  * Web element for {@link DatasetsView}.
  */
-public class DatasetsViewPage extends SeleniumComponent {
+public class DatasetsViewComponent extends SeleniumComponent {
 
-  public static Function<WebDriver, DatasetsViewPage> find() {
-    return d -> new DatasetsViewPage(d.findElement(By.id(ID)));
+  public static Function<WebDriver, DatasetsViewComponent> find() {
+    return d -> new DatasetsViewComponent(d.findElement(By.id(ID)));
   }
 
-  public DatasetsViewPage(WebElement datasetsView) {
+  public DatasetsViewComponent(WebElement datasetsView) {
     super(datasetsView);
     assert ID.equals(datasetsView.getAttribute("id"));
   }

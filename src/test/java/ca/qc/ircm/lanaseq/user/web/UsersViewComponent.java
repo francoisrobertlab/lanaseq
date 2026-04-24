@@ -13,13 +13,13 @@ import org.openqa.selenium.WebElement;
 /**
  * Web element for {@link UsersView}.
  */
-public class UsersViewPage extends SeleniumComponent {
+public class UsersViewComponent extends SeleniumComponent {
 
-  public static Function<WebDriver, UsersViewPage> find() {
-    return d -> new UsersViewPage(d.findElement(By.id(ID)));
+  public static Function<WebDriver, UsersViewComponent> find() {
+    return d -> new UsersViewComponent(d.findElement(By.id(ID)));
   }
 
-  public UsersViewPage(WebElement usersView) {
+  public UsersViewComponent(WebElement usersView) {
     super(usersView);
     assert ID.equals(usersView.getAttribute("id"));
   }

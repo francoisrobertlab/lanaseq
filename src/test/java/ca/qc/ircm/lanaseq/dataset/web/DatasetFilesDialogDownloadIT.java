@@ -54,7 +54,7 @@ public class DatasetFilesDialogDownloadIT extends AbstractSeleniumTestCase {
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
-    DatasetsViewPage view = waitUntil(DatasetsViewPage.find());
+    DatasetsViewComponent view = waitUntil(DatasetsViewComponent.find());
     view.datasets().select(3);
     view.files().click();
     DatasetFilesDialogComponent dialog = waitUntil(DatasetFilesDialogComponent.find());

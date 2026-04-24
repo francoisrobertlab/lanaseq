@@ -13,13 +13,13 @@ import org.openqa.selenium.WebElement;
 /**
  * Web element for {@link PublicFilesView}.
  */
-public class PublicFilesViewPage extends SeleniumComponent {
+public class PublicFilesViewComponent extends SeleniumComponent {
 
-  public static Function<WebDriver, PublicFilesViewPage> find() {
-    return d -> new PublicFilesViewPage(d.findElement(By.id(ID)));
+  public static Function<WebDriver, PublicFilesViewComponent> find() {
+    return d -> new PublicFilesViewComponent(d.findElement(By.id(ID)));
   }
 
-  public PublicFilesViewPage(WebElement publicFilesView) {
+  public PublicFilesViewComponent(WebElement publicFilesView) {
     super(publicFilesView);
     assert ID.equals(publicFilesView.getAttribute("id"));
   }

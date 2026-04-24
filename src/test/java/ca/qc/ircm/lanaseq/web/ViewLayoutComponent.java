@@ -22,13 +22,13 @@ import org.openqa.selenium.WebElement;
 /**
  * Web element for {@link ViewLayout}.
  */
-public class ViewLayoutPage extends SeleniumComponent {
+public class ViewLayoutComponent extends SeleniumComponent {
 
-  public static Function<WebDriver, ViewLayoutPage> find() {
-    return d -> new ViewLayoutPage(d.findElement(By.id(ID)));
+  public static Function<WebDriver, ViewLayoutComponent> find() {
+    return d -> new ViewLayoutComponent(d.findElement(By.id(ID)));
   }
 
-  public ViewLayoutPage(WebElement viewLayout) {
+  public ViewLayoutComponent(WebElement viewLayout) {
     super(viewLayout);
     assert ID.equals(viewLayout.getAttribute("id"));
   }
