@@ -22,8 +22,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest
 @ActiveProfiles("test")
 @WebAppConfiguration
-@TestExecutionListeners(value = {VaadinLicenseExecutionListener.class,
-    FixSecurityContextHolderStrategyExecutionListener.class,
+@TestExecutionListeners(value = {FixSecurityContextHolderStrategyExecutionListener.class,
     UiUnitTestExecutionListener.class}, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
