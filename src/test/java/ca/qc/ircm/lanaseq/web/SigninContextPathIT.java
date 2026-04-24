@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPage;
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Cookie;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 /**
  * Integration tests for {@link SigninView} using Selenium and a non-empty context path.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithAnonymousUser
 public class SigninContextPathIT extends AbstractSeleniumTestCase {

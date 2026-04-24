@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPage;
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -14,7 +14,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 /**
  * Integration tests for {@link SignoutView} using Selenium.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SignoutIT extends AbstractSeleniumTestCase {
 

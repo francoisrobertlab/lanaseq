@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPage;
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import ca.qc.ircm.lanaseq.web.ViewLayoutPage;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
  * Integration tests for impersonating users and exiting impersonation using Selenium and a
  * non-empty context path.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class SwitchUserContextPathIT extends AbstractSeleniumTestCase {

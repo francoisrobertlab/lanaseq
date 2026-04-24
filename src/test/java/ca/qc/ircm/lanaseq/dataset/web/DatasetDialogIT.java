@@ -17,7 +17,7 @@ import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.combobox.ComboBoxBase.CustomValueSetEvent;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -47,7 +47,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 /**
  * Integration tests for {@link DatasetDialog}.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetDialogIT extends SpringUIUnitTest {
 

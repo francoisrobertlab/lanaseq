@@ -7,7 +7,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,7 +21,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 /**
  * Integration tests for {@link PublicSampleFiles} using Selenium.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @WithAnonymousUser
 public class PublicSampleFilesIT extends AbstractSeleniumTestCase {
 

@@ -9,7 +9,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,7 +24,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 /**
  * Integration tests for {@link DatasetFilesDialog} using Selenium.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetFilesDialogDownloadIT extends AbstractSeleniumTestCase {
 

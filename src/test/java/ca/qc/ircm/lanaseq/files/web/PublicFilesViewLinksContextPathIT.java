@@ -4,7 +4,7 @@ import static ca.qc.ircm.lanaseq.files.web.PublicFilesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 /**
  * Integration tests for {@link PublicFilesView} using Selenium and a non-empty context path.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class PublicFilesViewLinksContextPathIT extends AbstractSeleniumTestCase {

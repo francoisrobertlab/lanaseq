@@ -4,7 +4,7 @@ import static ca.qc.ircm.lanaseq.files.web.PublicFilesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +17,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 /**
  * Integration tests for {@link PublicFilesView} using Selenium.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class PublicFilesViewLinksIT extends AbstractSeleniumTestCase {
 

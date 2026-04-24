@@ -13,7 +13,7 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPage;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordViewPage;
 import java.util.Optional;
@@ -28,7 +28,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 /**
  * Integration tests for {@link SigninView} using Selenium.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @WithAnonymousUser
 public class SigninIT extends AbstractSeleniumTestCase {
 

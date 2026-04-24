@@ -3,7 +3,7 @@ package ca.qc.ircm.lanaseq.protocol.web;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 /**
  * Integration tests for {@link ProtocolsView}.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProtocolsViewIT extends SpringUIUnitTest {
 
