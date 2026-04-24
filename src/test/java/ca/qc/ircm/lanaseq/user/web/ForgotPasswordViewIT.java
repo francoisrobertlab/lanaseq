@@ -17,9 +17,9 @@ import ca.qc.ircm.lanaseq.web.SigninView;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import jakarta.mail.Message.RecipientType;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
@@ -40,7 +40,7 @@ import org.springframework.test.context.DynamicPropertySource;
  */
 @ServiceTestAnnotations
 @WithAnonymousUser
-public class ForgotPasswordViewIT extends SpringUIUnitTest {
+public class ForgotPasswordViewIT extends SpringBrowserlessTest {
 
   @RegisterExtension
   static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP);

@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.combobox.ComboBoxBase.CustomValueSetEvent;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -30,7 +30,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class KeywordsFieldTest extends SpringUIUnitTest {
+public class KeywordsFieldTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(KeywordsField.class);
   private KeywordsField keywordsField;

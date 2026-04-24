@@ -11,7 +11,7 @@ import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninView;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import java.time.LocalDateTime;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +30,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class JobsViewIT extends SpringUIUnitTest {
+public class JobsViewIT extends SpringBrowserlessTest {
 
   @Autowired
   private JobService service;

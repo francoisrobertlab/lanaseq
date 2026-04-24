@@ -15,9 +15,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -37,7 +37,7 @@ import org.springframework.test.web.servlet.assertj.MvcTestResultAssert;
 @ActiveProfiles({"test", "context-path"})
 @AutoConfigureMockMvc
 @WithAnonymousUser
-public class SigninViewContextPathIT extends SpringUIUnitTest {
+public class SigninViewContextPathIT extends SpringBrowserlessTest {
 
   @Autowired
   private MockMvcTester mvc;

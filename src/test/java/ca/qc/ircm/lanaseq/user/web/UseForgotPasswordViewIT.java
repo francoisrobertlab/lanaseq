@@ -11,9 +11,9 @@ import ca.qc.ircm.lanaseq.user.ForgotPasswordRepository;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.SigninView;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * Integration tests for {@link UseForgotPasswordView}.
  */
 @ServiceTestAnnotations
-public class UseForgotPasswordViewIT extends SpringUIUnitTest {
+public class UseForgotPasswordViewIT extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(UseForgotPasswordView.class);
   @SuppressWarnings("unused")

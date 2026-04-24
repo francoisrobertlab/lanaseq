@@ -1856,7 +1856,7 @@ public class SampleServiceTest {
     when(configuration.getHome().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null ? temporaryFolder.resolve(String.valueOf(sample.getDate().getYear()))
-          .resolve(sample.getName()) : null;
+                              .resolve(sample.getName()) : null;
     });
     Sample sample = repository.findById(1L).orElseThrow();
     detach(sample);

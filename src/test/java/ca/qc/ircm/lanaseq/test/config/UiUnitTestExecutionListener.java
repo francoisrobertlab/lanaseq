@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.test.config;
 
-import com.vaadin.testbench.unit.internal.MockVaadin;
+import com.vaadin.browserless.internal.MockVaadin;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 

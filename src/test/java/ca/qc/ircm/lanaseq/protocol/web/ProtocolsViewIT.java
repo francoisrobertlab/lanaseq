@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninView;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -15,7 +15,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @SeleniumTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ProtocolsViewIT extends SpringUIUnitTest {
+public class ProtocolsViewIT extends SpringBrowserlessTest {
 
   @Test
   @WithAnonymousUser
