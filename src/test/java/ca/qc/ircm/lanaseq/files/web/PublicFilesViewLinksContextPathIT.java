@@ -3,23 +3,25 @@ package ca.qc.ircm.lanaseq.files.web;
 import static ca.qc.ircm.lanaseq.files.web.PublicFilesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.test.config.AbstractLocalBrowserTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
- * Integration tests for {@link PublicFilesView}.
+ * Integration tests for {@link PublicFilesView} using Selenium and a non-empty context path.
  */
 @TestBenchTestAnnotations
+@ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PublicFilesViewLocalIT extends AbstractLocalBrowserTestCase {
+public class PublicFilesViewLinksContextPathIT extends AbstractSeleniumTestCase {
 
   @Value("${download-home}")
   protected Path downloadHome;
@@ -28,13 +30,13 @@ public class PublicFilesViewLocalIT extends AbstractLocalBrowserTestCase {
     openView(VIEW_NAME);
   }
 
-  @BrowserTest
+  @Test
   public void downloadLinks() throws IOException, InterruptedException {
     Files.createDirectories(downloadHome);
     Path downloaded = downloadHome.resolve("links.txt");
     Files.deleteIfExists(downloaded);
     open();
-    PublicFilesViewElement view = $(PublicFilesViewElement.class).waitForFirst();
+    PublicFilesViewPage view = waitUntil(PublicFilesViewPage.find());
 
     view.downloadLinks().click();
 
@@ -61,14 +63,14 @@ public class PublicFilesViewLocalIT extends AbstractLocalBrowserTestCase {
     }
   }
 
-  @BrowserTest
+  @Test
   public void downloadLinks_FilterFilename() throws IOException, InterruptedException {
     Files.createDirectories(downloadHome);
     Path downloaded = downloadHome.resolve("links.txt");
     Files.deleteIfExists(downloaded);
     open();
-    PublicFilesViewElement view = $(PublicFilesViewElement.class).waitForFirst();
-    view.files().filenameFilter().setValue("JS1");
+    PublicFilesViewPage view = waitUntil(PublicFilesViewPage.find());
+    view.files().filenameFilter().sendKeys("JS1");
 
     view.downloadLinks().click();
 

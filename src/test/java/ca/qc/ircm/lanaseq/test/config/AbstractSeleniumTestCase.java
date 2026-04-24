@@ -1,5 +1,8 @@
 package ca.qc.ircm.lanaseq.test.config;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
@@ -14,6 +17,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 
@@ -29,6 +33,8 @@ public abstract class AbstractSeleniumTestCase {
   protected int port;
   @Value("${server.servlet.context-path:}")
   protected String contextPath;
+  @Autowired
+  private AppConfiguration configuration;
 
   @BeforeEach
   public void createWebDriver() {
@@ -38,6 +44,14 @@ public abstract class AbstractSeleniumTestCase {
     options.setExperimentalOption("prefs", chromePrefs);
     //options.addArguments("--headless");
     driver = new ChromeDriver(options);
+  }
+
+  @BeforeEach
+  public void setServerUrl()
+      throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    Method setServerUrl = AppConfiguration.class.getDeclaredMethod("setServerUrl", String.class);
+    setServerUrl.setAccessible(true);
+    setServerUrl.invoke(configuration, baseUrl());
   }
 
   @AfterEach
