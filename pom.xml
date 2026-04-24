@@ -495,8 +495,6 @@
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
                 <systemPropertyVariables>
-                  <com.vaadin.testbench.Parameters.headless>true
-                  </com.vaadin.testbench.Parameters.headless>
                   <selenium.headless>true</selenium.headless>
                 </systemPropertyVariables>
               </configuration>
