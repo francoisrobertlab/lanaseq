@@ -144,15 +144,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-testbench-junit6</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- Required for vaadin-testbench-unit -->
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-charts-flow</artifactId>
-      <scope>test</scope>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
     </dependency>
     <dependency>
       <groupId>com.icegreen</groupId>
