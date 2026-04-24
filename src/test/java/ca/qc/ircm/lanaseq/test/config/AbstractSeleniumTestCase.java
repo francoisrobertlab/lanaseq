@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -33,6 +34,8 @@ public abstract class AbstractSeleniumTestCase {
   protected int port;
   @Value("${server.servlet.context-path:}")
   protected String contextPath;
+  @Value("${selenium.headless:false}")
+  protected boolean headless;
   @Autowired
   private AppConfiguration configuration;
 
@@ -42,8 +45,11 @@ public abstract class AbstractSeleniumTestCase {
     HashMap<String, Object> chromePrefs = new HashMap<>();
     chromePrefs.put("download.default_directory", downloadHome.toString());
     options.setExperimentalOption("prefs", chromePrefs);
-    //options.addArguments("--headless");
+    if (headless) {
+      options.addArguments("--headless");
+    }
     driver = new ChromeDriver(options);
+    driver.manage().window().setSize(new Dimension(1200, 1083));
   }
 
   @BeforeEach
