@@ -5,9 +5,9 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 
 /**
- * Configures UI unit tests.
+ * Configures browserless unit tests.
  */
-public class UiUnitTestExecutionListener implements TestExecutionListener {
+public class BrowserlessUnitTestExecutionListener implements TestExecutionListener {
 
   @Override
   public void beforeTestMethod(TestContext testContext) {

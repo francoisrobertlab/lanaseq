@@ -23,7 +23,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @ActiveProfiles("test")
 @WebAppConfiguration
 @TestExecutionListeners(value = {FixSecurityContextHolderStrategyExecutionListener.class,
-    UiUnitTestExecutionListener.class}, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
+    BrowserlessUnitTestExecutionListener.class}, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public @interface NonTransactionalTestAnnotations {
