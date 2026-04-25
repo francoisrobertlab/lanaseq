@@ -59,7 +59,7 @@
     <!-- Dependencies -->
     <vaadin.version>25.1.3</vaadin.version>
     <generate-property-names.version>2.2</generate-property-names.version>
-    <openfeign.querydsl.version>5.6.1</openfeign.querydsl.version>
+    <openfeign.querydsl.version>6.12</openfeign.querydsl.version>
     <guava.version>33.3.1-jre</guava.version>
     <greenmail.version>2.0.1</greenmail.version>
     <selenium.version>4.27.0</selenium.version>
@@ -69,7 +69,6 @@
     <maven-site-plugin.version>3.21.0</maven-site-plugin.version>
     <maven-project-info-reports-plugin.version>3.9.0</maven-project-info-reports-plugin.version>
     <spotbugs-maven-plugin.version>4.9.8.2</spotbugs-maven-plugin.version>
-    <apt-maven-plugin.version>1.1.3</apt-maven-plugin.version>
     <migrations-maven-plugin.version>1.1.3</migrations-maven-plugin.version>
   </properties>
 
@@ -225,7 +224,12 @@
       <groupId>io.github.openfeign.querydsl</groupId>
       <artifactId>querydsl-jpa</artifactId>
       <version>${openfeign.querydsl.version}</version>
-      <classifier>jakarta</classifier>
+    </dependency>
+    <dependency>
+      <groupId>io.github.openfeign.querydsl</groupId>
+      <artifactId>querydsl-apt</artifactId>
+      <version>${openfeign.querydsl.version}</version>
+      <classifier>jpa</classifier>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -333,32 +337,6 @@
           <version>${maven-site-plugin.version}</version>
         </plugin>
         <plugin>
-          <groupId>com.mysema.maven</groupId>
-          <artifactId>apt-maven-plugin</artifactId>
-          <version>${apt-maven-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>querydsl-metamodel</id>
-              <goals>
-                <goal>process</goal>
-              </goals>
-              <phase>generate-sources</phase>
-              <configuration>
-                <outputDirectory>target/generated-sources/querydsl</outputDirectory>
-                <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
-              </configuration>
-            </execution>
-          </executions>
-          <dependencies>
-            <dependency>
-              <groupId>io.github.openfeign.querydsl</groupId>
-              <artifactId>querydsl-apt</artifactId>
-              <version>${openfeign.querydsl.version}</version>
-              <classifier>jakarta</classifier>
-            </dependency>
-          </dependencies>
-        </plugin>
-        <plugin>
           <groupId>com.vaadin</groupId>
           <artifactId>vaadin-maven-plugin</artifactId>
           <version>${vaadin.version}</version>
@@ -409,10 +387,6 @@
       <plugin>
         <groupId>io.github.git-commit-id</groupId>
         <artifactId>git-commit-id-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>com.mysema.maven</groupId>
-        <artifactId>apt-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
