@@ -1610,7 +1610,7 @@ public class DatasetServiceTest {
     when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null ? temporaryFolder.resolve(String.valueOf(dataset.getDate().getYear()))
-          .resolve(dataset.getName()) : null;
+                               .resolve(dataset.getName()) : null;
     });
     Dataset dataset = repository.findById(1L).orElseThrow();
     detach(dataset);

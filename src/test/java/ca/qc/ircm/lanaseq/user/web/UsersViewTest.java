@@ -39,6 +39,7 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
@@ -52,7 +53,6 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -71,7 +71,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class UsersViewTest extends SpringUIUnitTest {
+public class UsersViewTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(UsersView.class);
   private static final String USER_PREFIX = messagePrefix(User.class);
@@ -117,6 +117,21 @@ public class UsersViewTest extends SpringUIUnitTest {
     User user = new User();
     user.setActive(active);
     return user;
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.users).isUsable());
+    assertTrue(test(view.add).isUsable());
+    assertTrue(view.edit.isVisible());
+    assertFalse(view.edit.isEnabled());
+    assertTrue(view.switchUser.isVisible());
+    assertFalse(view.switchUser.isEnabled());
+    test(view.users).select(0);
+    assertTrue(view.edit.isVisible());
+    assertTrue(view.edit.isEnabled());
+    assertTrue(view.switchUser.isVisible());
+    assertTrue(view.switchUser.isEnabled());
   }
 
   @Test

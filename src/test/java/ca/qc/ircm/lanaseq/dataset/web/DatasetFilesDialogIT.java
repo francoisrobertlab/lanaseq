@@ -3,7 +3,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SAVE;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.editItem;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,10 +15,15 @@ import ca.qc.ircm.lanaseq.dataset.DatasetPublicFile;
 import ca.qc.ircm.lanaseq.dataset.DatasetPublicFileRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.jobs.JobService;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.flow.component.notification.testbench.NotificationElement;
-import com.vaadin.testbench.BrowserTest;
+import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.web.EditableFile;
+import com.vaadin.browserless.SpringBrowserlessTest;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.grid.editor.EditorImpl;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,20 +35,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.SystemUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.openqa.selenium.Keys;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.transaction.TestTransaction;
 
 /**
  * Integration tests for {@link DatasetFilesDialog}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
+public class DatasetFilesDialogIT extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetFilesDialog.class);
   @Autowired
@@ -63,27 +68,12 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
     file1 = Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI());
   }
 
-  private void open() {
-    openView(VIEW_NAME);
+  @AfterEach
+  public void afterTest() {
+    jobService.getJobs().forEach(jobService::removeJob);
   }
 
-  @BrowserTest
-  public void fieldsExistence() {
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().controlClick(0);
-    DatasetFilesDialogElement dialog = view.filesDialog();
-    assertTrue(optional(dialog::header).isPresent());
-    assertTrue(optional(dialog::message).isPresent());
-    assertTrue(optional(dialog::folders).isPresent());
-    assertTrue(optional(dialog::files).isPresent());
-    assertTrue(optional(dialog::samples).isPresent());
-    assertTrue(optional(dialog::refresh).isPresent());
-    assertTrue(optional(dialog::upload).isPresent());
-    assertTrue(optional(dialog::addLargeFiles).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void files() throws Throwable {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Path home = configuration.getHome().folder(dataset);
@@ -98,22 +88,33 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         file2);
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().controlClick(3);
-    DatasetFilesDialogElement dialog = view.filesDialog();
-    Assertions.assertEquals(2, dialog.folders().labels().size());
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(3);
+    test(view.files).click();
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    List<Span> labels = test(dialog.folders).find(Span.class).all();
+    Assertions.assertEquals(2, labels.size());
     Assertions.assertEquals(configuration.getHome().label(dataset, !SystemUtils.IS_OS_WINDOWS),
-        dialog.folders().labels().get(0).getText());
+        labels.get(0).getText());
     Assertions.assertEquals(
         configuration.getArchives().get(0).label(dataset, !SystemUtils.IS_OS_WINDOWS),
-        dialog.folders().labels().get(1).getText());
-    Assertions.assertEquals(2, dialog.files().getRowCount());
-    Assertions.assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
-    Assertions.assertEquals(file2.getFileName().toString(), dialog.files().filename(1));
+        labels.get(1).getText());
+    Assertions.assertEquals(2, test(dialog.files).size());
+    Assertions.assertEquals(file1.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(0, dialog.filename.getKey(), "title",
+            String.class));
+    Assertions.assertEquals(file1.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(0, dialog.filename.getKey(), "filename",
+            String.class));
+    Assertions.assertEquals(file2.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(1, dialog.filename.getKey(), "title",
+            String.class));
+    Assertions.assertEquals(file2.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(1, dialog.filename.getKey(), "filename",
+            String.class));
   }
 
-  @BrowserTest
+  @Test
   public void rename() throws Throwable {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Path folder = configuration.getHome().folder(dataset);
@@ -122,15 +123,16 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         file);
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().controlClick(3);
-    DatasetFilesDialogElement dialog = view.filesDialog();
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(3);
+    test(view.files).click();
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
 
-    dialog.files().filenameCell(0).doubleClick();
-    dialog.filenameEdit().setValue(dataset.getName() + "_R1.fastq");
-    dialog.filenameEdit().sendKeys(Keys.ENTER);
-    Thread.sleep(1000);
+    EditableFile editableFile = dialog.files.getListDataView().getItem(0);
+    EditorImpl<EditableFile> editor = (EditorImpl<EditableFile>) dialog.files.getEditor();
+    editItem(editor, editableFile);
+    dialog.filenameEdit.setValue(dataset.getName() + "_R1.fastq");
+    editor.closeEditor();
 
     assertTrue(Files.exists(file.resolveSibling(dataset.getName() + "_R1.fastq")));
     assertArrayEquals(Files.readAllBytes(
@@ -139,7 +141,7 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
     assertFalse(Files.exists(file));
   }
 
-  @BrowserTest
+  @Test
   public void publicFile() throws Throwable {
     Dataset dataset = repository.findById(6L).orElseThrow();
     Path home = configuration.getHome().folder(dataset);
@@ -148,18 +150,17 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         file1);
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().controlClick(1);
-    DatasetFilesDialogElement dialog = view.filesDialog();
-    assertFalse(dialog.files().publicFileCheckbox(0).isChecked());
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(1);
+    test(view.files).click();
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    assertFalse(
+        ((Checkbox) test(dialog.files).getCellComponent(0, dialog.publicFile.getKey())).getValue());
 
-    TestTransaction.flagForCommit();
-    dialog.files().publicFileCheckbox(0).click();
-    Thread.sleep(1000); // Wait for insert to complete.
-    TestTransaction.end();
+    test((Checkbox) test(dialog.files).getCellComponent(0, dialog.publicFile.getKey())).click();
 
-    assertTrue(dialog.files().publicFileCheckbox(0).isChecked());
+    assertTrue(
+        ((Checkbox) test(dialog.files).getCellComponent(0, dialog.publicFile.getKey())).getValue());
     Optional<DatasetPublicFile> optionalDatasetPublicFile = datasetPublicFileRepository.findByDatasetAndPath(
         dataset, "R1.fastq");
     assertTrue(optionalDatasetPublicFile.isPresent());
@@ -168,7 +169,7 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
         datasetPublicFile.getExpiryDate());
   }
 
-  @BrowserTest
+  @Test
   public void delete() throws Throwable {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Path folder = configuration.getHome().folder(dataset);
@@ -179,13 +180,12 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
         file);
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().controlClick(3);
-    DatasetFilesDialogElement dialog = view.filesDialog();
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(3);
+    test(view.files).click();
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
 
-    dialog.files().delete(0).click();
-    Thread.sleep(1000);
+    test(test(dialog.files).getCellComponent(0, dialog.delete.getKey())).click();
 
     assertFalse(Files.exists(file));
     Path deleted = folder.resolve(DELETED_FILENAME);
@@ -201,23 +201,23 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
   }
 
-  @BrowserTest
+  @Test
   public void viewFiles_Sample() {
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().controlClick(3);
-    DatasetFilesDialogElement dialog = view.filesDialog();
-    dialog.samples().getCell(0, 0).doubleClick();
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(3);
+    test(view.files).click();
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    test(dialog.samples).doubleClickRow(0);
 
-    assertTrue(dialog.sampleFilesDialog().isOpen());
+    assertTrue($(SampleFilesDialog.class).exists());
   }
 
-  @BrowserTest
+  @Test
   public void refresh() throws Throwable {
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().controlClick(3);
-    DatasetFilesDialogElement dialog = view.filesDialog();
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(3);
+    test(view.files).click();
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
     Dataset dataset = repository.findById(2L).orElseThrow();
     Path home = configuration.getHome().folder(dataset);
     Files.createDirectories(home);
@@ -225,40 +225,45 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         file1);
-    Assertions.assertEquals(0, dialog.files().getRowCount());
+    Assertions.assertEquals(0, test(dialog.files).size());
 
-    dialog.refresh().click();
+    test(dialog.refresh).click();
 
-    Assertions.assertEquals(1, dialog.files().getRowCount());
-    Assertions.assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
+    Assertions.assertEquals(1, test(dialog.files).size());
+    Assertions.assertEquals(file1.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(0, dialog.filename.getKey(), "title",
+            String.class));
+    Assertions.assertEquals(file1.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(0, dialog.filename.getKey(), "filename",
+            String.class));
   }
 
-  @BrowserTest
+  @Test
   public void addLargeFiles() {
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().controlClick(3);
-    DatasetFilesDialogElement dialog = view.filesDialog();
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(3);
+    test(view.files).click();
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
 
-    dialog.addLargeFiles().click();
+    test(dialog.addLargeFiles).click();
 
-    assertTrue(dialog.addFilesDialog().isOpen());
+    assertTrue($(AddDatasetFilesDialog.class).exists());
   }
 
-  @BrowserTest
+  @Test
   public void upload() throws Throwable {
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().controlClick(3);
-    DatasetFilesDialogElement dialog = view.filesDialog();
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(3);
+    test(view.files).click();
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
     Dataset dataset = repository.findById(2L).orElseThrow();
 
-    dialog.upload().upload(file1.toFile());
+    test(dialog.upload).upload(file1.toFile());
 
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    Notification notification = $(Notification.class).first();
     Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FILES_SAVE,
-            new Object[]{file1.getFileName(), dataset.getName()}, currentLocale()),
-        notification.getText());
+            new Object[]{file1.getFileName(), dataset.getName()}, UI.getCurrent().getLocale()),
+        test(notification).getText());
     // Wait for files to finish copying.
     Thread.sleep(1000);
     Path folder = configuration.getHome().folder(dataset);

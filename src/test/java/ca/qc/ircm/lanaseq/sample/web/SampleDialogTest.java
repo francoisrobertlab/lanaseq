@@ -63,6 +63,7 @@ import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.validation.ValidationLogger;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -74,7 +75,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -99,7 +99,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SampleDialogTest extends SpringUIUnitTest {
+public class SampleDialogTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SampleDialog.class);
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
@@ -182,6 +182,70 @@ public class SampleDialogTest extends SpringUIUnitTest {
     dialog.keywords.setValue(Stream.of(keyword1, keyword2).collect(Collectors.toSet()));
     dialog.filenames.setValue(Stream.of(filename1, filename2).collect(Collectors.toSet()));
     dialog.note.setValue(note);
+  }
+
+  @Test
+  public void fieldsExistence_Add() {
+    dialog.setSampleId(0);
+    assertTrue(test(dialog.date).isUsable());
+    assertTrue(test(dialog.sampleId).isUsable());
+    assertTrue(test(dialog.replicate).isUsable());
+    assertTrue(test(dialog.protocol).isUsable());
+    assertTrue(test(dialog.assay).isUsable());
+    assertTrue(test(dialog.type).isUsable());
+    assertTrue(test(dialog.target).isUsable());
+    assertTrue(test(dialog.strain).isUsable());
+    assertTrue(test(dialog.strainDescription).isUsable());
+    assertTrue(test(dialog.treatment).isUsable());
+    assertTrue(test(dialog.keywords).isUsable());
+    assertTrue(test(dialog.filenames).isUsable());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertFalse(dialog.delete.isVisible());
+  }
+
+  @Test
+  public void fieldsExistence_Update() {
+    assertTrue(test(dialog.date).isUsable());
+    assertTrue(test(dialog.sampleId).isUsable());
+    assertTrue(test(dialog.replicate).isUsable());
+    assertTrue(test(dialog.protocol).isUsable());
+    assertTrue(test(dialog.assay).isUsable());
+    assertTrue(test(dialog.type).isUsable());
+    assertTrue(test(dialog.target).isUsable());
+    assertTrue(test(dialog.strain).isUsable());
+    assertTrue(test(dialog.strainDescription).isUsable());
+    assertTrue(test(dialog.treatment).isUsable());
+    assertTrue(test(dialog.keywords).isUsable());
+    assertTrue(test(dialog.filenames).isUsable());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertFalse(dialog.delete.isVisible());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void fieldsExistence_Deletable() {
+    when(service.isDeletable(any())).thenReturn(true);
+    dialog.setSampleId(9);
+    assertTrue(test(dialog.date).isUsable());
+    assertTrue(test(dialog.sampleId).isUsable());
+    assertTrue(test(dialog.replicate).isUsable());
+    assertTrue(test(dialog.protocol).isUsable());
+    assertTrue(test(dialog.assay).isUsable());
+    assertTrue(test(dialog.type).isUsable());
+    assertTrue(test(dialog.target).isUsable());
+    assertTrue(test(dialog.strain).isUsable());
+    assertTrue(test(dialog.strainDescription).isUsable());
+    assertTrue(test(dialog.treatment).isUsable());
+    assertTrue(test(dialog.keywords).isUsable());
+    assertTrue(test(dialog.filenames).isUsable());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertTrue(test(dialog.delete).isUsable());
   }
 
   @Test

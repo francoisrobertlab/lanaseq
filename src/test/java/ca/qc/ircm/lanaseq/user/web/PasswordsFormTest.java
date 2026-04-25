@@ -16,11 +16,11 @@ import static org.mockito.Mockito.mock;
 
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +32,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PasswordsFormTest extends SpringUIUnitTest {
+public class PasswordsFormTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(PasswordsForm.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);

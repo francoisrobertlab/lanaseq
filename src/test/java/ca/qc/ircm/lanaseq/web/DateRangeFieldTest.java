@@ -23,13 +23,13 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetGrid;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DateRangeField.Dates;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.datepicker.DatePickerVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Optional;
@@ -44,7 +44,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DateRangeFieldTest extends SpringUIUnitTest {
+public class DateRangeFieldTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(DateRangeField.class);
   private DateRangeField dateRange;

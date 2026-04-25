@@ -9,7 +9,7 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinServletResponse;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
  * Sign out view.
  */
 @Route(value = SignoutView.VIEW_NAME)
-@AnonymousAllowed
+@PermitAll
 public class SignoutView extends VerticalLayout implements BeforeEnterObserver, UrlComponent {
 
   public static final String VIEW_NAME = "signout";

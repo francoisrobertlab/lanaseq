@@ -60,6 +60,7 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.WarningNotification;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -75,7 +76,6 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -101,7 +101,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ProtocolDialogTest extends SpringUIUnitTest {
+public class ProtocolDialogTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolDialog.class);
   private static final String PROTOCOL_PREFIX = messagePrefix(Protocol.class);
@@ -165,6 +165,31 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     ProtocolFile file = new ProtocolFile();
     file.setFilename(filename);
     return file;
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(dialog.name).isUsable());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.upload).isUsable());
+    assertTrue(test(dialog.files).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertFalse(dialog.delete.isVisible());
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void fieldsExistence_Deletable() {
+    when(service.isDeletable(any())).thenReturn(true);
+    dialog.setProtocolId(4);
+    assertTrue(test(dialog.name).isUsable());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.upload).isUsable());
+    assertTrue(test(dialog.files).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertTrue(test(dialog.delete).isUsable());
   }
 
   @Test

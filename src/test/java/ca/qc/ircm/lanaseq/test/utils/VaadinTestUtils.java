@@ -14,6 +14,7 @@ import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
+import com.vaadin.flow.component.grid.editor.EditorImpl;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.upload.UploadI18N;
@@ -203,6 +204,21 @@ public class VaadinTestUtils {
              IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  /**
+   * Starts editing item in Grid.
+   *
+   * @param editor editor
+   * @param item   item to edit
+   */
+  public static <T> void editItem(EditorImpl<T> editor, T item)
+      throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    editor.editItem(item);
+    // requestEditItem method is not called by Vaadin mocking framework. Call it manually.
+    Method method = EditorImpl.class.getDeclaredMethod("requestEditItem", Object.class);
+    method.setAccessible(true);
+    method.invoke(editor, item);
   }
 
   /**

@@ -21,12 +21,12 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.UserService;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PasswordViewTest extends SpringUIUnitTest {
+public class PasswordViewTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(PasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -57,6 +57,14 @@ public class PasswordViewTest extends SpringUIUnitTest {
   public void beforeTest() {
     UI.getCurrent().setLocale(locale);
     view = navigate(PasswordView.class);
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.header).isUsable());
+    assertTrue(test(view.passwords.password).isUsable());
+    assertTrue(test(view.passwords.passwordConfirm).isUsable());
+    assertTrue(test(view.save).isUsable());
   }
 
   @Test

@@ -1,205 +1,112 @@
 package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
-import ca.qc.ircm.lanaseq.files.web.PublicFilesViewElement;
-import ca.qc.ircm.lanaseq.jobs.web.JobsViewElement;
-import ca.qc.ircm.lanaseq.protocol.web.ProtocolsViewElement;
-import ca.qc.ircm.lanaseq.sample.web.SamplesViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import ca.qc.ircm.lanaseq.user.web.ProfileViewElement;
-import ca.qc.ircm.lanaseq.user.web.UsersViewElement;
-import com.vaadin.testbench.BrowserTest;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
+import ca.qc.ircm.lanaseq.files.web.PublicFilesView;
+import ca.qc.ircm.lanaseq.jobs.web.JobsView;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
+import ca.qc.ircm.lanaseq.sample.web.SamplesView;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.web.ProfileView;
+import ca.qc.ircm.lanaseq.user.web.UsersView;
+import com.vaadin.browserless.SpringBrowserlessTest;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.Grid;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Integration tests for {@link ViewLayout}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ViewLayoutIT extends AbstractBrowserTestCase {
+public class ViewLayoutIT extends SpringBrowserlessTest {
 
-  private void open() {
-    openView(VIEW_NAME);
-  }
-
-  @BrowserTest
+  @Test
   @WithAnonymousUser
   public void security_Anonymous() {
-    open();
-
-    $(SigninViewElement.class).waitForFirst();
+    navigate(VIEW_NAME, SigninView.class);
   }
 
-  @BrowserTest
-  public void fieldsExistence_User() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    assertTrue(optional(view::applicationName).isPresent());
-    assertTrue(optional(view::header).isPresent());
-    assertTrue(optional(view::laboratory).isPresent());
-    assertTrue(optional(view::drawerToggle).isPresent());
-    assertTrue(optional(view::datasets).isPresent());
-    assertTrue(optional(view::samples).isPresent());
-    assertTrue(optional(view::protocols).isPresent());
-    assertTrue(optional(view::publicFiles).isPresent());
-    assertTrue(optional(view::jobs).isPresent());
-    assertTrue(optional(view::profile).isPresent());
-    assertFalse(optional(view::users).isPresent());
-    assertFalse(optional(view::exitSwitchUser).isPresent());
-    assertTrue(optional(view::signout).isPresent());
-  }
-
-  @BrowserTest
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void fieldsExistence_Manager() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    assertTrue(optional(view::applicationName).isPresent());
-    assertTrue(optional(view::header).isPresent());
-    assertTrue(optional(view::laboratory).isPresent());
-    assertTrue(optional(view::drawerToggle).isPresent());
-    assertTrue(optional(view::datasets).isPresent());
-    assertTrue(optional(view::samples).isPresent());
-    assertTrue(optional(view::protocols).isPresent());
-    assertTrue(optional(view::publicFiles).isPresent());
-    assertTrue(optional(view::jobs).isPresent());
-    assertTrue(optional(view::profile).isPresent());
-    assertTrue(optional(view::users).isPresent());
-    assertFalse(optional(view::exitSwitchUser).isPresent());
-    assertTrue(optional(view::signout).isPresent());
-  }
-
-  @BrowserTest
-  @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void fieldsExistence_Admin() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    assertTrue(optional(view::applicationName).isPresent());
-    assertTrue(optional(view::header).isPresent());
-    assertTrue(optional(view::laboratory).isPresent());
-    assertTrue(optional(view::drawerToggle).isPresent());
-    assertTrue(optional(view::datasets).isPresent());
-    assertTrue(optional(view::samples).isPresent());
-    assertTrue(optional(view::protocols).isPresent());
-    assertTrue(optional(view::publicFiles).isPresent());
-    assertTrue(optional(view::jobs).isPresent());
-    assertTrue(optional(view::profile).isPresent());
-    assertTrue(optional(view::users).isPresent());
-    assertFalse(optional(view::exitSwitchUser).isPresent());
-    assertTrue(optional(view::signout).isPresent());
-  }
-
-  @BrowserTest
-  @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void fieldsExistence_Runas() {
-    open();
-    $(ViewLayoutElement.class).waitForFirst().users().click();
-    UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
-    usersView.users().select(1);
-    usersView.switchUser().click();
-    $(DatasetsViewElement.class).waitForFirst();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    assertTrue(optional(view::applicationName).isPresent());
-    assertTrue(optional(view::header).isPresent());
-    assertTrue(optional(view::laboratory).isPresent());
-    assertTrue(optional(view::drawerToggle).isPresent());
-    assertTrue(optional(view::datasets).isPresent());
-    assertTrue(optional(view::samples).isPresent());
-    assertTrue(optional(view::protocols).isPresent());
-    assertTrue(optional(view::publicFiles).isPresent());
-    assertTrue(optional(view::jobs).isPresent());
-    assertTrue(optional(view::profile).isPresent());
-    assertTrue(optional(view::users).isPresent());
-    assertTrue(optional(view::exitSwitchUser).isPresent());
-    assertTrue(optional(view::signout).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void datasets() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    view.datasets().click();
-    $(DatasetsViewElement.class).waitForFirst();
+    navigate(SamplesView.class);
+    ViewLayout view = $(ViewLayout.class).first();
+    test(view.sideNav).clickItem(view.datasets.getLabel());
+    assertTrue($(DatasetsView.class).exists());
   }
 
-  @BrowserTest
+  @Test
   public void samples() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    view.samples().click();
-    $(SamplesViewElement.class).waitForFirst();
+    navigate(DatasetsView.class);
+    ViewLayout view = $(ViewLayout.class).first();
+    test(view.sideNav).clickItem(view.samples.getLabel());
+    assertTrue($(SamplesView.class).exists());
   }
 
-  @BrowserTest
+  @Test
   public void protocols() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    view.protocols().click();
-    $(ProtocolsViewElement.class).waitForFirst();
+    navigate(DatasetsView.class);
+    ViewLayout view = $(ViewLayout.class).first();
+    test(view.sideNav).clickItem(view.protocols.getLabel());
+    assertTrue($(ProtocolsView.class).exists());
   }
 
-  @BrowserTest
+  @Test
   public void publicFiles() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    view.publicFiles().click();
-    $(PublicFilesViewElement.class).waitForFirst();
+    navigate(DatasetsView.class);
+    ViewLayout view = $(ViewLayout.class).first();
+    test(view.sideNav).clickItem(view.publicFiles.getLabel());
+    assertTrue($(PublicFilesView.class).exists());
   }
 
-  @BrowserTest
+  @Test
   public void jobs() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    view.jobs().click();
-    $(JobsViewElement.class).waitForFirst();
+    navigate(DatasetsView.class);
+    ViewLayout view = $(ViewLayout.class).first();
+    test(view.sideNav).clickItem(view.jobs.getLabel());
+    assertTrue($(JobsView.class).exists());
   }
 
-  @BrowserTest
+  @Test
   public void profile() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    view.profile().click();
-    $(ProfileViewElement.class).waitForFirst();
+    navigate(DatasetsView.class);
+    ViewLayout view = $(ViewLayout.class).first();
+    test(view.sideNav).clickItem(view.profile.getLabel());
+    assertTrue($(ProfileView.class).exists());
   }
 
-  @BrowserTest
+  @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void users() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    view.users().click();
-    $(UsersViewElement.class).waitForFirst();
+    navigate(DatasetsView.class);
+    ViewLayout view = $(ViewLayout.class).first();
+    test(view.sideNav).clickItem(view.users.getLabel());
+    assertTrue($(UsersView.class).exists());
   }
 
-  @BrowserTest
+  @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
+  @Disabled("Done in SwitchUserIT.exitSwitchUser")
   public void exitSwitchUser() {
-    open();
-    $(ViewLayoutElement.class).waitForFirst().users().click();
-    UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
-    usersView.users().select(2);
-    usersView.switchUser().click();
-    $(DatasetsViewElement.class).waitForFirst();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    view.profile().click();
-    view.exitSwitchUser().click();
-    $(DatasetsViewElement.class).waitForFirst();
-    ViewLayoutElement viewReload = $(ViewLayoutElement.class).waitForFirst();
-    assertFalse(optional(viewReload::exitSwitchUser).isPresent());
-    assertTrue(optional(viewReload::users).isPresent());
-  }
-
-  @BrowserTest
-  public void signout() {
-    open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
-    view.signout().click();
-    $(SigninViewElement.class).waitForFirst();
+    navigate(UsersView.class);
+    @SuppressWarnings("unchecked") Grid<User> usersGrid = (Grid<User>) $(Grid.class).first();
+    test(usersGrid).select(2);
+    $(Button.class).id(SWITCH_USER).click();
+    ViewLayout view = $(ViewLayout.class).first();
+    assertTrue(test(view.exitSwitchUser).isUsable());
+    assertFalse(view.users.isVisible());
+    test(view.sideNav).clickItem(view.exitSwitchUser.getLabel());
+    assertTrue($(DatasetsView.class).exists());
+    view = $(ViewLayout.class).first();
+    assertFalse(view.exitSwitchUser.isVisible());
+    assertTrue(test(view.users).isUsable());
   }
 }

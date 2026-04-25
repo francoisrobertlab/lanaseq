@@ -3,9 +3,10 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_SAVE;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.editItem;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,10 +16,14 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFile;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.flow.component.notification.testbench.NotificationElement;
-import com.vaadin.testbench.BrowserTest;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.web.EditableFile;
+import com.vaadin.browserless.SpringBrowserlessTest;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.grid.editor.EditorImpl;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,20 +35,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.SystemUtils;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.openqa.selenium.Keys;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.transaction.TestTransaction;
 
 /**
  * Integration tests for {@link SampleFilesDialog}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SampleFilesDialogIT extends AbstractBrowserTestCase {
+public class SampleFilesDialogIT extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
   @Autowired
@@ -63,26 +67,12 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
     file1 = Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI());
   }
 
-  private void open() {
-    openView(VIEW_NAME);
+  @AfterEach
+  public void afterTest() {
+    jobService.getJobs().forEach(jobService::removeJob);
   }
 
-  @BrowserTest
-  public void fieldsExistence() {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(0);
-    SampleFilesDialogElement dialog = view.filesDialog();
-    assertTrue(optional(dialog::header).isPresent());
-    assertTrue(optional(dialog::message).isPresent());
-    assertTrue(optional(dialog::folders).isPresent());
-    assertTrue(optional(dialog::files).isPresent());
-    assertTrue(optional(dialog::refresh).isPresent());
-    assertTrue(optional(dialog::upload).isPresent());
-    assertTrue(optional(dialog::addLargeFiles).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void files() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path home = configuration.getHome().folder(sample);
@@ -97,22 +87,32 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         file2);
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement dialog = view.filesDialog();
-    Assertions.assertEquals(2, dialog.folders().labels().size());
-    Assertions.assertEquals(configuration.getHome().label(sample, !SystemUtils.IS_OS_WINDOWS),
-        dialog.folders().labels().get(0).getText());
-    Assertions.assertEquals(
-        configuration.getArchives().get(0).label(sample, !SystemUtils.IS_OS_WINDOWS),
-        dialog.folders().labels().get(1).getText());
-    Assertions.assertEquals(2, dialog.files().getRowCount());
-    Assertions.assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
-    Assertions.assertEquals(file2.getFileName().toString(), dialog.files().filename(1));
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(1);
+    test(view.files).click();
+    SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
+    List<Span> labels = test(dialog.folders).find(Span.class).all();
+    assertEquals(2, labels.size());
+    assertEquals(configuration.getHome().label(sample, !SystemUtils.IS_OS_WINDOWS),
+        labels.get(0).getText());
+    assertEquals(configuration.getArchives().getFirst().label(sample, !SystemUtils.IS_OS_WINDOWS),
+        labels.get(1).getText());
+    assertEquals(2, test(dialog.files).size());
+    assertEquals(file1.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(0, dialog.filename.getKey(), "title",
+            String.class));
+    assertEquals(file1.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(0, dialog.filename.getKey(), "filename",
+            String.class));
+    assertEquals(file2.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(1, dialog.filename.getKey(), "title",
+            String.class));
+    assertEquals(file2.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(1, dialog.filename.getKey(), "filename",
+            String.class));
   }
 
-  @BrowserTest
+  @Test
   public void rename() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
@@ -121,15 +121,16 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         file);
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement dialog = view.filesDialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(1);
+    test(view.files).click();
+    SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
 
-    dialog.files().filenameCell(0).doubleClick();
-    dialog.filenameEdit().setValue(sample.getName() + "_R1.fastq");
-    dialog.filenameEdit().sendKeys(Keys.ENTER);
-    Thread.sleep(1000); // Allow time to apply changes to files.
+    EditableFile editableFile = dialog.files.getListDataView().getItem(0);
+    EditorImpl<EditableFile> editor = (EditorImpl<EditableFile>) dialog.files.getEditor();
+    editItem(editor, editableFile);
+    dialog.filenameEdit.setValue(sample.getName() + "_R1.fastq");
+    editor.closeEditor();
 
     assertTrue(Files.exists(file.resolveSibling(sample.getName() + "_R1.fastq")));
     assertArrayEquals(Files.readAllBytes(
@@ -138,7 +139,7 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
     assertFalse(Files.exists(file));
   }
 
-  @BrowserTest
+  @Test
   public void publicFile() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path home = configuration.getHome().folder(sample);
@@ -147,27 +148,26 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         file1);
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement dialog = view.filesDialog();
-    assertFalse(dialog.files().publicFileCheckbox(0).isChecked());
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(1);
+    test(view.files).click();
+    SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
+    assertFalse(
+        ((Checkbox) test(dialog.files).getCellComponent(0, dialog.publicFile.getKey())).getValue());
 
-    TestTransaction.flagForCommit();
-    dialog.files().publicFileCheckbox(0).click();
-    Thread.sleep(1000); // Wait for insert to complete.
-    TestTransaction.end();
+    test((Checkbox) test(dialog.files).getCellComponent(0, dialog.publicFile.getKey())).click();
 
-    assertTrue(dialog.files().publicFileCheckbox(0).isChecked());
+    assertTrue(
+        ((Checkbox) test(dialog.files).getCellComponent(0, dialog.publicFile.getKey())).getValue());
     Optional<SamplePublicFile> optionalSamplePublicFile = samplePublicFileRepository.findBySampleAndPath(
         sample, "R1.fastq");
     assertTrue(optionalSamplePublicFile.isPresent());
     SamplePublicFile samplePublicFile = optionalSamplePublicFile.orElseThrow();
-    Assertions.assertEquals(LocalDate.now().plus(configuration.getPublicFilePeriod()),
+    assertEquals(LocalDate.now().plus(configuration.getPublicFilePeriod()),
         samplePublicFile.getExpiryDate());
   }
 
-  @BrowserTest
+  @Test
   public void delete() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
@@ -178,34 +178,32 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
         file);
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement dialog = view.filesDialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(1);
+    test(view.files).click();
+    SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
 
-    dialog.files().delete(0).click();
-    Thread.sleep(1000); // Allow time to apply changes to files.
+    test(test(dialog.files).getCellComponent(0, dialog.delete.getKey())).click();
 
     assertFalse(Files.exists(file));
     Path deleted = folder.resolve(DELETED_FILENAME);
     List<String> deletedLines = Files.readAllLines(deleted);
     String[] deletedFileColumns = deletedLines.get(deletedLines.size() - 1).split("\t", -1);
-    Assertions.assertEquals(3, deletedFileColumns.length);
-    Assertions.assertEquals("R1.fastq", deletedFileColumns[0]);
+    assertEquals(3, deletedFileColumns.length);
+    assertEquals("R1.fastq", deletedFileColumns[0]);
     DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-    Assertions.assertEquals(modifiedTime,
-        LocalDateTime.from(formatter.parse(deletedFileColumns[1])));
+    assertEquals(modifiedTime, LocalDateTime.from(formatter.parse(deletedFileColumns[1])));
     LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
   }
 
-  @BrowserTest
+  @Test
   public void refresh() throws Throwable {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement dialog = view.filesDialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(1);
+    test(view.files).click();
+    SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     Sample sample = repository.findById(10L).orElseThrow();
     Path home = configuration.getHome().folder(sample);
     Files.createDirectories(home);
@@ -213,40 +211,45 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         file1);
-    Assertions.assertEquals(0, dialog.files().getRowCount());
+    assertEquals(0, test(dialog.files).size());
 
-    dialog.refresh().click();
+    test(dialog.refresh).click();
 
-    Assertions.assertEquals(1, dialog.files().getRowCount());
-    Assertions.assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
+    assertEquals(1, test(dialog.files).size());
+    assertEquals(file1.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(0, dialog.filename.getKey(), "title",
+            String.class));
+    assertEquals(file1.getFileName().toString(),
+        test(dialog.files).getLitRendererPropertyValue(0, dialog.filename.getKey(), "filename",
+            String.class));
   }
 
-  @BrowserTest
+  @Test
   public void addLargeFiles() {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(0);
-    SampleFilesDialogElement dialog = view.filesDialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(0);
+    test(view.files).click();
+    SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
 
-    dialog.addLargeFiles().click();
+    test(dialog.addLargeFiles).click();
 
-    assertTrue(dialog.addFilesDialog().isOpen());
+    assertTrue($(AddSampleFilesDialog.class).exists());
   }
 
-  @BrowserTest
+  @Test
   public void upload() throws Throwable {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement dialog = view.filesDialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(1);
+    test(view.files).click();
+    SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     Sample sample = repository.findById(10L).orElseThrow();
 
-    dialog.upload().upload(file1.toFile());
+    test(dialog.upload).upload(file1.toFile());
 
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FILES_SAVE,
-            new Object[]{file1.getFileName(), sample.getName()}, currentLocale()),
-        notification.getText());
+    Notification notification = $(Notification.class).first();
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FILES_SAVE,
+            new Object[]{file1.getFileName(), sample.getName()}, UI.getCurrent().getLocale()),
+        test(notification).getText());
     // Wait for files to finish copying.
     Thread.sleep(1000);
     Path folder = configuration.getHome().folder(sample);
@@ -254,6 +257,6 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
     assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(file1.getFileName())));
-    Assertions.assertEquals(1, jobService.getJobs().size());
+    assertEquals(1, jobService.getJobs().size());
   }
 }

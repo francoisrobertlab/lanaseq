@@ -1,53 +1,47 @@
 package ca.qc.ircm.lanaseq.jobs.web;
 
-import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
-import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.jobs.Job.UNDETERMINED_PROGRESS;
 import static ca.qc.ircm.lanaseq.jobs.web.JobsView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.jobs.Job;
 import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import ca.qc.ircm.lanaseq.web.SigninViewElement;
-import com.vaadin.testbench.BrowserTest;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.web.SigninView;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import java.time.LocalDateTime;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link JobsView}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class JobsViewIT extends AbstractBrowserTestCase {
+public class JobsViewIT extends SpringBrowserlessTest {
 
-  private static final String MESSAGE_PREFIX = messagePrefix(JobsView.class);
-  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
-  @Autowired
-  private MessageSource messageSource;
   @Autowired
   private JobService service;
   @Autowired
   private AuthenticatedUser authenticatedUser;
 
-  private void open() {
-    openView(VIEW_NAME);
+  @AfterEach
+  public void afterTest() {
+    if (!authenticatedUser.isAnonymous()) {
+      service.getJobs().forEach(service::removeJob);
+    }
   }
 
   private void prepareJobs() {
@@ -102,55 +96,31 @@ public class JobsViewIT extends AbstractBrowserTestCase {
     return job;
   }
 
-  @BrowserTest
+  @Test
   @WithAnonymousUser
   public void security_Anonymous() {
-    open();
-
-    $(SigninViewElement.class).waitForFirst();
+    navigate(VIEW_NAME, SigninView.class);
   }
 
-  @BrowserTest
-  public void title() {
-    open();
-
-    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
-        currentLocale());
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-            currentLocale()), getDriver().getTitle());
-  }
-
-  @BrowserTest
-  public void fieldsExistence() {
-    open();
-    JobsViewElement view = $(JobsViewElement.class).waitForFirst();
-    assertTrue(optional(view::jobs).isPresent());
-    assertTrue(optional(view::refresh).isPresent());
-    assertTrue(optional(view::removeDone).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void refresh() {
     prepareJobs();
-    open();
-    JobsViewElement view = $(JobsViewElement.class).waitForFirst();
-    Assertions.assertEquals(6, view.jobs().getRowCount());
+    JobsView view = navigate(JobsView.class);
+    assertEquals(6, test(view.jobs).size());
     Job job = job();
     job.time = LocalDateTime.now();
     job.progress = UNDETERMINED_PROGRESS;
     service.addJob(job);
-    view.refresh().click();
-    Assertions.assertEquals(7, view.jobs().getRowCount());
+    test(view.refresh).click();
+    assertEquals(7, test(view.jobs).size());
   }
 
-  @BrowserTest
+  @Test
   public void removeDone() {
     prepareJobs();
-    open();
-    JobsViewElement view = $(JobsViewElement.class).waitForFirst();
-    Assertions.assertEquals(6, view.jobs().getRowCount());
-    view.removeDone().click();
-    Assertions.assertEquals(2, view.jobs().getRowCount());
+    JobsView view = navigate(JobsView.class);
+    assertEquals(6, test(view.jobs).size());
+    test(view.removeDone).click();
+    assertEquals(2, test(view.jobs).size());
   }
 }

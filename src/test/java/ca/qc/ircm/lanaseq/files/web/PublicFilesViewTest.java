@@ -40,6 +40,7 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.web.PublicSampleFiles;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.FooterRow;
@@ -50,7 +51,6 @@ import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.server.streams.DownloadResponse;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -74,7 +74,7 @@ import org.springframework.util.FileCopyUtils;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PublicFilesViewTest extends SpringUIUnitTest {
+public class PublicFilesViewTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(PublicFilesView.class);
   private static final String PUBLIC_FILE_PREFIX = messagePrefix(PublicFile.class);
@@ -140,6 +140,16 @@ public class PublicFilesViewTest extends SpringUIUnitTest {
     samplePublicFile.setPath(filename);
     samplePublicFile.setExpiryDate(expiryDate);
     return samplePublicFile;
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.files).isUsable());
+    assertTrue(test(view.filenameFilter).isUsable());
+    assertTrue(test(view.expiryDateFilter).isUsable());
+    assertTrue(test(view.sampleNameFilter).isUsable());
+    assertTrue(test(view.ownerFilter).isUsable());
+    assertTrue(test(view.downloadLinks).isUsable());
   }
 
   @Test

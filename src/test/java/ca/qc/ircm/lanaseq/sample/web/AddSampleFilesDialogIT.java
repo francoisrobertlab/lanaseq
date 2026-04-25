@@ -2,8 +2,8 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVE_STARTED;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,28 +11,28 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.flow.component.notification.testbench.NotificationElement;
-import com.vaadin.testbench.BrowserTest;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.browserless.SpringBrowserlessTest;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.notification.Notification;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.transaction.TestTransaction;
 
 /**
  * Integration tests for {@link AddSampleFilesDialog}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class AddSampleFilesDialogIT extends AbstractBrowserTestCase {
+public class AddSampleFilesDialogIT extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(AddSampleFilesDialog.class);
   @Autowired
@@ -46,8 +46,9 @@ public class AddSampleFilesDialogIT extends AbstractBrowserTestCase {
   private Path file1;
   private Path file2;
 
-  private void open() {
-    openView(VIEW_NAME);
+  @AfterEach
+  public void afterTest() {
+    jobService.getJobs().forEach(jobService::removeJob);
   }
 
   private void copyFiles(Sample sample)
@@ -64,36 +65,21 @@ public class AddSampleFilesDialogIT extends AbstractBrowserTestCase {
         file2);
   }
 
-  @BrowserTest
-  public void fieldsExistence() {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(0);
-    SampleFilesDialogElement filesDialog = view.filesDialog();
-    filesDialog.addLargeFiles().click();
-    AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
-    assertTrue(optional(dialog::header).isPresent());
-    assertTrue(optional(dialog::message).isPresent());
-    assertTrue(optional(dialog::files).isPresent());
-    assertTrue(optional(dialog::refresh).isPresent());
-    assertTrue(optional(dialog::save).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void refresh() throws Throwable {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement filesDialog = view.filesDialog();
-    filesDialog.addLargeFiles().click();
-    AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(1);
+    test(view.files).click();
+    SampleFilesDialog filesDialog = $(SampleFilesDialog.class).first();
+    test(filesDialog.addLargeFiles).click();
+    AddSampleFilesDialog dialog = $(AddSampleFilesDialog.class).first();
     Sample sample = repository.findById(10L).orElseThrow();
-    Assertions.assertEquals(0, dialog.files().getRowCount());
+    assertEquals(0, test(dialog.files).size());
     copyFiles(sample);
 
-    dialog.refresh().click();
+    test(dialog.refresh).click();
 
-    Assertions.assertEquals(2, dialog.files().getRowCount());
+    assertEquals(2, test(dialog.files).size());
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         configuration.getUpload().folder(sample).resolve("other.fastq"));
@@ -101,19 +87,19 @@ public class AddSampleFilesDialogIT extends AbstractBrowserTestCase {
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         configuration.getUpload().getFolder().resolve("prefix_" + sample.getName() + "_R1"));
 
-    dialog.refresh().click();
+    test(dialog.refresh).click();
 
-    Assertions.assertEquals(4, dialog.files().getRowCount());
+    assertEquals(4, test(dialog.files).size());
   }
 
-  @BrowserTest
+  @Test
   public void save() throws Throwable {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement filesDialog = view.filesDialog();
-    filesDialog.addLargeFiles().click();
-    final AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
+    SamplesView view = navigate(SamplesView.class);
+    test(view.samples).select(1);
+    test(view.files).click();
+    SampleFilesDialog filesDialog = $(SampleFilesDialog.class).first();
+    test(filesDialog.addLargeFiles).click();
+    AddSampleFilesDialog dialog = $(AddSampleFilesDialog.class).first();
     Sample sample = repository.findById(10L).orElseThrow();
     copyFiles(sample);
     String filenameInRoot = "prefix_" + sample.getName() + "_R1";
@@ -121,14 +107,12 @@ public class AddSampleFilesDialogIT extends AbstractBrowserTestCase {
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         configuration.getUpload().getFolder().resolve(filenameInRoot));
 
-    TestTransaction.flagForCommit();
-    dialog.save().click();
-    TestTransaction.end();
+    test(dialog.save).click();
 
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    Assertions.assertEquals(
+    Notification notification = $(Notification.class).first();
+    assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVE_STARTED, new Object[]{3, sample.getName()},
-            currentLocale()), notification.getText());
+            UI.getCurrent().getLocale()), test(notification).getText());
     // Wait for files to finish copying.
     Thread.sleep(1000);
     Path folder = configuration.getHome().folder(sample);
@@ -147,6 +131,6 @@ public class AddSampleFilesDialogIT extends AbstractBrowserTestCase {
     assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(filenameInRoot)));
-    Assertions.assertEquals(1, jobService.getJobs().size());
+    assertEquals(1, jobService.getJobs().size());
   }
 }

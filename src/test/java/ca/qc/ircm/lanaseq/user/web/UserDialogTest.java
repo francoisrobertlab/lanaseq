@@ -26,12 +26,12 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +48,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class UserDialogTest extends SpringUIUnitTest {
+public class UserDialogTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(UserDialog.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -75,6 +75,35 @@ public class UserDialogTest extends SpringUIUnitTest {
     User user = repository.findById(2L).orElseThrow();
     doubleClickItem(view.users, user);
     dialog = $(UserDialog.class).first();
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void fieldsExistence_Manager() {
+    assertTrue(test(dialog.form).isUsable());
+    assertTrue(test(dialog.form.email).isUsable());
+    assertTrue(test(dialog.form.name).isUsable());
+    assertFalse(dialog.form.admin.isVisible());
+    assertTrue(test(dialog.form.manager).isUsable());
+    assertTrue(test(dialog.form.passwords).isUsable());
+    assertTrue(test(dialog.form.passwords.password).isUsable());
+    assertTrue(test(dialog.form.passwords.passwordConfirm).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+  }
+
+  @Test
+  public void fieldsExistence_Admin() {
+    assertTrue(test(dialog.form).isUsable());
+    assertTrue(test(dialog.form.email).isUsable());
+    assertTrue(test(dialog.form.name).isUsable());
+    assertTrue(test(dialog.form.admin).isUsable());
+    assertTrue(test(dialog.form.manager).isUsable());
+    assertTrue(test(dialog.form.passwords).isUsable());
+    assertTrue(test(dialog.form.passwords.password).isUsable());
+    assertTrue(test(dialog.form.passwords.passwordConfirm).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
   }
 
   @Test

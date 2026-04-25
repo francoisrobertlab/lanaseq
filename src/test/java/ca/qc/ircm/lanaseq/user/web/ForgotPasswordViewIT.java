@@ -1,32 +1,31 @@
 package ca.qc.ircm.lanaseq.user.web;
 
-import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
-import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.SAVED;
-import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.VIEW_NAME;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.mail.MailConfiguration;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordRepository;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
-import ca.qc.ircm.lanaseq.web.SigninViewElement;
+import ca.qc.ircm.lanaseq.web.SigninView;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.vaadin.flow.component.notification.testbench.NotificationElement;
-import com.vaadin.testbench.BrowserTest;
+import com.vaadin.browserless.SpringBrowserlessTest;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.notification.Notification;
 import jakarta.mail.Message.RecipientType;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +38,9 @@ import org.springframework.test.context.DynamicPropertySource;
 /**
  * Integration tests for {@link ForgotPasswordView}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithAnonymousUser
-public class ForgotPasswordViewIT extends AbstractBrowserTestCase {
+public class ForgotPasswordViewIT extends SpringBrowserlessTest {
 
   @RegisterExtension
   static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP);
@@ -54,6 +53,8 @@ public class ForgotPasswordViewIT extends AbstractBrowserTestCase {
   @Autowired
   private MailConfiguration mailConfiguration;
   @Autowired
+  private AppConfiguration appConfiguration;
+  @Autowired
   private MessageSource messageSource;
   private final String email = "olivia.brown@ircm.qc.ca";
 
@@ -64,67 +65,42 @@ public class ForgotPasswordViewIT extends AbstractBrowserTestCase {
     registry.add("mail.enabled", () -> "true");
   }
 
-  private void open() {
-    openView(VIEW_NAME);
-  }
-
-  @BrowserTest
-  public void title() {
-    open();
-    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
-        currentLocale());
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-            currentLocale()), getDriver().getTitle());
-  }
-
-  @BrowserTest
-  public void fieldsExistence() {
-    open();
-    ForgotPasswordViewElement view = $(ForgotPasswordViewElement.class).waitForFirst();
-    assertTrue(optional(view::header).isPresent());
-    assertTrue(optional(view::message).isPresent());
-    assertTrue(optional(view::email).isPresent());
-    assertTrue(optional(view::save).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void save() throws MessagingException {
-    open();
-    ForgotPasswordViewElement view = $(ForgotPasswordViewElement.class).waitForFirst();
-    view.email().setValue(email);
-    view.save().click();
+    ForgotPasswordView view = navigate(ForgotPasswordView.class);
+    test(view.email).setValue(email);
+    test(view.save).click();
 
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{email}, currentLocale()),
-        notification.getText());
+    Notification notification = $(Notification.class).first();
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{email},
+        UI.getCurrent().getLocale()), test(notification).getText());
     List<ForgotPassword> forgotPasswords = repository.findByUserEmail(email);
     ForgotPassword forgotPassword = forgotPasswords.get(forgotPasswords.size() - 1);
-    Assertions.assertEquals(4, forgotPasswords.size());
-    $(SigninViewElement.class).waitForFirst();
+    assertEquals(4, forgotPasswords.size());
+    assertTrue($(SigninView.class).exists());
 
     MimeMessage[] messages = greenMail.getReceivedMessages();
-    Assertions.assertEquals(1, messages.length);
+    assertEquals(1, messages.length);
     MimeMessage message = messages[0];
     String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + "application.name", null,
-        currentLocale());
+        UI.getCurrent().getLocale());
     String subject = messageSource.getMessage(SERVICE_PREFIX + "subject",
-        new Object[]{applicationName}, currentLocale());
-    Assertions.assertEquals(subject, message.getSubject());
+        new Object[]{applicationName}, UI.getCurrent().getLocale());
+    assertEquals(subject, message.getSubject());
     assertNotNull(message.getFrom());
-    Assertions.assertEquals(1, message.getFrom().length);
-    Assertions.assertEquals(new InternetAddress(mailConfiguration.from()), message.getFrom()[0]);
+    assertEquals(1, message.getFrom().length);
+    assertEquals(new InternetAddress(mailConfiguration.from()), message.getFrom()[0]);
     assertNotNull(message.getRecipients(RecipientType.TO));
-    Assertions.assertEquals(1, message.getRecipients(RecipientType.TO).length);
-    Assertions.assertEquals(new InternetAddress(email), message.getRecipients(RecipientType.TO)[0]);
+    assertEquals(1, message.getRecipients(RecipientType.TO).length);
+    assertEquals(new InternetAddress(email), message.getRecipients(RecipientType.TO)[0]);
     assertTrue(message.getRecipients(RecipientType.CC) == null
         || message.getRecipients(RecipientType.CC).length == 0);
     assertTrue(message.getRecipients(RecipientType.BCC) == null
         || message.getRecipients(RecipientType.BCC).length == 0);
     String body = GreenMailUtil.getBody(message);
-    String url = viewUrl(UseForgotPasswordView.VIEW_NAME) + "/" + forgotPassword.getId() + "/"
-        + forgotPassword.getConfirmNumber();
+    String url = appConfiguration.getUrl(
+        UseForgotPasswordView.VIEW_NAME + "/" + forgotPassword.getId() + "/"
+            + forgotPassword.getConfirmNumber());
     assertTrue(body.contains(url), url + " not found in email " + body);
   }
 }

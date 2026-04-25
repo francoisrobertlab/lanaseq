@@ -68,6 +68,7 @@ import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -90,7 +91,6 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -118,7 +118,7 @@ import tools.jackson.databind.node.ObjectNode;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetDialogTest extends SpringUIUnitTest {
+public class DatasetDialogTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetDialog.class);
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
@@ -180,6 +180,37 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     dialog.keywords.setValue(Stream.of(keyword1, keyword2).collect(Collectors.toSet()));
     dialog.filenames.setValue(Stream.of(filename1, filename2).collect(Collectors.toSet()));
     dialog.note.setValue(note);
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(dialog.namePrefix).isUsable());
+    assertTrue(test(dialog.generateName).isUsable());
+    assertTrue(test(dialog.keywords).isUsable());
+    assertTrue(test(dialog.filenames).isUsable());
+    assertTrue(dialog.protocol.isAttached());
+    assertTrue(dialog.protocol.isReadOnly());
+    assertTrue(dialog.assay.isAttached());
+    assertTrue(dialog.assay.isReadOnly());
+    assertTrue(dialog.type.isAttached());
+    assertTrue(dialog.type.isReadOnly());
+    assertTrue(dialog.target.isAttached());
+    assertTrue(dialog.target.isReadOnly());
+    assertTrue(dialog.strain.isAttached());
+    assertTrue(dialog.strain.isReadOnly());
+    assertTrue(dialog.strainDescription.isAttached());
+    assertTrue(dialog.strainDescription.isReadOnly());
+    assertTrue(dialog.treatment.isAttached());
+    assertTrue(dialog.treatment.isReadOnly());
+    assertTrue(test(dialog.note).isUsable());
+    assertTrue(test(dialog.date).isUsable());
+    assertTrue(test(dialog.samplesHeader).isUsable());
+    assertTrue(test(dialog.samples).isUsable());
+    assertTrue(test(dialog.addSample).isUsable());
+    assertFalse(test(dialog.error).isUsable());
+    assertTrue(test(dialog.save).isUsable());
+    assertTrue(test(dialog.cancel).isUsable());
+    assertTrue(test(dialog.delete).isUsable());
   }
 
   @Test

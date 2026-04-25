@@ -1,37 +1,36 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.dataset.web.PublicDatasetFiles.REST_MAPPING;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
-import ca.qc.ircm.lanaseq.dataset.DatasetPublicFileRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.testbench.BrowserTest;
+import ca.qc.ircm.lanaseq.test.config.AbstractSeleniumTestCase;
+import ca.qc.ircm.lanaseq.test.config.SeleniumTestAnnotations;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 
 /**
- * Integration tests for {@link PublicDatasetFiles}.
+ * Integration tests for {@link PublicDatasetFiles} using Selenium.
  */
-@TestBenchTestAnnotations
+@SeleniumTestAnnotations
 @WithAnonymousUser
-public class PublicDatasetFilesIT extends AbstractBrowserTestCase {
+public class PublicDatasetFilesIT extends AbstractSeleniumTestCase {
 
   @Autowired
   private DatasetRepository repository;
   @Autowired
-  private DatasetPublicFileRepository datasetPublicFileRepository;
-  @Autowired
   private AppConfiguration configuration;
 
-  @BrowserTest
+  @Test
   public void publicFile() throws Throwable {
     Dataset dataset = repository.findById(6L).orElseThrow();
     Path home = configuration.getHome().folder(dataset);
@@ -43,7 +42,7 @@ public class PublicDatasetFilesIT extends AbstractBrowserTestCase {
 
     openView(REST_MAPPING + "/" + dataset.getName() + "/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
 
-    Assertions.assertEquals(Files.readString(file1).replaceAll("\n", " "),
-        $("body").waitForFirst().getText());
+    WebElement body = waitUntil(d -> d.findElement(By.cssSelector("body")));
+    assertEquals(Files.readString(file1).replaceAll("\\n", " "), body.getText());
   }
 }

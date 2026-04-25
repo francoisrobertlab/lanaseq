@@ -32,6 +32,7 @@ import ca.qc.ircm.lanaseq.jobs.Job;
 import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -42,7 +43,6 @@ import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class JobsViewTest extends SpringUIUnitTest {
+public class JobsViewTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(JobsView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -167,6 +167,13 @@ public class JobsViewTest extends SpringUIUnitTest {
       }
     }
     return job;
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.jobs).isUsable());
+    assertTrue(test(view.refresh).isUsable());
+    assertTrue(test(view.removeDone).isUsable());
   }
 
   @Test

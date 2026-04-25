@@ -25,9 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @WebAppConfiguration
 @TestExecutionListeners(value = {InitializeDatabaseExecutionListener.class,
-    TemporaryFolderForAppConfiguration.class, VaadinLicenseExecutionListener.class,
+    TemporaryFolderForAppConfiguration.class,
     FixSecurityContextHolderStrategyExecutionListener.class,
-    UiUnitTestExecutionListener.class}, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
+    BrowserlessUnitTestExecutionListener.class}, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Transactional
 @Sql({"/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql",
     "/fix-database-for-threads.sql"})

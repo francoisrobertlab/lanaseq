@@ -65,7 +65,6 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
   public static final String USERS = "users";
   public static final String USERS_REQUIRED = property(USERS, REQUIRED);
   public static final String SWITCH_USER = "switchUser";
-  public static final String SWITCH_FAILED = "switchFailed";
   private static final String MESSAGE_PREFIX = messagePrefix(UsersView.class);
   private static final String USER_PREFIX = messagePrefix(User.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);

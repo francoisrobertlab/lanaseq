@@ -28,13 +28,13 @@ import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.QueryParameters;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,7 +50,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
  */
 @NonTransactionalTestAnnotations
 @WithAnonymousUser
-public class SigninViewTest extends SpringUIUnitTest {
+public class SigninViewTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SigninView.class);
   private static final String USER_PREFIX = messagePrefix(User.class);
@@ -92,6 +92,12 @@ public class SigninViewTest extends SpringUIUnitTest {
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertTrue(view.isForgotPasswordButtonVisible());
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(view).isOpen());
+    assertTrue(test(view).isUsable());
   }
 
   @Test

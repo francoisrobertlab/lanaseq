@@ -36,12 +36,12 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.selection.SelectionModel;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Locale;
@@ -60,7 +60,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetsViewTest extends SpringUIUnitTest {
+public class DatasetsViewTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetsView.class);
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
@@ -93,6 +93,38 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     when(service.all(any(), any())).then(i -> datasets.stream());
     UI.getCurrent().setLocale(locale);
     view = navigate(DatasetsView.class);
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.datasets).isUsable());
+    assertTrue(view.edit.isVisible());
+    assertFalse(view.edit.isEnabled());
+    assertTrue(view.merge.isVisible());
+    assertFalse(view.merge.isEnabled());
+    assertTrue(view.files.isVisible());
+    assertFalse(view.files.isEnabled());
+    assertTrue(view.analyze.isVisible());
+    assertFalse(view.analyze.isEnabled());
+    view.datasets.setItems(datasets);
+    view.datasets.select(datasets.getFirst());
+    assertTrue(view.edit.isVisible());
+    assertTrue(view.edit.isEnabled());
+    assertTrue(view.merge.isVisible());
+    assertTrue(view.merge.isEnabled());
+    assertTrue(view.files.isVisible());
+    assertTrue(view.files.isEnabled());
+    assertTrue(view.analyze.isVisible());
+    assertTrue(view.analyze.isEnabled());
+    view.datasets.select(datasets.get(1));
+    assertTrue(view.edit.isVisible());
+    assertFalse(view.edit.isEnabled());
+    assertTrue(view.merge.isVisible());
+    assertTrue(view.merge.isEnabled());
+    assertTrue(view.files.isVisible());
+    assertFalse(view.files.isEnabled());
+    assertTrue(view.analyze.isVisible());
+    assertTrue(view.analyze.isEnabled());
   }
 
   @Test

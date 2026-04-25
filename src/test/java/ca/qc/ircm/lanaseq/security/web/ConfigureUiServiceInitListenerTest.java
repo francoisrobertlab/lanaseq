@@ -10,12 +10,12 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.PasswordView;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.internal.AfterNavigationHandler;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +32,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ConfigureUiServiceInitListenerTest extends SpringUIUnitTest {
+public class ConfigureUiServiceInitListenerTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(ConfigureUiServiceInitListener.class);
   private static final Logger logger = LoggerFactory.getLogger(

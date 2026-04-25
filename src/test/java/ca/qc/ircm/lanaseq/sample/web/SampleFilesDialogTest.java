@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.PUBLIC_FILE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.editItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.properties;
@@ -61,6 +62,8 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.EditableFile;
+import com.vaadin.browserless.MetaKeys;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -69,7 +72,6 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.editor.Editor;
-import com.vaadin.flow.component.grid.editor.EditorCloseEvent;
 import com.vaadin.flow.component.grid.editor.EditorCloseListener;
 import com.vaadin.flow.component.grid.editor.EditorImpl;
 import com.vaadin.flow.component.html.Anchor;
@@ -82,11 +84,8 @@ import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
-import com.vaadin.testbench.unit.MetaKeys;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -125,7 +124,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SampleFilesDialogTest extends SpringUIUnitTest {
+public class SampleFilesDialogTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -232,6 +231,16 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
   private EditableFile editableFile(String filename) {
     return new EditableFile(new File(filename));
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(dialog.message).isUsable());
+    assertTrue(test(dialog.folders).isUsable());
+    assertTrue(test(dialog.files).isUsable());
+    assertTrue(test(dialog.refresh).isUsable());
+    assertTrue(test(dialog.upload).isUsable());
+    assertTrue(test(dialog.addLargeFiles).isUsable());
   }
 
   @Test
@@ -578,13 +587,11 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     Files.createDirectories(path.getParent());
     Files.write(path, fileContent);
     Path sibling = path.resolveSibling("new_name.txt");
-    dialog.filenameEdit.setValue("new_name//.txt");
-    file.setFilename(sibling.getFileName().toString());
     EditorImpl<EditableFile> editor = (EditorImpl<EditableFile>) dialog.files.getEditor();
-    Method method = EditorImpl.class.getDeclaredMethod("fireCloseEvent", EditorCloseEvent.class);
-    method.setAccessible(true);
+    editItem(editor, file);
+    dialog.filenameEdit.setValue("new_name//.txt");
 
-    method.invoke(editor, new EditorCloseEvent<>(editor, file));
+    editor.closeEditor();
 
     assertEquals(currentName, file.getFilename());
     assertFalse(Files.exists(sibling));
@@ -599,13 +606,11 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     Files.createDirectories(path.getParent());
     Files.write(path, fileContent);
     Path sibling = path.resolveSibling("new_name.txt");
-    dialog.filenameEdit.setValue(sibling.getFileName().toString());
-    file.setFilename(sibling.getFileName().toString());
     EditorImpl<EditableFile> editor = (EditorImpl<EditableFile>) dialog.files.getEditor();
-    Method method = EditorImpl.class.getDeclaredMethod("fireCloseEvent", EditorCloseEvent.class);
-    method.setAccessible(true);
+    editItem(editor, file);
+    dialog.filenameEdit.setValue(sibling.getFileName().toString());
 
-    method.invoke(editor, new EditorCloseEvent<>(editor, file));
+    editor.closeEditor();
 
     assertTrue(Files.exists(sibling));
     assertFalse(Files.exists(path));

@@ -48,7 +48,7 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 @EnableMethodSecurity(securedEnabled = true)
 public class WebSecurityConfiguration {
 
-  public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
+  private static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
   private static final String SIGNIN_DEFAULT_FAILURE_URL =
       SIGNIN_PROCESSING_URL + "?" + SigninView.FAIL;
   private static final String SIGNIN_LOCKED_URL = SIGNIN_PROCESSING_URL + "?" + SigninView.LOCKED;
@@ -164,7 +164,7 @@ public class WebSecurityConfiguration {
 
     // Used for TestBench.
     try {
-      Class<?> clazz = Class.forName("ca.qc.ircm.lanaseq.test.config.TestBenchSecurityFilter");
+      Class<?> clazz = Class.forName("ca.qc.ircm.lanaseq.test.config.SeleniumSecurityFilter");
       http.addFilterBefore((Filter) clazz.getDeclaredConstructor().newInstance(),
           SecurityContextHolderFilter.class);
     } catch (ClassNotFoundException e) {

@@ -32,11 +32,11 @@ import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.SigninView;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +50,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 @WithAnonymousUser
-public class UseForgotPasswordViewTest extends SpringUIUnitTest {
+public class UseForgotPasswordViewTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(UseForgotPasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -70,6 +70,14 @@ public class UseForgotPasswordViewTest extends SpringUIUnitTest {
     UI.getCurrent().setLocale(locale);
     String parameter = "2/b";
     view = navigate(UseForgotPasswordView.class, parameter);
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(view.message).isUsable());
+    assertTrue(test(view.form.password).isUsable());
+    assertTrue(test(view.form.passwordConfirm).isUsable());
+    assertTrue(test(view.save).isUsable());
   }
 
   @Test

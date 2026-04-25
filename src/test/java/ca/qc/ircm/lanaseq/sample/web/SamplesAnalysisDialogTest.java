@@ -32,10 +32,10 @@ import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
+import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
-import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,7 +55,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
+public class SamplesAnalysisDialogTest extends SpringBrowserlessTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SamplesAnalysisDialog.class);
   private SamplesAnalysisDialog dialog;
@@ -90,6 +90,13 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     samples.forEach(sample -> view.samples.select(sample));
     view.analyze.click();
     dialog = $(SamplesAnalysisDialog.class).first();
+  }
+
+  @Test
+  public void fieldsExistence() {
+    assertTrue(test(dialog.message).isUsable());
+    assertTrue(test(dialog.filenamePatterns).isUsable());
+    assertTrue(test(dialog.createFolder).isUsable());
   }
 
   @Test

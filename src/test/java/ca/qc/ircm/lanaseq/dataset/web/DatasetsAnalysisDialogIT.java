@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,9 +9,10 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.testbench.BrowserTest;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.browserless.SpringBrowserlessTest;
+import com.vaadin.flow.component.combobox.ComboBoxBase.CustomValueSetEvent;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,26 +21,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Assertions;
-import org.openqa.selenium.Keys;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Integration tests for {@link DatasetsAnalysisDialog}.
  */
-@TestBenchTestAnnotations
+@ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetsAnalysisDialogIT extends AbstractBrowserTestCase {
+public class DatasetsAnalysisDialogIT extends SpringBrowserlessTest {
 
   @Autowired
   private DatasetRepository repository;
   @Autowired
   private AppConfiguration configuration;
   private final Random random = new Random();
-
-  private void open() {
-    openView(VIEW_NAME);
-  }
 
   private byte[] writeFile(Path file) throws IOException {
     byte[] bytes = new byte[2048];
@@ -48,20 +45,7 @@ public class DatasetsAnalysisDialogIT extends AbstractBrowserTestCase {
     return bytes;
   }
 
-  @BrowserTest
-  public void fieldsExistence() {
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().select(0);
-    view.analyze().click();
-    DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
-    assertTrue(optional(dialog::header).isPresent());
-    assertTrue(optional(dialog::message).isPresent());
-    assertTrue(optional(dialog::filenamePatterns).isPresent());
-    assertTrue(optional(dialog::create).isPresent());
-  }
-
-  @BrowserTest
+  @Test
   public void create_One() throws Throwable {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Sample sample1 = dataset.getSamples().get(0);
@@ -78,19 +62,18 @@ public class DatasetsAnalysisDialogIT extends AbstractBrowserTestCase {
     final byte[] fastq3Content = writeFile(fastq3);
     Path fastq4 = sample2Folder.resolve("a_R2.fastq");
     final byte[] fastq4Content = writeFile(fastq4);
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().select(3);
-    view.analyze().click();
-    DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
-    dialog.filenamePatterns().sendKeys("*.fastq" + Keys.RETURN);
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(3);
+    test(view.analyze).click();
+    DatasetsAnalysisDialog dialog = $(DatasetsAnalysisDialog.class).first();
+    fireEvent(dialog.filenamePatterns,
+        new CustomValueSetEvent<>(dialog.filenamePatterns, false, "*.fastq"));
 
-    dialog.create().click();
-    Thread.sleep(2000); // Wait for file copy.
+    test(dialog.createFolder).click();
 
-    assertTrue(dialog.isOpen());
-    dialog.confirm().getConfirmButton().click();
-    assertFalse(dialog.isOpen());
+    assertTrue(dialog.isOpened());
+    test($(ConfirmDialog.class).first()).confirm();
+    assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(List.of(dataset));
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
@@ -118,7 +101,7 @@ public class DatasetsAnalysisDialogIT extends AbstractBrowserTestCase {
         datasetMetaContent.get(1));
   }
 
-  @BrowserTest
+  @Test
   public void create_Many() throws Throwable {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Dataset dataset2 = repository.findById(7L).orElseThrow();
@@ -144,20 +127,19 @@ public class DatasetsAnalysisDialogIT extends AbstractBrowserTestCase {
     final byte[] fastq5Content = writeFile(fastq5);
     Path fastq6 = sample3Folder.resolve(sample3.getName() + "_R2.fastq");
     final byte[] fastq6Content = writeFile(fastq6);
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().select(3);
-    view.datasets().select(0);
-    view.analyze().click();
-    DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
-    dialog.filenamePatterns().sendKeys("*.fastq" + Keys.RETURN);
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(3);
+    test(view.datasets).select(0);
+    test(view.analyze).click();
+    DatasetsAnalysisDialog dialog = $(DatasetsAnalysisDialog.class).first();
+    fireEvent(dialog.filenamePatterns,
+        new CustomValueSetEvent<>(dialog.filenamePatterns, false, "*.fastq"));
 
-    dialog.create().click();
-    Thread.sleep(2000); // Wait for file copy.
+    test(dialog.createFolder).click();
 
-    assertTrue(dialog.isOpen());
-    dialog.confirm().getConfirmButton().click();
-    assertFalse(dialog.isOpen());
+    assertTrue(dialog.isOpened());
+    test($(ConfirmDialog.class).first()).confirm();
+    assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(datasets);
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
@@ -194,7 +176,7 @@ public class DatasetsAnalysisDialogIT extends AbstractBrowserTestCase {
         datasetMetaContent.get(2));
   }
 
-  @BrowserTest
+  @Test
   public void create_NoFilenamePattern() throws Throwable {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Sample sample1 = dataset.getSamples().get(0);
@@ -211,17 +193,16 @@ public class DatasetsAnalysisDialogIT extends AbstractBrowserTestCase {
     final byte[] fastq3Content = writeFile(fastq3);
     Path fastq4 = sample2Folder.resolve("a_R2.fastq");
     final byte[] fastq4Content = writeFile(fastq4);
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().select(3);
-    view.analyze().click();
-    DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
+    DatasetsView view = navigate(DatasetsView.class);
+    test(view.datasets).select(3);
+    test(view.analyze).click();
+    DatasetsAnalysisDialog dialog = $(DatasetsAnalysisDialog.class).first();
 
-    dialog.create().click();
+    test(dialog.createFolder).click();
 
-    assertTrue(dialog.isOpen());
-    dialog.confirm().getConfirmButton().click();
-    assertFalse(dialog.isOpen());
+    assertTrue(dialog.isOpened());
+    test($(ConfirmDialog.class).first()).confirm();
+    assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(List.of(dataset));
     assertTrue(Files.exists(folder));
     assertFalse(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
