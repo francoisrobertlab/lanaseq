@@ -321,7 +321,6 @@
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
-            <rerunFailingTestsCount>0</rerunFailingTestsCount>
             <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
             <systemPropertyVariables>
               <selenium.skip>${selenium.skip}</selenium.skip>
