@@ -15,7 +15,7 @@ public class GridComponent extends SeleniumComponent {
 
   protected WebElement cell(int row, int column) {
     WebElement body = element.getShadowRoot().findElement(By.cssSelector("tbody"));
-    WebElement gridRow = body.findElements(By.cssSelector("tr")).get(row);
+    WebElement gridRow = body.findElements(By.cssSelector("tr:not([hidden])")).get(row);
     String slotName = gridRow.findElements(By.cssSelector("td")).get(column)
         .findElement(By.cssSelector("slot")).getAttribute("name");
     return element.findElement(By.cssSelector("vaadin-grid-cell-content[slot='" + slotName + "']"));
@@ -23,7 +23,7 @@ public class GridComponent extends SeleniumComponent {
 
   protected WebElement headerCell(int row, int column) {
     WebElement body = element.getShadowRoot().findElement(By.cssSelector("thead"));
-    WebElement gridRow = body.findElements(By.cssSelector("tr")).get(row);
+    WebElement gridRow = body.findElements(By.cssSelector("tr:not([hidden])")).get(row);
     String slotName = gridRow.findElements(By.cssSelector("th")).get(column)
         .findElement(By.cssSelector("slot")).getAttribute("name");
     return element.findElement(By.cssSelector("vaadin-grid-cell-content[slot='" + slotName + "']"));
