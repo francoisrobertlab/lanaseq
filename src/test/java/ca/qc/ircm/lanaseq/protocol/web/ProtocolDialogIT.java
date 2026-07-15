@@ -87,12 +87,12 @@ public class ProtocolDialogIT extends SpringBrowserlessTest {
   public void save_New() throws Throwable {
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.add).click();
-    ProtocolDialog dialog = $(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).first();
     setFields(dialog);
 
     test(dialog.save).click();
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     Protocol protocol = repository.findByName(name).orElseThrow();
@@ -116,12 +116,12 @@ public class ProtocolDialogIT extends SpringBrowserlessTest {
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.protocols).select(0);
     test(view.edit).click();
-    ProtocolDialog dialog = $(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).first();
     setFields(dialog);
 
     test(dialog.save).click();
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     Protocol protocol = repository.findById(1L).orElseThrow();
@@ -149,12 +149,12 @@ public class ProtocolDialogIT extends SpringBrowserlessTest {
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.protocols).select(0);
     test(view.edit).click();
-    ProtocolDialog dialog = $(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).first();
     setFields(dialog);
 
     test(dialog.cancel).click();
 
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     Protocol protocol = repository.findById(1L).orElseThrow();
     assertEquals("FLAG", protocol.getName());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getCreationDate());
@@ -176,13 +176,13 @@ public class ProtocolDialogIT extends SpringBrowserlessTest {
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.protocols).select(3);
     test(view.edit).click();
-    ProtocolDialog dialog = $(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).first();
     final String name = protocol.getName();
 
     test(dialog.delete).click();
-    test($(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).first()).confirm();
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     assertFalse(repository.findById(4L).isPresent());

@@ -289,6 +289,6 @@ public class SigninViewTest extends SpringBrowserlessTest {
   @Test
   public void forgotPassword() {
     view.fireForgotPasswordEvent();
-    assertTrue($(ForgotPasswordView.class).exists());
+    assertTrue(find(ForgotPasswordView.class).exists());
   }
 }

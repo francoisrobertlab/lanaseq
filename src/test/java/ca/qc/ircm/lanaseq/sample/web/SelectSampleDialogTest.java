@@ -105,20 +105,20 @@ public class SelectSampleDialogTest extends SpringBrowserlessTest {
     when(service.all()).thenReturn(samples);
     UI.getCurrent().setLocale(locale);
     navigate(DatasetsView.class);
-    @SuppressWarnings("unchecked") Grid<Dataset> datasetGrid = $(Grid.class).first();
+    @SuppressWarnings("unchecked") Grid<Dataset> datasetGrid = find(Grid.class).first();
     datasetGrid.setItems(datasetRepository.findAll());
     test(datasetGrid).doubleClickRow(1);
-    if ($(Button.class).withId(DatasetDialog.id(ADD_SAMPLE)).exists()) {
-      Button addSample = $(Button.class).id(DatasetDialog.id(ADD_SAMPLE));
+    if (find(Button.class).withId(DatasetDialog.id(ADD_SAMPLE)).exists()) {
+      Button addSample = find(Button.class).id(DatasetDialog.id(ADD_SAMPLE));
       addSample.click();
     } else {
       // Invoke method DatasetDialog.addSample() directly since UI testing is bugged and does not show button.
-      DatasetDialog datasetDialog = $(DatasetDialog.class).first();
+      DatasetDialog datasetDialog = find(DatasetDialog.class).first();
       Method addSampleMethod = DatasetDialog.class.getDeclaredMethod("addSample");
       addSampleMethod.setAccessible(true);
       addSampleMethod.invoke(datasetDialog);
     }
-    dialog = $(SelectSampleDialog.class).first();
+    dialog = find(SelectSampleDialog.class).first();
   }
 
   private Sample name(String name) {

@@ -101,13 +101,13 @@ public class DatasetDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.edit).click();
-    DatasetDialog dialog = $(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).first();
     fill(dialog);
 
     test(dialog.save).click();
 
     String name = namePrefix + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date);
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     dataset = repository.findById(2L).orElseThrow();
@@ -162,7 +162,7 @@ public class DatasetDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.edit).click();
-    DatasetDialog dialog = $(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).first();
     List<Sample> samples = new ArrayList<>(dialog.samples.getListDataView().getItems().toList());
     Collections.reverse(samples);
     dialog.samples.setItems(samples);
@@ -170,7 +170,7 @@ public class DatasetDialogIT extends SpringBrowserlessTest {
     test(dialog.save).click();
 
     String name = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022";
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     Dataset dataset = repository.findById(2L).orElseThrow();
@@ -223,9 +223,9 @@ public class DatasetDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.edit).click();
-    DatasetDialog dialog = $(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).first();
     test(dialog.addSample).click();
-    SelectSampleDialog selectSampleDialog = $(SelectSampleDialog.class).first();
+    SelectSampleDialog selectSampleDialog = find(SelectSampleDialog.class).first();
     @SuppressWarnings("unchecked") Grid<Sample> samplesGrid = test(selectSampleDialog).find(
         Grid.class).first();
     test(samplesGrid).doubleClickRow(2);
@@ -233,7 +233,7 @@ public class DatasetDialogIT extends SpringBrowserlessTest {
 
     test(dialog.save).click();
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     dataset = repository.findById(2L).orElseThrow();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{dataset.getName()},
         UI.getCurrent().getLocale()), test(notification).getText());
@@ -300,12 +300,12 @@ public class DatasetDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(0);
     test(view.edit).click();
-    DatasetDialog dialog = $(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).first();
     fill(dialog);
 
     test(dialog.cancel).click();
 
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     Dataset dataset = repository.findById(2L).orElseThrow();
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
     assertEquals(3, dataset.getKeywords().size());
@@ -355,13 +355,13 @@ public class DatasetDialogIT extends SpringBrowserlessTest {
     test(view.datasets.ownerFilter).setValue("benoit.coulombe@ircm.qc.ca");
     test(view.datasets).select(1);
     test(view.edit).click();
-    DatasetDialog dialog = $(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).first();
     final String name = dataset.getName();
 
     test(dialog.delete).click();
-    test($(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).first()).confirm();
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     assertFalse(repository.findById(4L).isPresent());

@@ -38,58 +38,58 @@ public class ViewLayoutIT extends SpringBrowserlessTest {
   @Test
   public void datasets() {
     navigate(SamplesView.class);
-    ViewLayout view = $(ViewLayout.class).first();
+    ViewLayout view = find(ViewLayout.class).first();
     test(view.sideNav).clickItem(view.datasets.getLabel());
-    assertTrue($(DatasetsView.class).exists());
+    assertTrue(find(DatasetsView.class).exists());
   }
 
   @Test
   public void samples() {
     navigate(DatasetsView.class);
-    ViewLayout view = $(ViewLayout.class).first();
+    ViewLayout view = find(ViewLayout.class).first();
     test(view.sideNav).clickItem(view.samples.getLabel());
-    assertTrue($(SamplesView.class).exists());
+    assertTrue(find(SamplesView.class).exists());
   }
 
   @Test
   public void protocols() {
     navigate(DatasetsView.class);
-    ViewLayout view = $(ViewLayout.class).first();
+    ViewLayout view = find(ViewLayout.class).first();
     test(view.sideNav).clickItem(view.protocols.getLabel());
-    assertTrue($(ProtocolsView.class).exists());
+    assertTrue(find(ProtocolsView.class).exists());
   }
 
   @Test
   public void publicFiles() {
     navigate(DatasetsView.class);
-    ViewLayout view = $(ViewLayout.class).first();
+    ViewLayout view = find(ViewLayout.class).first();
     test(view.sideNav).clickItem(view.publicFiles.getLabel());
-    assertTrue($(PublicFilesView.class).exists());
+    assertTrue(find(PublicFilesView.class).exists());
   }
 
   @Test
   public void jobs() {
     navigate(DatasetsView.class);
-    ViewLayout view = $(ViewLayout.class).first();
+    ViewLayout view = find(ViewLayout.class).first();
     test(view.sideNav).clickItem(view.jobs.getLabel());
-    assertTrue($(JobsView.class).exists());
+    assertTrue(find(JobsView.class).exists());
   }
 
   @Test
   public void profile() {
     navigate(DatasetsView.class);
-    ViewLayout view = $(ViewLayout.class).first();
+    ViewLayout view = find(ViewLayout.class).first();
     test(view.sideNav).clickItem(view.profile.getLabel());
-    assertTrue($(ProfileView.class).exists());
+    assertTrue(find(ProfileView.class).exists());
   }
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void users() {
     navigate(DatasetsView.class);
-    ViewLayout view = $(ViewLayout.class).first();
+    ViewLayout view = find(ViewLayout.class).first();
     test(view.sideNav).clickItem(view.users.getLabel());
-    assertTrue($(UsersView.class).exists());
+    assertTrue(find(UsersView.class).exists());
   }
 
   @Test
@@ -97,15 +97,15 @@ public class ViewLayoutIT extends SpringBrowserlessTest {
   @Disabled("Done in SwitchUserIT.exitSwitchUser")
   public void exitSwitchUser() {
     navigate(UsersView.class);
-    @SuppressWarnings("unchecked") Grid<User> usersGrid = (Grid<User>) $(Grid.class).first();
+    @SuppressWarnings("unchecked") Grid<User> usersGrid = (Grid<User>) find(Grid.class).first();
     test(usersGrid).select(2);
-    $(Button.class).id(SWITCH_USER).click();
-    ViewLayout view = $(ViewLayout.class).first();
+    find(Button.class).id(SWITCH_USER).click();
+    ViewLayout view = find(ViewLayout.class).first();
     assertTrue(test(view.exitSwitchUser).isUsable());
     assertFalse(view.users.isVisible());
     test(view.sideNav).clickItem(view.exitSwitchUser.getLabel());
-    assertTrue($(DatasetsView.class).exists());
-    view = $(ViewLayout.class).first();
+    assertTrue(find(DatasetsView.class).exists());
+    view = find(ViewLayout.class).first();
     assertFalse(view.exitSwitchUser.isVisible());
     assertTrue(test(view.users).isUsable());
   }

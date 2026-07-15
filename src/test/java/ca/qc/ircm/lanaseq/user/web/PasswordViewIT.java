@@ -70,11 +70,11 @@ public class PasswordViewIT extends SpringBrowserlessTest {
 
     test(view.save).click();
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, UI.getCurrent().getLocale()),
         test(notification).getText());
-    assertTrue($(DatasetsView.class).exists());
+    assertTrue(find(DatasetsView.class).exists());
     User user = repository.findById(6L).orElseThrow();
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
   }

@@ -55,7 +55,7 @@ public class ProfileViewIT extends SpringBrowserlessTest {
 
     test(view.save).click();
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, UI.getCurrent().getLocale()),
         test(notification).getText());
@@ -64,6 +64,6 @@ public class ProfileViewIT extends SpringBrowserlessTest {
     assertEquals(name, user.getName());
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
     assertNull(user.getLocale());
-    assertTrue($(ProfileView.class).exists());
+    assertTrue(find(ProfileView.class).exists());
   }
 }

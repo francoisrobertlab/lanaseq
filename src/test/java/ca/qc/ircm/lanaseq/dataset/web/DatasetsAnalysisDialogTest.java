@@ -90,7 +90,7 @@ public class DatasetsAnalysisDialogTest extends SpringBrowserlessTest {
     view.datasets.setItems(repository.findAll());
     datasets.forEach(sample -> view.datasets.select(sample));
     view.analyze.click();
-    dialog = $(DatasetsAnalysisDialog.class).first();
+    dialog = find(DatasetsAnalysisDialog.class).first();
   }
 
   @Test

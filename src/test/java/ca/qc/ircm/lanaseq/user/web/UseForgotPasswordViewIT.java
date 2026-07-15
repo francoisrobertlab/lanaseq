@@ -51,7 +51,7 @@ public class UseForgotPasswordViewIT extends SpringBrowserlessTest {
     test(view.form.passwordConfirm).setValue(password);
     test(view.save).click();
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, UI.getCurrent().getLocale()),
         test(notification).getText());
@@ -59,6 +59,6 @@ public class UseForgotPasswordViewIT extends SpringBrowserlessTest {
     assertTrue(forgotPassword.isUsed());
     User user = userRepository.findById(9L).orElseThrow();
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
-    assertTrue($(SigninView.class).exists());
+    assertTrue(find(SigninView.class).exists());
   }
 }

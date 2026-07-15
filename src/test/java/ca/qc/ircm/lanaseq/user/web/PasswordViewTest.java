@@ -112,7 +112,7 @@ public class PasswordViewTest extends SpringBrowserlessTest {
     view.save();
 
     verify(service, never()).save(any());
-    assertTrue($(PasswordView.class).exists());
+    assertTrue(find(PasswordView.class).exists());
   }
 
   @Test
@@ -128,8 +128,8 @@ public class PasswordViewTest extends SpringBrowserlessTest {
     view.save();
 
     verify(service).save(password);
-    assertTrue($(DatasetsView.class).exists());
-    Notification notification = $(Notification.class).first();
+    assertTrue(find(DatasetsView.class).exists());
+    Notification notification = find(Notification.class).first();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAVED), test(notification).getText());
   }
 }

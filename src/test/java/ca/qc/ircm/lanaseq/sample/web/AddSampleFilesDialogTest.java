@@ -164,9 +164,9 @@ public class AddSampleFilesDialogTest extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     view.samples.setItems(repository.findAll());
     test(view.samples).clickRow(1, new MetaKeys().ctrl());
-    SampleFilesDialog filesDialog = $(SampleFilesDialog.class).first();
+    SampleFilesDialog filesDialog = find(SampleFilesDialog.class).first();
     filesDialog.addLargeFiles.click();
-    dialog = $(AddSampleFilesDialog.class).first();
+    dialog = find(AddSampleFilesDialog.class).first();
   }
 
   private void writeFile(Path file, long size) throws IOException {
@@ -460,7 +460,7 @@ public class AddSampleFilesDialogTest extends SpringBrowserlessTest {
     assertTrue(dialog.error.isVisible());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE_ERROR), dialog.error.getText());
     verify(service, never()).saveFiles(any(), any(), any(), any());
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     verify(savedListener, never()).onComponentEvent(any());
     assertTrue(dialog.isOpened());
   }
@@ -496,7 +496,7 @@ public class AddSampleFilesDialogTest extends SpringBrowserlessTest {
     assertEquals("test message", jobCaptor.getValue().message);
     assertEquals(0.35, jobCaptor.getValue().progress);
     assertFalse(dialog.error.isVisible());
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, 4,
         sample.getName()), test(notification).getText());
     assertFalse(dialog.error.isVisible());
@@ -539,7 +539,7 @@ public class AddSampleFilesDialogTest extends SpringBrowserlessTest {
     progressionCaptor.getValue().accept("test message", 0.35);
     assertEquals("test message", jobCaptor.getValue().message);
     assertEquals(0.35, jobCaptor.getValue().progress);
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, 2,
         sample.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
@@ -573,7 +573,7 @@ public class AddSampleFilesDialogTest extends SpringBrowserlessTest {
     progressionCaptor.getValue().accept("test message", 0.35);
     assertEquals("test message", jobCaptor.getValue().message);
     assertEquals(0.35, jobCaptor.getValue().progress);
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, 0,
         sample.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
@@ -612,7 +612,7 @@ public class AddSampleFilesDialogTest extends SpringBrowserlessTest {
     progressionCaptor.getValue().accept("test message", 0.35);
     assertEquals("test message", jobCaptor.getValue().message);
     assertEquals(0.35, jobCaptor.getValue().progress);
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + AddDatasetFilesDialog.SAVE_STARTED, 2,
         sample.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());

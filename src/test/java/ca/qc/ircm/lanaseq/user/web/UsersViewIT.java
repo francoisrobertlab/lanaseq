@@ -47,7 +47,7 @@ public class UsersViewIT extends SpringBrowserlessTest {
     test(view.users).select(0);
     test(view.edit).click();
 
-    assertTrue($(UserDialog.class).exists());
+    assertTrue(find(UserDialog.class).exists());
   }
 
   @Test
@@ -56,6 +56,6 @@ public class UsersViewIT extends SpringBrowserlessTest {
 
     test(view.add).click();
 
-    assertTrue($(UserDialog.class).exists());
+    assertTrue(find(UserDialog.class).exists());
   }
 }

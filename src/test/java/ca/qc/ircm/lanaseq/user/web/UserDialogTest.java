@@ -74,7 +74,7 @@ public class UserDialogTest extends SpringBrowserlessTest {
     UsersView view = navigate(UsersView.class);
     User user = repository.findById(2L).orElseThrow();
     doubleClickItem(view.users, user);
-    dialog = $(UserDialog.class).first();
+    dialog = find(UserDialog.class).first();
   }
 
   @Test
@@ -193,7 +193,7 @@ public class UserDialogTest extends SpringBrowserlessTest {
     dialog.save();
 
     verify(service, never()).save(any(), any());
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -213,7 +213,7 @@ public class UserDialogTest extends SpringBrowserlessTest {
     dialog.save();
 
     verify(service).save(user, password);
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, email),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -233,7 +233,7 @@ public class UserDialogTest extends SpringBrowserlessTest {
     dialog.save();
 
     verify(service).save(user, null);
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, email),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -247,7 +247,7 @@ public class UserDialogTest extends SpringBrowserlessTest {
     dialog.cancel();
 
     verify(service, never()).save(any(), any());
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     assertFalse(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }

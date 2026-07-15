@@ -132,13 +132,13 @@ public class SampleDialogIT extends SpringBrowserlessTest {
   public void save_New() {
     SamplesView view = navigate(SamplesView.class);
     test(view.add).click();
-    SampleDialog dialog = $(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).first();
     fill(dialog);
 
     test(dialog.save).click();
 
     String name = name() + "_20200720";
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     List<Sample> samples = repository.findByOwner(new User(3L));
@@ -179,13 +179,13 @@ public class SampleDialogIT extends SpringBrowserlessTest {
     // Sample is randomly JS1 or JS2 because they have the same date. Use a stable select.
     view.samples.select(sample);
     test(view.edit).click();
-    SampleDialog dialog = $(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).first();
     fill(dialog);
 
     test(dialog.save).click();
 
     String name = name() + "_20200720";
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     sample = repository.findById(4L).orElseThrow();
@@ -227,12 +227,12 @@ public class SampleDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(0);
     test(view.edit).click();
-    SampleDialog dialog = $(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).first();
     fill(dialog);
 
     test(dialog.cancel).click();
 
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     Sample sample = repository.findById(4L).orElseThrow();
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
     assertEquals((Long) 3L, sample.getOwner().getId());
@@ -266,13 +266,13 @@ public class SampleDialogIT extends SpringBrowserlessTest {
     test(view.ownerFilter).setValue("benoit.coulombe@ircm.qc.ca");
     test(view.samples).select(0);
     test(view.edit).click();
-    SampleDialog dialog = $(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).first();
     final String name = sample.getName();
 
     test(dialog.delete).click();
-    test($(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).first()).confirm();
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     assertFalse(repository.findById(9L).isPresent());

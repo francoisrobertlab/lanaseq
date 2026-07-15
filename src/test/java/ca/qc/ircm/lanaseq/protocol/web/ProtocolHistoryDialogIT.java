@@ -39,11 +39,11 @@ public class ProtocolHistoryDialogIT extends SpringBrowserlessTest {
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.protocols).select(2);
     test(view.history).click();
-    ProtocolHistoryDialog dialog = $(ProtocolHistoryDialog.class).first();
+    ProtocolHistoryDialog dialog = find(ProtocolHistoryDialog.class).first();
 
     test(dialog.files).invokeLitRendererFunction(0, dialog.recover.getKey(), "recoverFile");
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + RECOVERED,
             new Object[]{"Histone FLAG Protocol.docx"}, UI.getCurrent().getLocale()),
         test(notification).getText());

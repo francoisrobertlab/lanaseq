@@ -316,7 +316,7 @@ public class UsersViewTest extends SpringBrowserlessTest {
     doubleClickItem(view.users, user);
 
     verify(service).get(user.getId());
-    UserDialog dialog = $(UserDialog.class).first();
+    UserDialog dialog = find(UserDialog.class).first();
     assertEquals(user.getId(), dialog.getUserId());
     assertTrue(dialog.isOpened());
   }
@@ -326,7 +326,7 @@ public class UsersViewTest extends SpringBrowserlessTest {
     User user = mock(User.class);
     when(service.get(anyLong())).thenReturn(Optional.of(user));
     view.edit(user);
-    UserDialog dialog = $(UserDialog.class).first();
+    UserDialog dialog = find(UserDialog.class).first();
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
   }
@@ -456,8 +456,8 @@ public class UsersViewTest extends SpringBrowserlessTest {
   public void add() {
     clickButton(view.add);
 
-    assertEquals(1, $(UserDialog.class).all().size());
-    UserDialog dialog = $(UserDialog.class).first();
+    assertEquals(1, find(UserDialog.class).all().size());
+    UserDialog dialog = find(UserDialog.class).first();
     assertEquals(0, dialog.getUserId());
   }
 
@@ -477,22 +477,22 @@ public class UsersViewTest extends SpringBrowserlessTest {
     when(service.get(anyLong())).thenReturn(Optional.of(user));
     view.users.select(user);
     test(view.edit).click();
-    assertEquals(1, $(UserDialog.class).all().size());
-    UserDialog dialog = $(UserDialog.class).first();
+    assertEquals(1, find(UserDialog.class).all().size());
+    UserDialog dialog = find(UserDialog.class).first();
     assertEquals(user.getId(), dialog.getUserId());
   }
 
   @Test
   public void edit_EmptySelection() {
     view.edit();
-    Notification error = $(Notification.class).first();
+    Notification error = find(Notification.class).first();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED),
         ((ErrorNotification) error).getText());
     assertFalse(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
         i -> i.getInvocation().getExpression().contains("window.open($0, $1)")
             && ((String) i.getInvocation().getParameters().getFirst()).startsWith("/impersonate")));
-    assertTrue($(UsersView.class).exists());
+    assertTrue(find(UsersView.class).exists());
   }
 
   @Test
@@ -520,13 +520,13 @@ public class UsersViewTest extends SpringBrowserlessTest {
   @Test
   public void switchUser_EmptySelection() {
     view.switchUser();
-    Notification error = $(Notification.class).first();
+    Notification error = find(Notification.class).first();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED),
         ((ErrorNotification) error).getText());
     assertFalse(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
         i -> i.getInvocation().getExpression().contains("window.open($0, $1)")
             && ((String) i.getInvocation().getParameters().getFirst()).startsWith("/impersonate")));
-    assertTrue($(UsersView.class).exists());
+    assertTrue(find(UsersView.class).exists());
   }
 }

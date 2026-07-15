@@ -94,7 +94,7 @@ public class DatasetGridTest extends SpringBrowserlessTest {
     when(service.all(any(), any())).then(i -> datasets.stream());
     UI.getCurrent().setLocale(locale);
     navigate(DatasetsView.class);
-    grid = $(DatasetGrid.class).first();
+    grid = find(DatasetGrid.class).first();
   }
 
   private Optional<Protocol> protocol(Dataset dataset) {

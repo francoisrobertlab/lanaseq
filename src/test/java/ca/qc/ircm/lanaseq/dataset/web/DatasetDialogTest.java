@@ -165,7 +165,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
     test(view.datasets).doubleClickRow(1);
-    dialog = $(DatasetDialog.class).first();
+    dialog = find(DatasetDialog.class).first();
   }
 
   private Sample name(String name) {
@@ -766,7 +766,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
   public void addSample() {
     clickButton(dialog.addSample);
 
-    @SuppressWarnings("unchecked") Grid<Sample> selectSampleDialogGrid = $(Grid.class).id(
+    @SuppressWarnings("unchecked") Grid<Sample> selectSampleDialogGrid = find(Grid.class).id(
         SelectSampleDialog.id(SelectSampleDialog.SAMPLES));
     selectSampleDialogGrid.sort(
         GridSortOrder.desc(selectSampleDialogGrid.getColumnByKey(SampleProperties.DATE)).build());
@@ -793,7 +793,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
   public void addSample_AlreadyInDataset() {
     clickButton(dialog.addSample);
 
-    @SuppressWarnings("unchecked") Grid<Sample> selectSampleDialogGrid = $(Grid.class).id(
+    @SuppressWarnings("unchecked") Grid<Sample> selectSampleDialogGrid = find(Grid.class).id(
         SelectSampleDialog.id(SelectSampleDialog.SAMPLES));
     selectSampleDialogGrid.sort(
         GridSortOrder.desc(selectSampleDialogGrid.getColumnByKey(SampleProperties.DATE)).build());
@@ -822,7 +822,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
         error.getMessage());
     verify(service, never()).save(any());
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -869,7 +869,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertEquals(Optional.of(dialog.getTranslation(MESSAGE_PREFIX + NAME_PREFIX_REGEX_ERROR)),
         error.getMessage());
     verify(service, never()).save(any());
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -887,7 +887,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertTrue(dataset.getKeywords().isEmpty());
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -907,7 +907,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertTrue(dataset.getFilenames().isEmpty());
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -926,7 +926,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertTrue(status.isOk());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -950,7 +950,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
         error.getMessage());
     verify(service, never()).save(any());
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -967,7 +967,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
 
     verify(service).exists("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022");
     verify(service, never()).save(any());
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -985,7 +985,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     verify(service).exists("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022");
     verify(service, atLeastOnce()).get(2L);
     verify(service).save(any());
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -1012,7 +1012,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(0, dataset.getSamples().size());
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -1065,7 +1065,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertEquals(expectedSample.getTreatment(), sample.getTreatment());
     assertEquals(expectedSample.getNote(), sample.getNote());
     assertEquals(expectedSample.getDate(), sample.getDate());
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -1079,7 +1079,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
 
     clickButton(dialog.cancel);
 
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     assertFalse(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -1099,7 +1099,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     verify(service, never()).save(any());
     verify(service).delete(dataset);
     assertFalse(dialog.isOpened());
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETED, dataset.getName()),
         test(notification).getText());
     verify(deletedListener).onComponentEvent(any());
@@ -1118,7 +1118,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     verify(service, never()).save(any());
     verify(service, never()).delete(dataset);
     assertTrue(dialog.isOpened());
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(Notification.class).exists());
     verify(deletedListener, never()).onComponentEvent(any());
   }
 }

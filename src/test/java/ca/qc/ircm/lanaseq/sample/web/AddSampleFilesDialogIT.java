@@ -70,9 +70,9 @@ public class AddSampleFilesDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(1);
     test(view.files).click();
-    SampleFilesDialog filesDialog = $(SampleFilesDialog.class).first();
+    SampleFilesDialog filesDialog = find(SampleFilesDialog.class).first();
     test(filesDialog.addLargeFiles).click();
-    AddSampleFilesDialog dialog = $(AddSampleFilesDialog.class).first();
+    AddSampleFilesDialog dialog = find(AddSampleFilesDialog.class).first();
     Sample sample = repository.findById(10L).orElseThrow();
     assertEquals(0, test(dialog.files).size());
     copyFiles(sample);
@@ -97,9 +97,9 @@ public class AddSampleFilesDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(1);
     test(view.files).click();
-    SampleFilesDialog filesDialog = $(SampleFilesDialog.class).first();
+    SampleFilesDialog filesDialog = find(SampleFilesDialog.class).first();
     test(filesDialog.addLargeFiles).click();
-    AddSampleFilesDialog dialog = $(AddSampleFilesDialog.class).first();
+    AddSampleFilesDialog dialog = find(AddSampleFilesDialog.class).first();
     Sample sample = repository.findById(10L).orElseThrow();
     copyFiles(sample);
     String filenameInRoot = "prefix_" + sample.getName() + "_R1";
@@ -109,7 +109,7 @@ public class AddSampleFilesDialogIT extends SpringBrowserlessTest {
 
     test(dialog.save).click();
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVE_STARTED, new Object[]{3, sample.getName()},
             UI.getCurrent().getLocale()), test(notification).getText());

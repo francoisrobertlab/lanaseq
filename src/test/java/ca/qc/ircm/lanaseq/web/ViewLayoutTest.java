@@ -74,7 +74,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
   public void beforeTest() {
     UI.getCurrent().setLocale(locale);
     navigate(DatasetsView.class);
-    view = $(ViewLayout.class).first();
+    view = find(ViewLayout.class).first();
   }
 
   private void assertNoExecuteJs() {
@@ -246,7 +246,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
   @Test
   public void tabs_SelectDatasets() {
     navigate(SamplesView.class);
-    view = $(ViewLayout.class).first();
+    view = find(ViewLayout.class).first();
     UI.getCurrent().addAfterNavigationListener(navigationListener);
 
     test(view.sideNav).clickItem(view.datasets.getLabel());
@@ -254,7 +254,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.datasets, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.datasets.getLabel(), view.header.getText());
-    assertTrue($(DatasetsView.class).exists());
+    assertTrue(find(DatasetsView.class).exists());
     assertNoExecuteJs();
   }
 
@@ -267,7 +267,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.samples, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.samples.getLabel(), view.header.getText());
-    assertTrue($(SamplesView.class).exists());
+    assertTrue(find(SamplesView.class).exists());
     assertNoExecuteJs();
   }
 
@@ -280,7 +280,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.protocols, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.protocols.getLabel(), view.header.getText());
-    assertTrue($(ProtocolsView.class).exists());
+    assertTrue(find(ProtocolsView.class).exists());
     assertNoExecuteJs();
   }
 
@@ -293,7 +293,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.publicFiles, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.publicFiles.getLabel(), view.header.getText());
-    assertTrue($(PublicFilesView.class).exists());
+    assertTrue(find(PublicFilesView.class).exists());
     assertNoExecuteJs();
   }
 
@@ -306,7 +306,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.jobs, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.jobs.getLabel(), view.header.getText());
-    assertTrue($(JobsView.class).exists());
+    assertTrue(find(JobsView.class).exists());
     assertNoExecuteJs();
   }
 
@@ -319,7 +319,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.profile, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.profile.getLabel(), view.header.getText());
-    assertTrue($(ProfileView.class).exists());
+    assertTrue(find(ProfileView.class).exists());
     assertNoExecuteJs();
   }
 
@@ -333,7 +333,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.users, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.users.getLabel(), view.header.getText());
-    assertTrue($(UsersView.class).exists());
+    assertTrue(find(UsersView.class).exists());
     assertNoExecuteJs();
   }
 
@@ -341,7 +341,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
   @WithMockUser(username = "jonh.smith@ircm.qc.ca", roles = {"USER", "PREVIOUS_ADMINISTRATOR"})
   public void tabs_SelectExitSwitchUser() {
     navigate(SamplesView.class);
-    view = $(ViewLayout.class).first();
+    view = find(ViewLayout.class).first();
 
     test(view.sideNav).clickItem(view.exitSwitchUser.getLabel());
 

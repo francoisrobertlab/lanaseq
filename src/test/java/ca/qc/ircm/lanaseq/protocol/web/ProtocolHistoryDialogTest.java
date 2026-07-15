@@ -92,7 +92,7 @@ public class ProtocolHistoryDialogTest extends SpringBrowserlessTest {
     UI.getCurrent().setLocale(locale);
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.protocols).clickRow(2, new MetaKeys().alt());
-    dialog = $(ProtocolHistoryDialog.class).first();
+    dialog = find(ProtocolHistoryDialog.class).first();
   }
 
   private ProtocolFile filename(String filename) {
@@ -166,7 +166,7 @@ public class ProtocolHistoryDialogTest extends SpringBrowserlessTest {
     LitRenderer<ProtocolFile> recoverRenderer = (LitRenderer<ProtocolFile>) dialog.recover.getRenderer();
     functions(recoverRenderer).get("recoverFile").accept(file, null);
     verify(service).recover(file);
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + RECOVERED, file.getFilename()),
         test(notification).getText());
     assertTrue(items(dialog.files).isEmpty());

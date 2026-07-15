@@ -91,7 +91,7 @@ public class DatasetFilesDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.files).click();
-    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
     List<Span> labels = test(dialog.folders).find(Span.class).all();
     Assertions.assertEquals(2, labels.size());
     Assertions.assertEquals(configuration.getHome().label(dataset, !SystemUtils.IS_OS_WINDOWS),
@@ -126,7 +126,7 @@ public class DatasetFilesDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.files).click();
-    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
 
     EditableFile editableFile = dialog.files.getListDataView().getItem(0);
     EditorImpl<EditableFile> editor = (EditorImpl<EditableFile>) dialog.files.getEditor();
@@ -153,7 +153,7 @@ public class DatasetFilesDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(1);
     test(view.files).click();
-    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
     assertFalse(
         ((Checkbox) test(dialog.files).getCellComponent(0, dialog.publicFile.getKey())).getValue());
 
@@ -183,7 +183,7 @@ public class DatasetFilesDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.files).click();
-    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
 
     test(test(dialog.files).getCellComponent(0, dialog.delete.getKey())).click();
 
@@ -206,10 +206,10 @@ public class DatasetFilesDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.files).click();
-    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
     test(dialog.samples).doubleClickRow(0);
 
-    assertTrue($(SampleFilesDialog.class).exists());
+    assertTrue(find(SampleFilesDialog.class).exists());
   }
 
   @Test
@@ -217,7 +217,7 @@ public class DatasetFilesDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.files).click();
-    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
     Dataset dataset = repository.findById(2L).orElseThrow();
     Path home = configuration.getHome().folder(dataset);
     Files.createDirectories(home);
@@ -243,11 +243,11 @@ public class DatasetFilesDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.files).click();
-    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
 
     test(dialog.addLargeFiles).click();
 
-    assertTrue($(AddDatasetFilesDialog.class).exists());
+    assertTrue(find(AddDatasetFilesDialog.class).exists());
   }
 
   @Test
@@ -255,12 +255,12 @@ public class DatasetFilesDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.files).click();
-    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
     Dataset dataset = repository.findById(2L).orElseThrow();
 
     test(dialog.upload).upload(file1.toFile());
 
-    Notification notification = $(Notification.class).first();
+    Notification notification = find(Notification.class).first();
     Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FILES_SAVE,
             new Object[]{file1.getFileName(), dataset.getName()}, UI.getCurrent().getLocale()),
         test(notification).getText());

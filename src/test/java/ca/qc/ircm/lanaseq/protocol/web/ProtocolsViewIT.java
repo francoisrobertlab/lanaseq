@@ -30,7 +30,7 @@ public class ProtocolsViewIT extends SpringBrowserlessTest {
     test(view.protocols).select(0);
     test(view.edit).click();
 
-    assertTrue($(ProtocolDialog.class).exists());
+    assertTrue(find(ProtocolDialog.class).exists());
   }
 
   @Test
@@ -41,7 +41,7 @@ public class ProtocolsViewIT extends SpringBrowserlessTest {
     test(view.protocols).select(2);
     test(view.history).click();
 
-    assertTrue($(ProtocolHistoryDialog.class).exists());
+    assertTrue(find(ProtocolHistoryDialog.class).exists());
   }
 
   @Test
@@ -50,6 +50,6 @@ public class ProtocolsViewIT extends SpringBrowserlessTest {
 
     test(view.add).click();
 
-    assertTrue($(ProtocolDialog.class).exists());
+    assertTrue(find(ProtocolDialog.class).exists());
   }
 }

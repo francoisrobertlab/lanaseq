@@ -67,13 +67,13 @@ public class UserDialogIT extends SpringBrowserlessTest {
     UsersView view = navigate(UsersView.class);
     test(view.users).select(2);
     test(view.edit).click();
-    UserDialog dialog = $(UserDialog.class).first();
+    UserDialog dialog = find(UserDialog.class).first();
     setFields(dialog);
 
     test(dialog.save).click();
 
-    assertFalse($(UserDialog.class).exists());
-    Notification notification = $(Notification.class).first();
+    assertFalse(find(UserDialog.class).exists());
+    Notification notification = find(Notification.class).first();
     Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{email},
         UI.getCurrent().getLocale()), test(notification).getText());
     User user = repository.findById(3L).orElseThrow();
@@ -90,14 +90,14 @@ public class UserDialogIT extends SpringBrowserlessTest {
     UsersView view = navigate(UsersView.class);
     test(view.users).select(2);
     test(view.edit).click();
-    UserDialog dialog = $(UserDialog.class).first();
+    UserDialog dialog = find(UserDialog.class).first();
     setFields(dialog);
     dialog.form.email.setValue("test");
 
     test(dialog.save).click();
 
-    assertTrue($(UserDialog.class).exists());
-    assertFalse($(Notification.class).exists());
+    assertTrue(find(UserDialog.class).exists());
+    assertFalse(find(Notification.class).exists());
     User user = repository.findById(3L).orElseThrow();
     Assertions.assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
     Assertions.assertEquals("Jonh Smith", user.getName());
@@ -112,13 +112,13 @@ public class UserDialogIT extends SpringBrowserlessTest {
     UsersView view = navigate(UsersView.class);
     test(view.users).select(2);
     test(view.edit).click();
-    UserDialog dialog = $(UserDialog.class).first();
+    UserDialog dialog = find(UserDialog.class).first();
     setFields(dialog);
 
     test(dialog.cancel).click();
 
-    assertFalse($(UserDialog.class).exists());
-    assertFalse($(Notification.class).exists());
+    assertFalse(find(UserDialog.class).exists());
+    assertFalse(find(Notification.class).exists());
     User user = repository.findById(3L).orElseThrow();
     Assertions.assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
     Assertions.assertEquals("Jonh Smith", user.getName());
