@@ -74,7 +74,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
   public void beforeTest() {
     UI.getCurrent().setLocale(locale);
     navigate(DatasetsView.class);
-    view = find(ViewLayout.class).first();
+    view = find(ViewLayout.class).single();
   }
 
   private void assertNoExecuteJs() {
@@ -246,7 +246,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
   @Test
   public void tabs_SelectDatasets() {
     navigate(SamplesView.class);
-    view = find(ViewLayout.class).first();
+    view = find(ViewLayout.class).single();
     UI.getCurrent().addAfterNavigationListener(navigationListener);
 
     test(view.sideNav).clickItem(view.datasets.getLabel());
@@ -341,7 +341,7 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
   @WithMockUser(username = "jonh.smith@ircm.qc.ca", roles = {"USER", "PREVIOUS_ADMINISTRATOR"})
   public void tabs_SelectExitSwitchUser() {
     navigate(SamplesView.class);
-    view = find(ViewLayout.class).first();
+    view = find(ViewLayout.class).single();
 
     test(view.sideNav).clickItem(view.exitSwitchUser.getLabel());
 

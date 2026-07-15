@@ -149,7 +149,7 @@ public class ProtocolDialogTest extends SpringBrowserlessTest {
     UI.getCurrent().setLocale(locale);
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.protocols).doubleClickRow(0);
-    dialog = find(ProtocolDialog.class).first();
+    dialog = find(ProtocolDialog.class).single();
   }
 
   private void fillFields() {
@@ -299,7 +299,7 @@ public class ProtocolDialogTest extends SpringBrowserlessTest {
     test(dialog.upload).upload(filename + "5", mimeType, fileContent);
     test(dialog.upload).upload(filename + "6", mimeType, fileContent);
 
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertInstanceOf(WarningNotification.class, notification);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT),
         ((WarningNotification) notification).getText());
@@ -566,7 +566,7 @@ public class ProtocolDialogTest extends SpringBrowserlessTest {
     verify(service, atLeastOnce()).nameExists(protocol.getName());
     verify(service, atLeastOnce()).get(protocol.getId());
     verify(service).save(any(), any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -588,7 +588,7 @@ public class ProtocolDialogTest extends SpringBrowserlessTest {
     verify(service, atLeastOnce()).nameExists(protocol.getName());
     verify(service, atLeastOnce()).get(protocol.getId());
     verify(service).save(any(), any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -632,7 +632,7 @@ public class ProtocolDialogTest extends SpringBrowserlessTest {
     BinderValidationStatus<Protocol> status = dialog.validateProtocol();
     assertTrue(status.isOk());
     verify(service).save(any(), any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -690,7 +690,7 @@ public class ProtocolDialogTest extends SpringBrowserlessTest {
     assertEquals(0, file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(fileContent, file.getContent());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -723,7 +723,7 @@ public class ProtocolDialogTest extends SpringBrowserlessTest {
     assertEquals(0, file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(this.fileContent, file.getContent());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -752,7 +752,7 @@ public class ProtocolDialogTest extends SpringBrowserlessTest {
     assertEquals(0, file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(this.fileContent, file.getContent());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -778,7 +778,7 @@ public class ProtocolDialogTest extends SpringBrowserlessTest {
     verify(service, never()).save(any(), any());
     verify(service).delete(protocol);
     assertFalse(dialog.isOpened());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETED, protocol.getName()),
         test(notification).getText());
     verify(deletedListener).onComponentEvent(any());

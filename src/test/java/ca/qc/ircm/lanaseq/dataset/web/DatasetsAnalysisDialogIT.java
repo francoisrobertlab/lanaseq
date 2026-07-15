@@ -65,14 +65,14 @@ public class DatasetsAnalysisDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.analyze).click();
-    DatasetsAnalysisDialog dialog = find(DatasetsAnalysisDialog.class).first();
+    DatasetsAnalysisDialog dialog = find(DatasetsAnalysisDialog.class).single();
     fireEvent(dialog.filenamePatterns,
         new CustomValueSetEvent<>(dialog.filenamePatterns, false, "*.fastq"));
 
     test(dialog.createFolder).click();
 
     assertTrue(dialog.isOpened());
-    test(find(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).single()).confirm();
     assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(List.of(dataset));
     assertTrue(Files.exists(folder));
@@ -131,14 +131,14 @@ public class DatasetsAnalysisDialogIT extends SpringBrowserlessTest {
     test(view.datasets).select(3);
     test(view.datasets).select(0);
     test(view.analyze).click();
-    DatasetsAnalysisDialog dialog = find(DatasetsAnalysisDialog.class).first();
+    DatasetsAnalysisDialog dialog = find(DatasetsAnalysisDialog.class).single();
     fireEvent(dialog.filenamePatterns,
         new CustomValueSetEvent<>(dialog.filenamePatterns, false, "*.fastq"));
 
     test(dialog.createFolder).click();
 
     assertTrue(dialog.isOpened());
-    test(find(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).single()).confirm();
     assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(datasets);
     assertTrue(Files.exists(folder));
@@ -196,12 +196,12 @@ public class DatasetsAnalysisDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.analyze).click();
-    DatasetsAnalysisDialog dialog = find(DatasetsAnalysisDialog.class).first();
+    DatasetsAnalysisDialog dialog = find(DatasetsAnalysisDialog.class).single();
 
     test(dialog.createFolder).click();
 
     assertTrue(dialog.isOpened());
-    test(find(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).single()).confirm();
     assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(List.of(dataset));
     assertTrue(Files.exists(folder));

@@ -55,7 +55,7 @@ public class ProfileViewIT extends SpringBrowserlessTest {
 
     test(view.save).click();
 
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, UI.getCurrent().getLocale()),
         test(notification).getText());

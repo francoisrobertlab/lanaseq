@@ -90,7 +90,7 @@ public class SampleFilesDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(1);
     test(view.files).click();
-    SampleFilesDialog dialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
     List<Span> labels = test(dialog.folders).find(Span.class).all();
     assertEquals(2, labels.size());
     assertEquals(configuration.getHome().label(sample, !SystemUtils.IS_OS_WINDOWS),
@@ -124,7 +124,7 @@ public class SampleFilesDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(1);
     test(view.files).click();
-    SampleFilesDialog dialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
 
     EditableFile editableFile = dialog.files.getListDataView().getItem(0);
     EditorImpl<EditableFile> editor = (EditorImpl<EditableFile>) dialog.files.getEditor();
@@ -151,7 +151,7 @@ public class SampleFilesDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(1);
     test(view.files).click();
-    SampleFilesDialog dialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
     assertFalse(
         ((Checkbox) test(dialog.files).getCellComponent(0, dialog.publicFile.getKey())).getValue());
 
@@ -181,7 +181,7 @@ public class SampleFilesDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(1);
     test(view.files).click();
-    SampleFilesDialog dialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
 
     test(test(dialog.files).getCellComponent(0, dialog.delete.getKey())).click();
 
@@ -203,7 +203,7 @@ public class SampleFilesDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(1);
     test(view.files).click();
-    SampleFilesDialog dialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
     Sample sample = repository.findById(10L).orElseThrow();
     Path home = configuration.getHome().folder(sample);
     Files.createDirectories(home);
@@ -229,7 +229,7 @@ public class SampleFilesDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(0);
     test(view.files).click();
-    SampleFilesDialog dialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
 
     test(dialog.addLargeFiles).click();
 
@@ -241,12 +241,12 @@ public class SampleFilesDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(1);
     test(view.files).click();
-    SampleFilesDialog dialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
     Sample sample = repository.findById(10L).orElseThrow();
 
     test(dialog.upload).upload(file1.toFile());
 
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FILES_SAVE,
             new Object[]{file1.getFileName(), sample.getName()}, UI.getCurrent().getLocale()),
         test(notification).getText());

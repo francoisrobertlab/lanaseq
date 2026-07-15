@@ -266,10 +266,10 @@ public class JobsViewTest extends SpringBrowserlessTest {
         }
       } else {
         assertInstanceOf(VerticalLayout.class, progressComponent);
-        NativeLabel message = test(progressComponent).find(NativeLabel.class).first();
+        NativeLabel message = test(progressComponent).find(NativeLabel.class).single();
         assertEquals(job.message, message.getText());
-        Span progress = test(progressComponent).find(Span.class).first();
-        ProgressBar progressBar = test(progressComponent).find(ProgressBar.class).first();
+        Span progress = test(progressComponent).find(Span.class).single();
+        ProgressBar progressBar = test(progressComponent).find(ProgressBar.class).single();
         if (i == 4) {
           assertEquals("40%", progress.getText());
           assertFalse(progressBar.isIndeterminate());

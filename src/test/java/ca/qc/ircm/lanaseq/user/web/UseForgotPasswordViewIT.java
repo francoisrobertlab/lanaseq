@@ -51,7 +51,7 @@ public class UseForgotPasswordViewIT extends SpringBrowserlessTest {
     test(view.form.passwordConfirm).setValue(password);
     test(view.save).click();
 
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, UI.getCurrent().getLocale()),
         test(notification).getText());

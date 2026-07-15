@@ -70,9 +70,9 @@ public class AddDatasetFilesDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.files).click();
-    DatasetFilesDialog filesDialog = find(DatasetFilesDialog.class).first();
+    DatasetFilesDialog filesDialog = find(DatasetFilesDialog.class).single();
     test(filesDialog.addLargeFiles).click();
-    AddDatasetFilesDialog dialog = find(AddDatasetFilesDialog.class).first();
+    AddDatasetFilesDialog dialog = find(AddDatasetFilesDialog.class).single();
     Dataset dataset = repository.findById(2L).orElseThrow();
     assertEquals(0, test(dialog.files).size());
     copyFiles(dataset);
@@ -97,9 +97,9 @@ public class AddDatasetFilesDialogIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(3);
     test(view.files).click();
-    DatasetFilesDialog filesDialog = find(DatasetFilesDialog.class).first();
+    DatasetFilesDialog filesDialog = find(DatasetFilesDialog.class).single();
     test(filesDialog.addLargeFiles).click();
-    AddDatasetFilesDialog dialog = find(AddDatasetFilesDialog.class).first();
+    AddDatasetFilesDialog dialog = find(AddDatasetFilesDialog.class).single();
     Dataset dataset = repository.findById(2L).orElseThrow();
     copyFiles(dataset);
     String filenameInRoot = "prefix_" + dataset.getName() + "_R1";
@@ -109,7 +109,7 @@ public class AddDatasetFilesDialogIT extends SpringBrowserlessTest {
 
     test(dialog.save).click();
 
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVE_STARTED, new Object[]{3, dataset.getName()},
             UI.getCurrent().getLocale()), test(notification).getText());

@@ -70,7 +70,7 @@ public class UserFormTest extends SpringBrowserlessTest {
   public void beforeTest() {
     UI.getCurrent().setLocale(locale);
     navigate(ProfileView.class);
-    form = find(UserForm.class).first();
+    form = find(UserForm.class).single();
   }
 
   private void fillForm() {

@@ -56,14 +56,14 @@ public class SamplesAnalysisDialogIT extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     test(view.samples).select(1);
     test(view.analyze).click();
-    SamplesAnalysisDialog dialog = find(SamplesAnalysisDialog.class).first();
+    SamplesAnalysisDialog dialog = find(SamplesAnalysisDialog.class).single();
     fireEvent(dialog.filenamePatterns,
         new CustomValueSetEvent<>(dialog.filenamePatterns, false, "*.fastq"));
 
     test(dialog.createFolder).click();
 
     assertTrue(dialog.isOpened());
-    test(find(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).single()).confirm();
     assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(List.of(sample));
     assertTrue(Files.exists(folder));
@@ -105,14 +105,14 @@ public class SamplesAnalysisDialogIT extends SpringBrowserlessTest {
     view.samples.select(repository.findById(4L).orElseThrow());
     test(view.samples).select(1);
     test(view.analyze).click();
-    SamplesAnalysisDialog dialog = find(SamplesAnalysisDialog.class).first();
+    SamplesAnalysisDialog dialog = find(SamplesAnalysisDialog.class).single();
     fireEvent(dialog.filenamePatterns,
         new CustomValueSetEvent<>(dialog.filenamePatterns, false, "*.fastq"));
 
     test(dialog.createFolder).click();
 
     assertTrue(dialog.isOpened());
-    test(find(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).single()).confirm();
     assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(samples);
     assertTrue(Files.exists(folder));
@@ -156,12 +156,12 @@ public class SamplesAnalysisDialogIT extends SpringBrowserlessTest {
     test(view.samples).select(1);
     test(view.samples).select(0);
     test(view.analyze).click();
-    SamplesAnalysisDialog dialog = find(SamplesAnalysisDialog.class).first();
+    SamplesAnalysisDialog dialog = find(SamplesAnalysisDialog.class).single();
 
     test(dialog.createFolder).click();
 
     assertTrue(dialog.isOpened());
-    test(find(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).single()).confirm();
     assertFalse(dialog.isOpened());
     Path folder = configuration.getAnalysis().folder(samples);
     assertTrue(Files.exists(folder));

@@ -89,7 +89,7 @@ public class SamplesAnalysisDialogTest extends SpringBrowserlessTest {
     view.samples.setItems(repository.findAll());
     samples.forEach(sample -> view.samples.select(sample));
     view.analyze.click();
-    dialog = find(SamplesAnalysisDialog.class).first();
+    dialog = find(SamplesAnalysisDialog.class).single();
   }
 
   @Test

@@ -63,7 +63,7 @@ public class SamplesViewIT extends SpringBrowserlessTest {
     test(view.samples).select(0);
     test(view.edit).click();
 
-    SampleDialog dialog = find(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).single();
     test(dialog.save).click();
     assertFalse(view.edit.isEnabled());
     test(view.samples).select(0);
@@ -78,9 +78,9 @@ public class SamplesViewIT extends SpringBrowserlessTest {
     test(view.samples).select(0);
     test(view.edit).click();
 
-    SampleDialog dialog = find(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).single();
     test(dialog.delete).click();
-    test(find(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).single()).confirm();
     assertFalse(view.edit.isEnabled());
     test(view.samples).select(0);
     assertTrue(view.edit.isEnabled());
@@ -103,7 +103,7 @@ public class SamplesViewIT extends SpringBrowserlessTest {
     test(view.merge).click();
 
     String name = "ChIPseq_Spt16_yFR101_G24D_JS2-JS1_20181022";
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + MERGED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     List<Dataset> datasets = datasetRepository.findByOwner(new User(3L));

@@ -237,7 +237,7 @@ public class DatasetFilesDialogTest extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
     test(view.datasets).clickRow(1, new MetaKeys().ctrl());
-    dialog = find(DatasetFilesDialog.class).first();
+    dialog = find(DatasetFilesDialog.class).single();
   }
 
   private EditableFile editableFile(String filename) {
@@ -694,7 +694,7 @@ public class DatasetFilesDialogTest extends SpringBrowserlessTest {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Sample sample = dataset.getSamples().get(0);
     doubleClickItem(dialog.samples, sample);
-    SampleFilesDialog sampleFilesDialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog sampleFilesDialog = find(SampleFilesDialog.class).single();
     assertEquals(sample.getId(), sampleFilesDialog.getSampleId());
   }
 
@@ -703,7 +703,7 @@ public class DatasetFilesDialogTest extends SpringBrowserlessTest {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Sample sample = dataset.getSamples().get(0);
     doubleClickItem(dialog.samples, sample);
-    SampleFilesDialog sampleFilesDialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog sampleFilesDialog = find(SampleFilesDialog.class).single();
     assertEquals(sample.getId(), sampleFilesDialog.getSampleId());
     @SuppressWarnings("unchecked") ListDataProvider<Sample> sampleDataProvider = mock(
         ListDataProvider.class);
@@ -769,7 +769,7 @@ public class DatasetFilesDialogTest extends SpringBrowserlessTest {
     progressionCaptor.getValue().accept("test message", 0.35);
     assertEquals("test message", jobCaptor.getValue().message);
     assertEquals(0.35, jobCaptor.getValue().progress);
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_SAVE, filename, dataset.getName()),
         test(notification).getText());
     assertFalse(Files.exists(file));
@@ -800,7 +800,7 @@ public class DatasetFilesDialogTest extends SpringBrowserlessTest {
     progressionCaptor.getValue().accept("test message", 0.35);
     assertEquals("test message", jobCaptor.getValue().message);
     assertEquals(0.35, jobCaptor.getValue().progress);
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_SAVE, filename, dataset.getName()),
         test(notification).getText());
   }
@@ -900,7 +900,7 @@ public class DatasetFilesDialogTest extends SpringBrowserlessTest {
 
     dialog.addLargeFiles.click();
 
-    AddDatasetFilesDialog largeFilesDialog = find(AddDatasetFilesDialog.class).first();
+    AddDatasetFilesDialog largeFilesDialog = find(AddDatasetFilesDialog.class).single();
     assertEquals(dataset.getId(), largeFilesDialog.getDatasetId());
     largeFilesDialog.fireSavedEvent();
     verify(service, atLeast(2)).files(dataset);

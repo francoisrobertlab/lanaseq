@@ -371,7 +371,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
     doubleClickItem(view.samples, sample);
 
     verify(service).get(sample.getId());
-    SampleDialog dialog = find(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).single();
     assertTrue(dialog.isOpened());
     assertEquals(sample.getId(), dialog.getSampleId());
   }
@@ -384,7 +384,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     doubleClickItem(view.samples, sample);
 
-    SampleDialog dialog = find(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).single();
     dialog.fireSavedEvent();
     verify(view.samples.getDataProvider()).refreshAll();
   }
@@ -397,7 +397,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     doubleClickItem(view.samples, sample);
 
-    SampleDialog dialog = find(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).single();
     dialog.fireDeletedEvent();
     verify(view.samples.getDataProvider()).refreshAll();
   }
@@ -408,7 +408,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
     Sample sample = view.samples.getListDataView().getItems().findFirst().orElseThrow();
     test(view.samples).clickRow(0, new MetaKeys().ctrl());
 
-    SampleFilesDialog dialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
     assertTrue(dialog.isOpened());
     assertEquals(sample.getId(), dialog.getSampleId());
   }
@@ -419,7 +419,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
     Sample sample = view.samples.getListDataView().getItems().findFirst().orElseThrow();
     test(view.samples).clickRow(0, new MetaKeys().meta());
 
-    SampleFilesDialog dialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
     assertTrue(dialog.isOpened());
     assertEquals(sample.getId(), dialog.getSampleId());
   }
@@ -535,7 +535,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
   public void add() {
     test(view.add).click();
 
-    SampleDialog dialog = find(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).single();
     assertTrue(dialog.isOpened());
     assertEquals(0, dialog.getSampleId());
   }
@@ -546,7 +546,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     test(view.add).click();
 
-    SampleDialog dialog = find(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).single();
     dialog.fireSavedEvent();
     verify(view.samples.getDataProvider()).refreshAll();
   }
@@ -557,7 +557,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     test(view.add).click();
 
-    SampleDialog dialog = find(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).single();
     dialog.fireDeletedEvent();
     verify(view.samples.getDataProvider()).refreshAll();
   }
@@ -580,7 +580,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     test(view.edit).click();
 
-    SampleDialog dialog = find(SampleDialog.class).first();
+    SampleDialog dialog = find(SampleDialog.class).single();
     assertTrue(dialog.isOpened());
     assertEquals(sample.getId(), dialog.getSampleId());
   }
@@ -589,7 +589,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
   public void edit_NoSelection() {
     view.edit();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
         ((ErrorNotification) error).getText());
@@ -603,7 +603,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     view.edit();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE),
         ((ErrorNotification) error).getText());
@@ -643,7 +643,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
     assertEquals(samples.get(0), dataset.getSamples().get(0));
     assertEquals(samples.get(1), dataset.getSamples().get(1));
     assertEquals(samples.get(0).getDate(), dataset.getDate());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()),
         test(notification).getText());
   }
@@ -670,7 +670,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
     assertEquals(samples.get(0), dataset.getSamples().get(0));
     assertEquals(samples.get(1), dataset.getSamples().get(1));
     assertEquals(samples.get(0).getDate(), dataset.getDate());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()),
         test(notification).getText());
   }
@@ -679,7 +679,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
   public void merge_NoSelection() {
     view.merge();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
         ((ErrorNotification) error).getText());
@@ -695,7 +695,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     test(view.merge).click();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE_ERROR),
         ((ErrorNotification) error).getText());
@@ -715,7 +715,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     test(view.merge).click();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
             "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020"),
@@ -742,7 +742,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     test(view.files).click();
 
-    SampleFilesDialog dialog = find(SampleFilesDialog.class).first();
+    SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
     assertTrue(dialog.isOpened());
     assertEquals(sample.getId(), dialog.getSampleId());
   }
@@ -751,7 +751,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
   public void files_NoSelection() {
     view.viewFiles();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
         ((ErrorNotification) error).getText());
@@ -765,7 +765,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     view.viewFiles();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE),
         ((ErrorNotification) error).getText());
@@ -790,7 +790,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     test(view.analyze).click();
 
-    SamplesAnalysisDialog dialog = find(SamplesAnalysisDialog.class).first();
+    SamplesAnalysisDialog dialog = find(SamplesAnalysisDialog.class).single();
     assertTrue(dialog.isOpened());
     assertEquals(1, dialog.getSampleIds().size());
     assertTrue(dialog.getSampleIds().contains(sample.getId()));
@@ -800,7 +800,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
   public void analyze_NoSelection() {
     view.analyze();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
         ((ErrorNotification) error).getText());
@@ -814,7 +814,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
     test(view.analyze).click();
 
-    SamplesAnalysisDialog dialog = find(SamplesAnalysisDialog.class).first();
+    SamplesAnalysisDialog dialog = find(SamplesAnalysisDialog.class).single();
     assertTrue(dialog.isOpened());
     assertEquals(2, dialog.getSampleIds().size());
     assertTrue(dialog.getSampleIds().contains(samples.get(0).getId()));

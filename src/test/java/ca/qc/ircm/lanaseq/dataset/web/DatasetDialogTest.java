@@ -165,7 +165,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
     test(view.datasets).doubleClickRow(1);
-    dialog = find(DatasetDialog.class).first();
+    dialog = find(DatasetDialog.class).single();
   }
 
   private Sample name(String name) {
@@ -887,7 +887,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertTrue(dataset.getKeywords().isEmpty());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -907,7 +907,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertTrue(dataset.getFilenames().isEmpty());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -926,7 +926,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertTrue(status.isOk());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -985,7 +985,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     verify(service).exists("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022");
     verify(service, atLeastOnce()).get(2L);
     verify(service).save(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -1012,7 +1012,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(0, dataset.getSamples().size());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -1065,7 +1065,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertEquals(expectedSample.getTreatment(), sample.getTreatment());
     assertEquals(expectedSample.getNote(), sample.getNote());
     assertEquals(expectedSample.getDate(), sample.getDate());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -1099,7 +1099,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     verify(service, never()).save(any());
     verify(service).delete(dataset);
     assertFalse(dialog.isOpened());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETED, dataset.getName()),
         test(notification).getText());
     verify(deletedListener).onComponentEvent(any());

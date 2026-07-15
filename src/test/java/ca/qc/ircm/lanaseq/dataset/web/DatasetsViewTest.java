@@ -176,7 +176,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     doubleClickItem(view.datasets, dataset);
 
-    DatasetDialog dialog = find(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).single();
     assertEquals(dataset.getId(), dialog.getDatasetId());
     verify(service).get(dataset.getId());
   }
@@ -188,7 +188,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     doubleClickItem(view.datasets, dataset);
 
-    DatasetDialog dialog = find(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).single();
     view.datasets.setItems(datasetDataProvider);
     dialog.fireSavedEvent();
     verify(view.datasets.getDataProvider()).refreshAll();
@@ -201,7 +201,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     doubleClickItem(view.datasets, dataset);
 
-    DatasetDialog dialog = find(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).single();
     view.datasets.setItems(datasetDataProvider);
     dialog.fireDeletedEvent();
     verify(view.datasets.getDataProvider()).refreshAll();
@@ -214,7 +214,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     clickItem(view.datasets, dataset, view.datasets.name, true, false, false, false);
 
-    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).single();
     assertEquals(dataset.getId(), dialog.getDatasetId());
   }
 
@@ -225,7 +225,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     clickItem(view.datasets, dataset, view.datasets.name, false, false, false, true);
 
-    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).single();
     assertEquals(dataset.getId(), dialog.getDatasetId());
   }
 
@@ -247,7 +247,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     view.edit.click();
 
-    DatasetDialog dialog = find(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).single();
     assertEquals(dataset.getId(), dialog.getDatasetId());
   }
 
@@ -255,7 +255,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
   public void edit_NoSelection() {
     view.edit();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED),
         ((ErrorNotification) error).getText());
@@ -269,7 +269,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     view.edit();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_MORE_THAN_ONE),
         ((ErrorNotification) error).getText());
@@ -317,7 +317,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
     assertEquals((Long) 4L, dataset.getSamples().get(3).getId());
     assertEquals((Long) 5L, dataset.getSamples().get(4).getId());
     assertEquals(datasets.get(0).getDate(), dataset.getDate());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()),
         test(notification).getText());
   }
@@ -364,7 +364,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
     assertEquals((Long) 4L, dataset.getSamples().get(3).getId());
     assertEquals((Long) 5L, dataset.getSamples().get(4).getId());
     assertEquals(datasets.get(0).getDate(), dataset.getDate());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()),
         test(notification).getText());
   }
@@ -373,7 +373,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
   public void merge_NoSamples() {
     view.merge();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED),
         ((ErrorNotification) error).getText());
@@ -408,7 +408,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
     assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
     assertEquals((Long) 5L, dataset.getSamples().get(1).getId());
     assertEquals(dataset1.getDate(), dataset.getDate());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()),
         test(notification).getText());
   }
@@ -421,7 +421,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     view.merge.click();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE_ERROR),
         ((ErrorNotification) error).getText());
@@ -444,7 +444,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     view.merge.click();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
             "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020"),
@@ -471,7 +471,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     view.files.click();
 
-    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).first();
+    DatasetFilesDialog dialog = find(DatasetFilesDialog.class).single();
     assertEquals(dataset.getId(), dialog.getDatasetId());
   }
 
@@ -479,7 +479,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
   public void files_NoSelection() {
     view.viewFiles();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED),
         ((ErrorNotification) error).getText());
@@ -493,7 +493,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     view.viewFiles();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_MORE_THAN_ONE),
         ((ErrorNotification) error).getText());
@@ -518,7 +518,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     view.analyze.click();
 
-    DatasetsAnalysisDialog dialog = find(DatasetsAnalysisDialog.class).first();
+    DatasetsAnalysisDialog dialog = find(DatasetsAnalysisDialog.class).single();
     List<Long> datasetIds = dialog.getDatasetIds();
     assertEquals(1, datasetIds.size());
     assertTrue(datasetIds.contains(dataset.getId()));
@@ -531,7 +531,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     view.analyze.click();
 
-    DatasetsAnalysisDialog dialog = find(DatasetsAnalysisDialog.class).first();
+    DatasetsAnalysisDialog dialog = find(DatasetsAnalysisDialog.class).single();
     List<Long> datasetIds = dialog.getDatasetIds();
     assertEquals(2, datasetIds.size());
     assertTrue(datasetIds.contains(datasets.get(0).getId()));
@@ -543,7 +543,7 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
     view.analyze();
 
     assertFalse(find(DatasetsAnalysisDialog.class).exists());
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED),
         ((ErrorNotification) error).getText());

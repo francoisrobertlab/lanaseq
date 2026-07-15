@@ -134,7 +134,7 @@ public class UseForgotPasswordViewTest extends SpringBrowserlessTest {
     verify(view.form).isValid();
     verify(service).updatePassword(eq(forgotPassword), eq(password));
     assertTrue(find(SigninView.class).exists());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAVED), test(notification).getText());
   }
 
@@ -152,7 +152,7 @@ public class UseForgotPasswordViewTest extends SpringBrowserlessTest {
     String parameter = "A434GS";
     view = navigate(UseForgotPasswordView.class, parameter);
     verify(service, times(2)).get(anyLong(), any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, notification);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID),
         ((ErrorNotification) notification).getText());
@@ -166,7 +166,7 @@ public class UseForgotPasswordViewTest extends SpringBrowserlessTest {
     String parameter = "34925";
     view = navigate(UseForgotPasswordView.class, parameter);
     verify(service, times(2)).get(anyLong(), any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, notification);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID),
         ((ErrorNotification) notification).getText());
@@ -180,7 +180,7 @@ public class UseForgotPasswordViewTest extends SpringBrowserlessTest {
     String parameter = "34925/feafet23ts";
     view = navigate(UseForgotPasswordView.class, parameter);
     verify(service, atLeastOnce()).get(34925L, "feafet23ts");
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, notification);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID),
         ((ErrorNotification) notification).getText());
@@ -192,7 +192,7 @@ public class UseForgotPasswordViewTest extends SpringBrowserlessTest {
   public void setParameter_Null() {
     view = navigate(UseForgotPasswordView.class);
     verify(service, times(2)).get(anyLong(), any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, notification);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID),
         ((ErrorNotification) notification).getText());

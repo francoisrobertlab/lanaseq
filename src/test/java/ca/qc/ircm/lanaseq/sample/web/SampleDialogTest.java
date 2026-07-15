@@ -165,7 +165,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     SamplesView view = navigate(SamplesView.class);
     view.samples.setItems(repository.findAll());
     test(view.samples).doubleClickRow(1);
-    dialog = find(SampleDialog.class).first();
+    dialog = find(SampleDialog.class).single();
   }
 
   private void fillForm() {
@@ -791,7 +791,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     Sample sample = sampleCaptor.getValue();
     assertEquals("new_assay_type", sample.getAssay());
     verify(service, never()).delete(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -814,7 +814,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getType());
     verify(service, never()).delete(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -837,7 +837,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getTarget());
     verify(service, never()).delete(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -886,7 +886,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getStrainDescription());
     verify(service, never()).delete(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -909,7 +909,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getTreatment());
     verify(service, never()).delete(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -931,7 +931,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     verify(service).save(sampleCaptor.capture());
     Sample sample = sampleCaptor.getValue();
     verify(service, never()).delete(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -953,7 +953,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     verify(service).save(sampleCaptor.capture());
     Sample sample = sampleCaptor.getValue();
     verify(service, never()).delete(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -975,7 +975,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     verify(service).save(sampleCaptor.capture());
     Sample sample = sampleCaptor.getValue();
     verify(service, never()).delete(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -1018,7 +1018,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     verify(service).exists("FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020");
     verify(service, atLeastOnce()).get(2L);
     verify(service).save(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -1054,7 +1054,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     assertTrue(sample.getFilenames().contains(filename1));
     assertTrue(sample.getFilenames().contains(filename2));
     verify(service, never()).delete(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -1092,7 +1092,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     assertTrue(sample.getFilenames().contains(filename1));
     assertTrue(sample.getFilenames().contains(filename2));
     verify(service, never()).delete(any());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -1134,7 +1134,7 @@ public class SampleDialogTest extends SpringBrowserlessTest {
     verify(service, never()).save(any());
     verify(service).delete(sample);
     assertFalse(dialog.isOpened());
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETED, sample.getName()),
         test(notification).getText());
     verify(savedListener, never()).onComponentEvent(any());

@@ -159,7 +159,7 @@ public class PublicFilesViewTest extends SpringBrowserlessTest {
     assertEquals(DOWNLOAD_LINKS, view.downloadLinks.getId().orElse(""));
     assertTrue(view.downloadLinks.getElement().hasAttribute("download"));
     assertEquals("", view.downloadLinks.getElement().getAttribute("download"));
-    assertEquals(view.downloadLinksButton, test(view.downloadLinks).find(Button.class).first());
+    assertEquals(view.downloadLinksButton, test(view.downloadLinks).find(Button.class).single());
     validateIcon(VaadinIcon.DOWNLOAD.create(), view.downloadLinksButton.getIcon());
   }
 
@@ -185,7 +185,7 @@ public class PublicFilesViewTest extends SpringBrowserlessTest {
         footerRow.getCell(view.delete).getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + DELETE),
         footerRow.getCell(view.delete).getText());
-    Button downloadLinksButton = test(view.downloadLinks).find(Button.class).first();
+    Button downloadLinksButton = test(view.downloadLinks).find(Button.class).single();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DOWNLOAD_LINKS),
         downloadLinksButton.getText());
   }
@@ -214,7 +214,7 @@ public class PublicFilesViewTest extends SpringBrowserlessTest {
         footerRow.getCell(view.delete).getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + DELETE),
         footerRow.getCell(view.delete).getText());
-    Button downloadLinksButton = test(view.downloadLinks).find(Button.class).first();
+    Button downloadLinksButton = test(view.downloadLinks).find(Button.class).single();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DOWNLOAD_LINKS),
         downloadLinksButton.getText());
   }

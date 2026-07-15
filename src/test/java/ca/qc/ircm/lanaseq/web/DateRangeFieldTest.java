@@ -57,11 +57,11 @@ public class DateRangeFieldTest extends SpringBrowserlessTest {
   public void beforeTest() {
     UI.getCurrent().setLocale(locale);
     navigate(DatasetsView.class);
-    DatasetGrid datasetGrid = find(DatasetGrid.class).first();
+    DatasetGrid datasetGrid = find(DatasetGrid.class).single();
     HeaderRow filtersRow = datasetGrid.getHeaderRows().get(1);
     dateRange = test(
         filtersRow.getCell(datasetGrid.getColumnByKey(DatasetProperties.DATE)).getComponent()).find(
-        DateRangeField.class).first();
+        DateRangeField.class).single();
   }
 
   @Test

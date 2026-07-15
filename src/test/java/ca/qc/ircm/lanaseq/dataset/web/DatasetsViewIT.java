@@ -59,7 +59,7 @@ public class DatasetsViewIT extends SpringBrowserlessTest {
     DatasetsView view = navigate(DatasetsView.class);
     test(view.datasets).select(0);
     test(view.edit).click();
-    DatasetDialog dialog = find(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).single();
     test(dialog.save).click();
     assertFalse(view.edit.isEnabled());
     test(view.datasets).select(0);
@@ -73,9 +73,9 @@ public class DatasetsViewIT extends SpringBrowserlessTest {
     test(view.datasets.ownerFilter).setValue("benoit.coulombe@ircm.qc.ca");
     test(view.datasets).select(1);
     test(view.edit).click();
-    DatasetDialog dialog = find(DatasetDialog.class).first();
+    DatasetDialog dialog = find(DatasetDialog.class).single();
     test(dialog.delete).click();
-    test(find(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).single()).confirm();
     assertFalse(view.edit.isEnabled());
     test(view.datasets).select(0);
     assertTrue(view.edit.isEnabled());
@@ -90,7 +90,7 @@ public class DatasetsViewIT extends SpringBrowserlessTest {
     test(view.merge).click();
 
     String name = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS3_20181022";
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + MERGED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     List<Dataset> datasets = repository.findByOwner(new User(3L));

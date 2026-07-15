@@ -87,12 +87,12 @@ public class ProtocolDialogIT extends SpringBrowserlessTest {
   public void save_New() throws Throwable {
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.add).click();
-    ProtocolDialog dialog = find(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).single();
     setFields(dialog);
 
     test(dialog.save).click();
 
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     Protocol protocol = repository.findByName(name).orElseThrow();
@@ -116,12 +116,12 @@ public class ProtocolDialogIT extends SpringBrowserlessTest {
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.protocols).select(0);
     test(view.edit).click();
-    ProtocolDialog dialog = find(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).single();
     setFields(dialog);
 
     test(dialog.save).click();
 
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     Protocol protocol = repository.findById(1L).orElseThrow();
@@ -149,7 +149,7 @@ public class ProtocolDialogIT extends SpringBrowserlessTest {
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.protocols).select(0);
     test(view.edit).click();
-    ProtocolDialog dialog = find(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).single();
     setFields(dialog);
 
     test(dialog.cancel).click();
@@ -176,13 +176,13 @@ public class ProtocolDialogIT extends SpringBrowserlessTest {
     ProtocolsView view = navigate(ProtocolsView.class);
     test(view.protocols).select(3);
     test(view.edit).click();
-    ProtocolDialog dialog = find(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).single();
     final String name = protocol.getName();
 
     test(dialog.delete).click();
-    test(find(ConfirmDialog.class).first()).confirm();
+    test(find(ConfirmDialog.class).single()).confirm();
 
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name},
         UI.getCurrent().getLocale()), test(notification).getText());
     assertFalse(repository.findById(4L).isPresent());

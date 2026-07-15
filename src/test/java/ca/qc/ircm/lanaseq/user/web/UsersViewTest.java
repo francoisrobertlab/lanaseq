@@ -316,7 +316,7 @@ public class UsersViewTest extends SpringBrowserlessTest {
     doubleClickItem(view.users, user);
 
     verify(service).get(user.getId());
-    UserDialog dialog = find(UserDialog.class).first();
+    UserDialog dialog = find(UserDialog.class).single();
     assertEquals(user.getId(), dialog.getUserId());
     assertTrue(dialog.isOpened());
   }
@@ -326,7 +326,7 @@ public class UsersViewTest extends SpringBrowserlessTest {
     User user = mock(User.class);
     when(service.get(anyLong())).thenReturn(Optional.of(user));
     view.edit(user);
-    UserDialog dialog = find(UserDialog.class).first();
+    UserDialog dialog = find(UserDialog.class).single();
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
   }
@@ -457,7 +457,7 @@ public class UsersViewTest extends SpringBrowserlessTest {
     clickButton(view.add);
 
     assertEquals(1, find(UserDialog.class).all().size());
-    UserDialog dialog = find(UserDialog.class).first();
+    UserDialog dialog = find(UserDialog.class).single();
     assertEquals(0, dialog.getUserId());
   }
 
@@ -478,14 +478,14 @@ public class UsersViewTest extends SpringBrowserlessTest {
     view.users.select(user);
     test(view.edit).click();
     assertEquals(1, find(UserDialog.class).all().size());
-    UserDialog dialog = find(UserDialog.class).first();
+    UserDialog dialog = find(UserDialog.class).single();
     assertEquals(user.getId(), dialog.getUserId());
   }
 
   @Test
   public void edit_EmptySelection() {
     view.edit();
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED),
         ((ErrorNotification) error).getText());
@@ -520,7 +520,7 @@ public class UsersViewTest extends SpringBrowserlessTest {
   @Test
   public void switchUser_EmptySelection() {
     view.switchUser();
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED),
         ((ErrorNotification) error).getText());

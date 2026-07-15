@@ -74,7 +74,7 @@ public class UserDialogTest extends SpringBrowserlessTest {
     UsersView view = navigate(UsersView.class);
     User user = repository.findById(2L).orElseThrow();
     doubleClickItem(view.users, user);
-    dialog = find(UserDialog.class).first();
+    dialog = find(UserDialog.class).single();
   }
 
   @Test
@@ -213,7 +213,7 @@ public class UserDialogTest extends SpringBrowserlessTest {
     dialog.save();
 
     verify(service).save(user, password);
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, email),
         test(notification).getText());
     assertFalse(dialog.isOpened());
@@ -233,7 +233,7 @@ public class UserDialogTest extends SpringBrowserlessTest {
     dialog.save();
 
     verify(service).save(user, null);
-    Notification notification = find(Notification.class).first();
+    Notification notification = find(Notification.class).single();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, email),
         test(notification).getText());
     assertFalse(dialog.isOpened());

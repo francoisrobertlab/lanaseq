@@ -37,7 +37,7 @@ public class AccessDeniedViewTest extends SpringBrowserlessTest {
   public void beforeTest() {
     UI.getCurrent().setLocale(locale);
     assertThrows(IllegalArgumentException.class, () -> navigate(UsersView.class));
-    view = find(AccessDeniedView.class).first();
+    view = find(AccessDeniedView.class).single();
   }
 
   @Test

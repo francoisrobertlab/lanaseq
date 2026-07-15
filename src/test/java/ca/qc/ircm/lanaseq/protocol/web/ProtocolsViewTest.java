@@ -278,7 +278,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
     test(view.protocols).doubleClickRow(0);
 
     verify(service).get(protocol.getId());
-    ProtocolDialog dialog = find(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).single();
     assertEquals(protocol.getId(), dialog.getProtocolId());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
@@ -291,7 +291,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
     test(view.protocols).doubleClickRow(0);
 
     verify(service).get(protocol.getId());
-    ProtocolDialog dialog = find(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).single();
     assertEquals(protocol.getId(), dialog.getProtocolId());
     dialog.fireDeletedEvent();
     verify(service, times(2)).all();
@@ -321,7 +321,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
     test(view.protocols).doubleClickRow(0);
 
     verify(service).get(protocol.getId());
-    ProtocolDialog dialog = find(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).single();
     assertEquals(protocol.getId(), dialog.getProtocolId());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
@@ -334,7 +334,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
     test(view.protocols).doubleClickRow(0);
 
     verify(service).get(protocol.getId());
-    ProtocolDialog dialog = find(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).single();
     assertEquals(protocol.getId(), dialog.getProtocolId());
     dialog.fireDeletedEvent();
     verify(service, times(2)).all();
@@ -355,7 +355,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
     test(view.protocols).clickRow(0, new MetaKeys().alt());
 
     verify(service).get(protocol.getId());
-    ProtocolHistoryDialog dialog = find(ProtocolHistoryDialog.class).first();
+    ProtocolHistoryDialog dialog = find(ProtocolHistoryDialog.class).single();
     assertEquals(protocol.getId(), dialog.getProtocolId());
   }
 
@@ -367,7 +367,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
     test(view.protocols).clickRow(0, new MetaKeys().alt());
 
     verify(service).get(protocol.getId());
-    ProtocolHistoryDialog dialog = find(ProtocolHistoryDialog.class).first();
+    ProtocolHistoryDialog dialog = find(ProtocolHistoryDialog.class).single();
     assertEquals(protocol.getId(), dialog.getProtocolId());
   }
 
@@ -442,7 +442,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
   public void add() {
     test(view.add).click();
 
-    ProtocolDialog dialog = find(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).single();
     assertEquals(0, dialog.getProtocolId());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
@@ -466,7 +466,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
     test(view.edit).click();
 
     verify(service).get(protocol.getId());
-    ProtocolDialog dialog = find(ProtocolDialog.class).first();
+    ProtocolDialog dialog = find(ProtocolDialog.class).single();
     assertEquals(protocol.getId(), dialog.getProtocolId());
   }
 
@@ -474,7 +474,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
   public void edit_NoSelection() {
     view.edit();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS_REQUIRED),
         ((ErrorNotification) error).getText());
@@ -511,7 +511,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
     test(view.history).click();
 
     verify(service).get(protocol.getId());
-    ProtocolHistoryDialog dialog = find(ProtocolHistoryDialog.class).first();
+    ProtocolHistoryDialog dialog = find(ProtocolHistoryDialog.class).single();
     assertEquals(protocol.getId(), dialog.getProtocolId());
   }
 
@@ -524,7 +524,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
     test(view.history).click();
 
     verify(service).get(protocol.getId());
-    ProtocolHistoryDialog dialog = find(ProtocolHistoryDialog.class).first();
+    ProtocolHistoryDialog dialog = find(ProtocolHistoryDialog.class).single();
     assertEquals(protocol.getId(), dialog.getProtocolId());
   }
 
@@ -533,7 +533,7 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
   public void history_NoSelection() {
     view.history();
 
-    Notification error = find(Notification.class).first();
+    Notification error = find(Notification.class).single();
     assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS_REQUIRED),
         ((ErrorNotification) error).getText());
