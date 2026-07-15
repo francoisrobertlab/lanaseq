@@ -33,7 +33,6 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
@@ -66,6 +65,7 @@ import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.test.utils.SearchUtils;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.browserless.SpringBrowserlessTest;
@@ -411,7 +411,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     clickButton(button);
     assertEquals(1, dialog.samples.getListDataView().getItemCount());
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
-    assertTrue(find(samples, 5L).isPresent());
+    assertTrue(SearchUtils.find(samples, 5L).isPresent());
     assertEquals("Histone FLAG", dialog.protocol.getValue());
     assertEquals("ChIP-seq", dialog.assay.getValue());
     assertEquals("", dialog.type.getValue());
@@ -568,8 +568,8 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertFalse(dialog.note.isReadOnly());
     assertEquals(2, dialog.samples.getListDataView().getItemCount());
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
-    assertTrue(find(samples, 4L).isPresent());
-    assertTrue(find(samples, 5L).isPresent());
+    assertTrue(SearchUtils.find(samples, 4L).isPresent());
+    assertTrue(SearchUtils.find(samples, 5L).isPresent());
     assertTrue(dialog.sampleRemove.isVisible());
     assertTrue(dialog.addSample.isVisible());
     assertTrue(dialog.save.isVisible());
@@ -614,8 +614,8 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertTrue(dialog.note.isReadOnly());
     assertEquals(2, dialog.samples.getListDataView().getItemCount());
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
-    assertTrue(find(samples, 6L).isPresent());
-    assertTrue(find(samples, 7L).isPresent());
+    assertTrue(SearchUtils.find(samples, 6L).isPresent());
+    assertTrue(SearchUtils.find(samples, 7L).isPresent());
     assertFalse(dialog.sampleRemove.isVisible());
     assertFalse(dialog.addSample.isVisible());
     assertFalse(dialog.save.isVisible());
@@ -654,7 +654,7 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
     assertTrue(dialog.note.isReadOnly());
     assertEquals(1, dialog.samples.getListDataView().getItemCount());
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
-    assertTrue(find(samples, 8L).isPresent());
+    assertTrue(SearchUtils.find(samples, 8L).isPresent());
     assertFalse(dialog.sampleRemove.isVisible());
     assertFalse(dialog.addSample.isVisible());
     assertFalse(dialog.save.isVisible());
@@ -777,9 +777,9 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
 
     assertEquals(3, dialog.samples.getListDataView().getItemCount());
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
-    assertTrue(find(samples, 4L).isPresent());
-    assertTrue(find(samples, 5L).isPresent());
-    assertTrue(find(samples, 9L).isPresent());
+    assertTrue(SearchUtils.find(samples, 4L).isPresent());
+    assertTrue(SearchUtils.find(samples, 5L).isPresent());
+    assertTrue(SearchUtils.find(samples, 9L).isPresent());
     assertEquals("Histone FLAG, BioID", dialog.protocol.getValue());
     assertEquals("ChIP-seq", dialog.assay.getValue());
     assertEquals("Input", dialog.type.getValue());
@@ -801,8 +801,8 @@ public class DatasetDialogTest extends SpringBrowserlessTest {
 
     assertEquals(2, dialog.samples.getListDataView().getItemCount());
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
-    assertTrue(find(samples, 4L).isPresent());
-    assertTrue(find(samples, 5L).isPresent());
+    assertTrue(SearchUtils.find(samples, 4L).isPresent());
+    assertTrue(SearchUtils.find(samples, 5L).isPresent());
   }
 
   @Test

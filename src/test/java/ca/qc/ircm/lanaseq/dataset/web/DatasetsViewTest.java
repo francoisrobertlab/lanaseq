@@ -13,7 +13,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
@@ -35,6 +34,7 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.test.utils.SearchUtils;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
@@ -297,11 +297,11 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(5, samplesCaptor.getValue().size());
-    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 5L).isPresent());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertEquals(0, dataset.getId());
@@ -344,11 +344,11 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(5, samplesCaptor.getValue().size());
-    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 5L).isPresent());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertEquals(0, dataset.getId());
@@ -384,8 +384,8 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
   @Test
   public void merge_DuplicatedSample() {
     when(sampleService.isMergable(any())).thenReturn(true);
-    Dataset dataset1 = find(datasets, 2L).orElseThrow();
-    Dataset dataset2 = find(datasets, 6L).orElseThrow();
+    Dataset dataset1 = SearchUtils.find(datasets, 2L).orElseThrow();
+    Dataset dataset2 = SearchUtils.find(datasets, 6L).orElseThrow();
     dataset1.getSamples().forEach(sample -> entityManager.detach(sample));
     dataset2.getSamples().forEach(sample -> entityManager.detach(sample));
     view.datasets.select(dataset1);
@@ -395,8 +395,8 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(2, samplesCaptor.getValue().size());
-    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 5L).isPresent());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertEquals(0, dataset.getId());
@@ -427,11 +427,11 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
         ((ErrorNotification) error).getText());
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(5, samplesCaptor.getValue().size());
-    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(SearchUtils.find(samplesCaptor.getValue(), 5L).isPresent());
     verify(service, never()).save(any());
   }
 

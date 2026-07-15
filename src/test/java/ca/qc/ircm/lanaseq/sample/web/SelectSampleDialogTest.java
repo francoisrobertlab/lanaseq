@@ -9,7 +9,6 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.id;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +33,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.test.utils.SearchUtils;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SelectedEvent;
 import com.vaadin.browserless.SpringBrowserlessTest;
@@ -188,11 +188,11 @@ public class SelectSampleDialogTest extends SpringBrowserlessTest {
     }
     assertEquals(4, dialog.samples.getListDataView().getItemCount());
     samples = dialog.samples.getListDataView().getItems().toList();
-    assertFalse(find(samples, 1L).isPresent());
-    assertTrue(find(samples, 4L).isPresent());
-    assertTrue(find(samples, 5L).isPresent());
-    assertTrue(find(samples, 10L).isPresent());
-    assertTrue(find(samples, 11L).isPresent());
+    assertFalse(SearchUtils.find(samples, 1L).isPresent());
+    assertTrue(SearchUtils.find(samples, 4L).isPresent());
+    assertTrue(SearchUtils.find(samples, 5L).isPresent());
+    assertTrue(SearchUtils.find(samples, 10L).isPresent());
+    assertTrue(SearchUtils.find(samples, 11L).isPresent());
   }
 
   @Test

@@ -3,7 +3,6 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -13,6 +12,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.test.utils.SearchUtils;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.browserless.SpringBrowserlessTest;
@@ -122,8 +122,8 @@ public class SamplesViewIT extends SpringBrowserlessTest {
     assertTrue(dataset.isEditable());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());
-    assertTrue(find(dataset.getSamples(), 5L).isPresent());
-    assertTrue(find(dataset.getSamples(), 10L).isPresent());
+    assertTrue(SearchUtils.find(dataset.getSamples(), 5L).isPresent());
+    assertTrue(SearchUtils.find(dataset.getSamples(), 10L).isPresent());
   }
 
   @Test

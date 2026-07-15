@@ -57,7 +57,7 @@
     <start-class>ca.qc.ircm.lanaseq.Main</start-class>
     <selenium.skip>false</selenium.skip>
     <!-- Dependencies -->
-    <vaadin.version>25.1.3</vaadin.version>
+    <vaadin.version>25.2.3</vaadin.version>
     <generate-property-names.version>2.2</generate-property-names.version>
     <openfeign.querydsl.version>6.12</openfeign.querydsl.version>
     <guava.version>33.3.1-jre</guava.version>
@@ -140,6 +140,11 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>browserless-test-junit6</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>browserless-test-spring</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

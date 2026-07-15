@@ -13,7 +13,6 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HISTORY;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS_REQUIRED;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,6 +31,7 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.test.utils.SearchUtils;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import com.vaadin.browserless.MetaKeys;
@@ -234,8 +234,8 @@ public class ProtocolsViewTest extends SpringBrowserlessTest {
     view.ownerFilter.setValue("jonh.smith@ircm.qc.ca");
     assertEquals(1, view.protocols.getListDataView().getItemCount());
     protocols = view.protocols.getListDataView().getItems().toList();
-    assertTrue(find(protocols, 1L).isPresent());
-    assertFalse(find(protocols, 2L).isPresent());
+    assertTrue(SearchUtils.find(protocols, 1L).isPresent());
+    assertFalse(SearchUtils.find(protocols, 2L).isPresent());
   }
 
   @Test
