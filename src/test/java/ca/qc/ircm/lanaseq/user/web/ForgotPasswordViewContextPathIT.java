@@ -104,8 +104,6 @@ public class ForgotPasswordViewContextPathIT extends SpringBrowserlessTest {
     String url = appConfiguration.getUrl(
         UseForgotPasswordView.VIEW_NAME + "/" + forgotPassword.getId() + "/"
             + forgotPassword.getConfirmNumber());
-    System.out.println(url);
-    System.out.println(body);
     assertTrue(body.contains(url), url + " not found in email " + body);
   }
 }

@@ -107,7 +107,6 @@ public class SigninIT extends AbstractSeleniumTestCase {
       }
     }
     view = waitUntil(SigninViewComponent.find());
-    System.out.println(view.errorMessageDescription().getText());
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + LOCKED,
             new Object[]{configuration.lockDuration().getSeconds() / 60}, currentLocale()),
         view.errorMessageDescription().getText());
