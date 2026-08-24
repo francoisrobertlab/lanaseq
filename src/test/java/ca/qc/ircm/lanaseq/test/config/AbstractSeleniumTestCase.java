@@ -44,6 +44,10 @@ public abstract class AbstractSeleniumTestCase {
     ChromeOptions options = new ChromeOptions();
     HashMap<String, Object> chromePrefs = new HashMap<>();
     chromePrefs.put("download.default_directory", downloadHome.toString());
+    chromePrefs.put("credentials_enable_service", false); // Disables the credentials service.
+    chromePrefs.put("profile.password_manager_enabled", false); // Turns off the password manager.
+    chromePrefs.put("profile.password_manager_leak_detection",
+        false); // Disables the password breach warning.
     options.setExperimentalOption("prefs", chromePrefs);
     if (headless) {
       options.addArguments("--headless");
