@@ -14,6 +14,7 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
 
 import ca.qc.ircm.lanaseq.test.config.SeleniumComponent;
+import edu.umd.cs.findbugs.annotations.CheckReturnValue;
 import java.util.function.Function;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -31,6 +32,19 @@ public class ViewLayoutComponent extends SeleniumComponent {
   public ViewLayoutComponent(WebElement viewLayout) {
     super(viewLayout);
     assert ID.equals(viewLayout.getAttribute("id"));
+  }
+
+  @CheckReturnValue
+  public Function<WebDriver, ViewLayoutComponent> openDrawer() {
+    WebElement drawerToggle = element.findElement(By.cssSelector("vaadin-drawer-toggle"));
+    if (!"true".equals(drawerToggle.getAttribute("aria-expanded"))) {
+      drawerToggle.click();
+    }
+    return d -> {
+      d.findElement(By.id(styleName(PROFILE, NAV)));
+      d.findElement(By.cssSelector("vaadin-drawer-toggle[aria-expanded='true']"));
+      return ViewLayoutComponent.find().apply(d);
+    };
   }
 
   public WebElement datasets() {
