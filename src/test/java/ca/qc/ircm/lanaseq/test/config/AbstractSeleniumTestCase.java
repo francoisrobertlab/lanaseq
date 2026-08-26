@@ -13,7 +13,9 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Wait;
@@ -117,5 +119,15 @@ public abstract class AbstractSeleniumTestCase {
   protected <T> T waitUntil(Function<? super WebDriver, T> isTrue, Duration waitTime) {
     Wait<WebDriver> wait = new WebDriverWait(driver, waitTime);
     return wait.until(isTrue);
+  }
+
+  protected void scrollIntoView(WebElement element) {
+    executeScript("arguments[0].scrollIntoView(true);", element);
+  }
+
+  protected @Nullable Object executeScript(String script, @Nullable Object... args) {
+    assert driver instanceof JavascriptExecutor;
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+    return js.executeScript(script, args);
   }
 }
