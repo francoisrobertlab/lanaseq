@@ -17,6 +17,7 @@ import ca.qc.ircm.lanaseq.test.config.SeleniumComponent;
 import edu.umd.cs.findbugs.annotations.CheckReturnValue;
 import java.util.function.Function;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -41,7 +42,11 @@ public class ViewLayoutComponent extends SeleniumComponent {
       drawerToggle.click();
     }
     return d -> {
-      d.findElement(By.id(styleName(PROFILE, NAV)));
+      WebElement profile = d.findElement(
+          By.cssSelector("vaadin-side-nav-item[id='" + styleName(PROFILE, NAV) + "']"));
+      if (!profile.isDisplayed()) {
+        throw new NoSuchElementException("profile side nav item is not displayed yet");
+      }
       d.findElement(By.cssSelector("vaadin-drawer-toggle[aria-expanded='true']"));
       return ViewLayoutComponent.find().apply(d);
     };
