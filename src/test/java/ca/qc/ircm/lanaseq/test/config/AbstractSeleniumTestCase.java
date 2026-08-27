@@ -1,6 +1,10 @@
 package ca.qc.ircm.lanaseq.test.config;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.dataset.web.PublicDatasetFiles;
+import ca.qc.ircm.lanaseq.sample.web.PublicSampleFiles;
+import ca.qc.ircm.lanaseq.web.SigninViewComponent;
+import ca.qc.ircm.lanaseq.web.ViewLayoutComponent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -14,6 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -97,6 +102,17 @@ public abstract class AbstractSeleniumTestCase {
       driver.navigate().refresh();
     } else {
       driver.get(url);
+      if (!url.contains(PublicDatasetFiles.REST_MAPPING) && !url.contains(
+          PublicSampleFiles.REST_MAPPING)) {
+        // The first time the page is loaded, Vaadin may be initiating for a long time.
+        waitUntil(d -> {
+          try {
+            return ViewLayoutComponent.find().apply(d);
+          } catch (NoSuchElementException e) {
+            return SigninViewComponent.find().apply(d);
+          }
+        }, Duration.ofSeconds(30));
+      }
     }
   }
 
