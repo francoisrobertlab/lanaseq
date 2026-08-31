@@ -59,7 +59,7 @@
     <!-- Dependencies -->
     <vaadin.version>25.2.6</vaadin.version>
     <generate-property-names.version>2.2</generate-property-names.version>
-    <openfeign.querydsl.version>6.12</openfeign.querydsl.version>
+    <openfeign.querydsl.version>7.6</openfeign.querydsl.version>
     <guava.version>33.7.1-jre</guava.version>
     <greenmail.version>2.1.13</greenmail.version>
     <commons-io.version>2.21.0</commons-io.version>
