@@ -131,9 +131,9 @@ public class ForgotPasswordService {
     email.addTo(emailAddress);
     Context context = new Context(locale);
     context.setVariable("url", url);
-    String htmlTemplateLocation = "/user/forgotpassword.html";
+    String htmlTemplateLocation = "user/forgotpassword.html";
     String htmlEmail = emailTemplateEngine.process(htmlTemplateLocation, context);
-    String textTemplateLocation = "/user/forgotpassword.txt";
+    String textTemplateLocation = "user/forgotpassword.txt";
     String textEmail = emailTemplateEngine.process(textTemplateLocation, context);
     email.setText(textEmail, htmlEmail);
 

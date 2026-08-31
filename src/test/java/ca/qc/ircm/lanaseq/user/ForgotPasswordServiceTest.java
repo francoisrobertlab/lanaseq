@@ -17,10 +17,8 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.mail.MailService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -165,22 +163,24 @@ public class ForgotPasswordServiceTest {
     verify(email).addTo(user.getEmail());
     String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + "application.name", null,
         locale);
-    ResourceBundle mailResources = ResourceBundle.getBundle("user.forgotpassword", locale);
     verify(email).setSubject(
         messageSource.getMessage(MESSAGE_PREFIX + "subject", new Object[]{applicationName},
             locale));
     verify(email).setText(stringCaptor.capture(), stringCaptor.capture());
     String textContent = stringCaptor.getAllValues().get(0);
     String htmlContent = stringCaptor.getAllValues().get(1);
-    assertTrue(textContent.contains(MessageFormat.format(mailResources.getString("header"), "")));
-    assertTrue(htmlContent.contains(
-        StringUtils.escapeXml(MessageFormat.format(mailResources.getString("header"), ""))));
-    assertTrue(textContent.contains(MessageFormat.format(mailResources.getString("message"), "")));
-    assertTrue(htmlContent.contains(
-        StringUtils.escapeXml(MessageFormat.format(mailResources.getString("message"), ""))));
-    assertTrue(textContent.contains(MessageFormat.format(mailResources.getString("footer"), "")));
-    assertTrue(htmlContent.contains(
-        StringUtils.escapeXml(MessageFormat.format(mailResources.getString("footer"), ""))));
+    assertTrue(
+        textContent.contains(messageSource.getMessage("user.forgotpassword.header", null, locale)));
+    assertTrue(htmlContent.contains(StringUtils.escapeXml(
+        messageSource.getMessage("user.forgotpassword.header", null, locale))));
+    assertTrue(textContent.contains(
+        messageSource.getMessage("user.forgotpassword.message", null, locale)));
+    assertTrue(htmlContent.contains(StringUtils.escapeXml(
+        messageSource.getMessage("user.forgotpassword.message", null, locale))));
+    assertTrue(
+        textContent.contains(messageSource.getMessage("user.forgotpassword.footer", null, locale)));
+    assertTrue(htmlContent.contains(StringUtils.escapeXml(
+        messageSource.getMessage("user.forgotpassword.footer", null, locale))));
     String url = appConfiguration.getUrl(forgotPasswordUrl);
     assertTrue(textContent.contains(url));
     assertTrue(htmlContent.contains(url));

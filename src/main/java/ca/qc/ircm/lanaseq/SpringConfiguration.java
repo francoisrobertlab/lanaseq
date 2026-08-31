@@ -7,9 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.messageresolver.StandardMessageResolver;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 /**
  * Configuration for Spring.
@@ -32,18 +29,5 @@ public class SpringConfiguration {
     messageSource.setDefaultEncoding("UTF-8");
     messageSource.setAlwaysUseMessageFormat(true);
     return messageSource;
-  }
-
-  /**
-   * Creates Thymeleaf's template engine.
-   *
-   * @return Thymeleaf's template engine
-   */
-  @Bean
-  public TemplateEngine emailTemplateEngine() {
-    TemplateEngine templateEngine = new TemplateEngine();
-    templateEngine.setTemplateResolver(new ClassLoaderTemplateResolver());
-    templateEngine.setMessageResolver(new StandardMessageResolver());
-    return templateEngine;
   }
 }
