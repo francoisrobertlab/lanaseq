@@ -21,7 +21,7 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -355,13 +355,12 @@ public class ViewLayoutTest extends SpringBrowserlessTest {
   public void tabs_SelectSignout() {
     // Invalidated session.
     test(view.sideNav).clickItem(view.signout.getLabel());
-    assertThrows(IllegalStateException.class,
-        () -> VaadinServletRequest.getCurrent().getWrappedSession(false).getAttributeNames());
+    assertNull(VaadinServletRequest.getCurrent().getWrappedSession(false));
 
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
-        i -> i.getInvocation().getExpression().contains("window.open($0, $1)") && !i.getInvocation()
-            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0)
-            .equals("/" + SigninView.VIEW_NAME)));
+        i -> i.getInvocation().getExpression().contains("vaadin-redirect-pending")
+            && !i.getInvocation().getParameters().isEmpty() && i.getInvocation().getParameters()
+            .getFirst().equals("/" + SigninView.VIEW_NAME)));
   }
 
   @Test

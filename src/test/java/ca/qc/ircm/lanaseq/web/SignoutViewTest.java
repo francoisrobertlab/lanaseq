@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.web;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
@@ -39,13 +39,12 @@ public class SignoutViewTest extends SpringBrowserlessTest {
   @Test
   public void beforeEnter() {
     // Invalidated session.
-    assertThrows(IllegalStateException.class, () -> view.beforeEnter(event));
-    assertThrows(IllegalStateException.class,
-        () -> VaadinServletRequest.getCurrent().getWrappedSession(false).getAttributeNames());
+    view.beforeEnter(event);
+    assertNull(VaadinServletRequest.getCurrent().getWrappedSession(false));
 
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
-        i -> i.getInvocation().getExpression().contains("window.open($0, $1)") && !i.getInvocation()
-            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0)
-            .equals("/" + SigninView.VIEW_NAME)));
+        i -> i.getInvocation().getExpression().contains("vaadin-redirect-pending")
+            && !i.getInvocation().getParameters().isEmpty() && i.getInvocation().getParameters()
+            .getFirst().equals("/" + SigninView.VIEW_NAME)));
   }
 }
