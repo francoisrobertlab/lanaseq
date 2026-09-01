@@ -25,7 +25,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.id;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.PUBLIC_FILE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.editItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -692,8 +691,9 @@ public class DatasetFilesDialogTest extends SpringBrowserlessTest {
   @Test
   public void samples_ViewFiles() {
     Dataset dataset = repository.findById(2L).orElseThrow();
+    dialog.samples.setItems(dataset.getSamples());
     Sample sample = dataset.getSamples().get(0);
-    doubleClickItem(dialog.samples, sample);
+    test(dialog.samples).doubleClickRow(0);
     SampleFilesDialog sampleFilesDialog = find(SampleFilesDialog.class).single();
     assertEquals(sample.getId(), sampleFilesDialog.getSampleId());
   }
@@ -701,8 +701,9 @@ public class DatasetFilesDialogTest extends SpringBrowserlessTest {
   @Test
   public void samples_ViewFiles_RefreshOnClose() {
     Dataset dataset = repository.findById(2L).orElseThrow();
+    dialog.samples.setItems(dataset.getSamples());
     Sample sample = dataset.getSamples().get(0);
-    doubleClickItem(dialog.samples, sample);
+    test(dialog.samples).doubleClickRow(0);
     SampleFilesDialog sampleFilesDialog = find(SampleFilesDialog.class).single();
     assertEquals(sample.getId(), sampleFilesDialog.getSampleId());
     @SuppressWarnings("unchecked") ListDataProvider<Sample> sampleDataProvider = mock(

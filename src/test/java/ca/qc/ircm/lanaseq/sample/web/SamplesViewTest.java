@@ -21,7 +21,6 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -35,6 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,6 +58,7 @@ import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.provider.SortOrder;
@@ -365,10 +366,11 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
   @Test
   public void view() {
+    view.samples.setItems(samples);
     Sample sample = samples.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(sample));
 
-    doubleClickItem(view.samples, sample);
+    test(view.samples).doubleClickRow(8);
 
     verify(service).get(sample.getId());
     SampleDialog dialog = find(SampleDialog.class).single();
@@ -378,11 +380,13 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
   @Test
   public void view_RefreshOnSave() {
+    view.samples.setItems(samples);
+    DataProvider<Sample, ?> dataProvider = spy(view.samples.getDataProvider());
+    view.samples.setDataProvider(dataProvider);
     Sample sample = samples.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(sample));
-    view.samples.setItems(sampleDataProvider);
-
-    doubleClickItem(view.samples, sample);
+    
+    test(view.samples).doubleClickRow(8);
 
     SampleDialog dialog = find(SampleDialog.class).single();
     dialog.fireSavedEvent();
@@ -391,11 +395,13 @@ public class SamplesViewTest extends SpringBrowserlessTest {
 
   @Test
   public void view_RefreshOnDelete() {
+    view.samples.setItems(samples);
+    DataProvider<Sample, ?> dataProvider = spy(view.samples.getDataProvider());
+    view.samples.setDataProvider(dataProvider);
     Sample sample = samples.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(sample));
-    view.samples.setItems(sampleDataProvider);
 
-    doubleClickItem(view.samples, sample);
+    test(view.samples).doubleClickRow(8);
 
     SampleDialog dialog = find(SampleDialog.class).single();
     dialog.fireDeletedEvent();
@@ -406,6 +412,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
   public void viewFiles_Control() {
     view.samples.setItems(samples);
     Sample sample = view.samples.getListDataView().getItems().findFirst().orElseThrow();
+
     test(view.samples).clickRow(0, new MetaKeys().ctrl());
 
     SampleFilesDialog dialog = find(SampleFilesDialog.class).single();
@@ -417,6 +424,7 @@ public class SamplesViewTest extends SpringBrowserlessTest {
   public void addFiles_Meta() {
     view.samples.setItems(samples);
     Sample sample = view.samples.getListDataView().getItems().findFirst().orElseThrow();
+
     test(view.samples).clickRow(0, new MetaKeys().meta());
 
     SampleFilesDialog dialog = find(SampleFilesDialog.class).single();

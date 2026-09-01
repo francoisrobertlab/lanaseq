@@ -3,7 +3,6 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.ID;
@@ -72,8 +71,8 @@ public class UserDialogTest extends SpringBrowserlessTest {
         i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     UI.getCurrent().setLocale(locale);
     UsersView view = navigate(UsersView.class);
-    User user = repository.findById(2L).orElseThrow();
-    doubleClickItem(view.users, user);
+    view.users.setItems(repository.findAll());
+    test(view.users).doubleClickRow(1);
     dialog = find(UserDialog.class).single();
   }
 

@@ -7,7 +7,6 @@ import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
@@ -310,10 +309,11 @@ public class UsersViewTest extends SpringBrowserlessTest {
 
   @Test
   public void view() {
+    view.users.setItems(users);
     User user = users.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(user));
 
-    doubleClickItem(view.users, user);
+    test(view.users).doubleClickRow(0);
 
     verify(service).get(user.getId());
     UserDialog dialog = find(UserDialog.class).single();

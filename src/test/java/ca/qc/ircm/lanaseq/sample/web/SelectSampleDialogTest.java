@@ -9,7 +9,6 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.id;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -265,11 +264,12 @@ public class SelectSampleDialogTest extends SpringBrowserlessTest {
 
   @Test
   public void select() {
+    dialog.samples.setItems(samples);
     dialog.addSelectedListener(listener);
 
-    Sample sample = samples.get(0);
-    doubleClickItem(dialog.samples, sample);
+    test(dialog.samples).doubleClickRow(0);
 
+    Sample sample = samples.get(0);
     verify(listener).onComponentEvent(selectedEventCaptor.capture());
     assertEquals(sample, selectedEventCaptor.getValue().getSelection());
     assertFalse(dialog.isOpened());

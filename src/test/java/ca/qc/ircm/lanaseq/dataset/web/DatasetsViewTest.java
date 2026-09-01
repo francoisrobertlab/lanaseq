@@ -13,8 +13,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,6 +34,7 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.utils.SearchUtils;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
+import com.vaadin.browserless.MetaKeys;
 import com.vaadin.browserless.SpringBrowserlessTest;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -171,10 +170,11 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
   @Test
   public void datasets_View() {
+    view.datasets.setItems(datasets);
     Dataset dataset = datasets.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(dataset));
 
-    doubleClickItem(view.datasets, dataset);
+    test(view.datasets).doubleClickRow(0);
 
     DatasetDialog dialog = find(DatasetDialog.class).single();
     assertEquals(dataset.getId(), dialog.getDatasetId());
@@ -183,10 +183,11 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
   @Test
   public void datasets_View_RefreshOnSave() {
+    view.datasets.setItems(datasets);
     Dataset dataset = datasets.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(dataset));
 
-    doubleClickItem(view.datasets, dataset);
+    test(view.datasets).doubleClickRow(0);
 
     DatasetDialog dialog = find(DatasetDialog.class).single();
     view.datasets.setItems(datasetDataProvider);
@@ -196,10 +197,11 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
   @Test
   public void datasets_View_RefreshOnDelete() {
+    view.datasets.setItems(datasets);
     Dataset dataset = datasets.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(dataset));
 
-    doubleClickItem(view.datasets, dataset);
+    test(view.datasets).doubleClickRow(0);
 
     DatasetDialog dialog = find(DatasetDialog.class).single();
     view.datasets.setItems(datasetDataProvider);
@@ -209,10 +211,11 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
   @Test
   public void datasets_AddFiles_Control() {
+    view.datasets.setItems(datasets);
     Dataset dataset = datasets.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(dataset));
 
-    clickItem(view.datasets, dataset, view.datasets.name, true, false, false, false);
+    test(view.datasets).clickRow(0, new MetaKeys().ctrl());
 
     DatasetFilesDialog dialog = find(DatasetFilesDialog.class).single();
     assertEquals(dataset.getId(), dialog.getDatasetId());
@@ -220,10 +223,11 @@ public class DatasetsViewTest extends SpringBrowserlessTest {
 
   @Test
   public void datasets_AddFiles_Meta() {
+    view.datasets.setItems(datasets);
     Dataset dataset = datasets.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(dataset));
 
-    clickItem(view.datasets, dataset, view.datasets.name, false, false, false, true);
+    test(view.datasets).clickRow(0, new MetaKeys().meta());
 
     DatasetFilesDialog dialog = find(DatasetFilesDialog.class).single();
     assertEquals(dataset.getId(), dialog.getDatasetId());
