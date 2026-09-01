@@ -1,4 +1,2 @@
-@NonNullApi
+@org.jspecify.annotations.NullMarked
 package ca.qc.ircm.lanaseq.analysis;
-
-import org.springframework.lang.NonNullApi;

@@ -16,7 +16,7 @@ import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import java.io.Serial;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Passwords form.

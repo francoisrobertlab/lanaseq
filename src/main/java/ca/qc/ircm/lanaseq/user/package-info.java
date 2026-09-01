@@ -1,4 +1,2 @@
-@NonNullApi
+@org.jspecify.annotations.NullMarked
 package ca.qc.ircm.lanaseq.user;
-
-import org.springframework.lang.NonNullApi;

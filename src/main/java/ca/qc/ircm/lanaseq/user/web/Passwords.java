@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.user.web;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Stores password and a confirmation that should match the password.

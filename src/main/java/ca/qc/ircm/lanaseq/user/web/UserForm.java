@@ -31,10 +31,10 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
 import java.io.Serial;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.lang.Nullable;
 
 /**
  * User form.
@@ -129,8 +129,7 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
     return valid;
   }
 
-  @Nullable
-  String getPassword() {
+  @Nullable String getPassword() {
     return passwords.getPassword();
   }
 
