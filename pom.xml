@@ -52,7 +52,6 @@
   </issueManagement>
 
   <properties>
-    <resource.delimiter>$[*]</resource.delimiter>
     <java.version>21</java.version>
     <start-class>ca.qc.ircm.lanaseq.Main</start-class>
     <selenium.skip>false</selenium.skip>
@@ -296,15 +295,6 @@
     </testResources>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <configuration>
-            <delimiters>
-              <delimiter>${resource.delimiter}</delimiter>
-            </delimiters>
-            <useDefaultDelimiters>false</useDefaultDelimiters>
-          </configuration>
-        </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
           <configuration>
