@@ -18,7 +18,7 @@
   <url>https://github.com/francoisrobertlab/lanaseq</url>
   <organization>
     <name>Institut de recherches cliniques de Montreal (IRCM)</name>
-    <url>http://www.ircm.qc.ca</url>
+    <url>https://www.ircm.qc.ca</url>
   </organization>
   <licenses>
     <license>
@@ -33,7 +33,7 @@
       <name>Christian Poitras</name>
       <email>christian.poitras@ircm.qc.ca</email>
       <organization>IRCM</organization>
-      <organizationUrl>http://www.ircm.qc.ca</organizationUrl>
+      <organizationUrl>https://www.ircm.qc.ca</organizationUrl>
       <timezone>-5</timezone>
       <roles>
         <role>Analyste en informatique</role>
