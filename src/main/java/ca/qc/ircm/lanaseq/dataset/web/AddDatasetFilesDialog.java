@@ -190,7 +190,8 @@ public class AddDatasetFilesDialog extends Dialog implements LocaleChangeObserve
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()));
       getUI().ifPresent(ui -> {
         WebBrowser browser = ui.getSession().getBrowser();
-        boolean unix = browser.isMacOSX() || browser.isLinux();
+        ua_parser.Client client = new ua_parser.Parser().parse(browser.getUserAgent());
+        boolean unix = !client.os.family.toUpperCase().contains("WINDOWS");
         if (dataset != null) {
           message.setText(getTranslation(MESSAGE_PREFIX + MESSAGE,
               configuration.getUpload().label(dataset, unix)));

@@ -194,7 +194,8 @@ public class AddSampleFilesDialog extends Dialog implements LocaleChangeObserver
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, sample.getName()));
       getUI().ifPresent(ui -> {
         WebBrowser browser = ui.getSession().getBrowser();
-        boolean unix = browser.isMacOSX() || browser.isLinux();
+        ua_parser.Client client = new ua_parser.Parser().parse(browser.getUserAgent());
+        boolean unix = !client.os.family.toUpperCase().contains("WINDOWS");
         if (sample != null) {
           message.setText(getTranslation(MESSAGE_PREFIX + MESSAGE,
               configuration.getUpload().label(sample, unix)));

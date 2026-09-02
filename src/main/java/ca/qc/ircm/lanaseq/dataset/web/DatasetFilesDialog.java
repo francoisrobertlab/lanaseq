@@ -313,7 +313,8 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver {
   private void updateMessage() {
     getUI().ifPresent(ui -> {
       WebBrowser browser = ui.getSession().getBrowser();
-      boolean unix = browser.isMacOSX() || browser.isLinux();
+      ua_parser.Client client = new ua_parser.Parser().parse(browser.getUserAgent());
+      boolean unix = !client.os.family.toUpperCase().contains("WINDOWS");
       if (dataset != null) {
         List<String> labels = service.folderLabels(dataset, unix);
         message.setText(getTranslation(MESSAGE_PREFIX + MESSAGE, labels.size()));

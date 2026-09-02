@@ -127,7 +127,8 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
       analysisService.copyDatasetsResources(datasets, filenamePatterns.getSelectedItems());
       boolean unix = getUI().map(ui -> {
         WebBrowser browser = ui.getSession().getBrowser();
-        return browser.isMacOSX() || browser.isLinux();
+        ua_parser.Client client = new ua_parser.Parser().parse(browser.getUserAgent());
+        return !client.os.family.toUpperCase().contains("WINDOWS");
       }).orElse(false);
       String folder = configuration.getAnalysis().label(datasets, unix);
       confirm.setText(getTranslation(MESSAGE_PREFIX + property(CONFIRM, "message"), folder));
