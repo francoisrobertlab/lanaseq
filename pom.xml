@@ -13,7 +13,7 @@
   <name>LANAseq</name>
   <version>1.11-SNAPSHOT</version>
   <inceptionYear>2018</inceptionYear>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   <description>Location Analysis Net Application for High-throughput sequencing</description>
   <url>https://github.com/francoisrobertlab/lanaseq</url>
   <organization>
